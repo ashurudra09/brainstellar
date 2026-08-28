@@ -1235,6 +1235,18 @@ input[type='text'] {
   text-align: center;
 }
 
+.pt-col-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.pt-col-sortable:hover {
+  color: inherit;
+  opacity: 1;
+  text-decoration: underline;
+}
+
 .pt-status-toggle,
 .pt-star-toggle {
   display: inline-flex;

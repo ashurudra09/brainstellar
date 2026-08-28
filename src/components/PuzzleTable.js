@@ -19,15 +19,28 @@ const DIFFICULTY_FILTERS = [
   { key: 'deadly', label: 'Deadly' },
 ];
 
+const DIFFICULTY_ORDER = { easy: 0, medium: 1, hard: 2, deadly: 3 };
+
 const PuzzleTable = ({ puzzles, onVisibleChange }) => {
   const { loaded, isSolved, isStarred, getNotes, toggleSolved, toggleStarred } = useContext(ProgressContext);
   const [statusFilter, setStatusFilter] = useState('all');
   const [difficultyFilter, setDifficultyFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [sortKey, setSortKey] = useState(null);
+  const [sortDir, setSortDir] = useState('asc');
+
+  const toggleSort = key => {
+    if (sortKey !== key) {
+      setSortKey(key);
+      setSortDir('asc');
+    } else {
+      setSortDir(dir => (dir === 'asc' ? 'desc' : 'asc'));
+    }
+  };
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return puzzles.filter(p => {
+    const filtered = puzzles.filter(p => {
       if (difficultyFilter !== 'all' && p.difficulty !== difficultyFilter) return false;
       if (q && !p.title.toLowerCase().includes(q) && !p.category.toLowerCase().includes(q)) return false;
 
@@ -37,7 +50,17 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
       if (statusFilter === 'notes') return getNotes(p.puzzleId).trim().length > 0;
       return true;
     });
-  }, [puzzles, statusFilter, difficultyFilter, search, isSolved, isStarred, getNotes]);
+
+    if (!sortKey) return filtered;
+
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortKey === 'difficulty') return DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty];
+      if (sortKey === 'category') return a.category.localeCompare(b.category);
+      return 0;
+    });
+    if (sortDir === 'desc') sorted.reverse();
+    return sorted;
+  }, [puzzles, statusFilter, difficultyFilter, search, sortKey, sortDir, isSolved, isStarred, getNotes]);
 
   useEffect(() => {
     if (onVisibleChange) onVisibleChange(visible);
@@ -85,8 +108,34 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
             <th className="pt-col-status">Status</th>
             <th className="pt-col-star">Star</th>
             <th className="pt-col-puzzle">Puzzle</th>
-            <th className="pt-col-difficulty">Difficulty</th>
-            <th className="pt-col-category">Category</th>
+            <th
+              className="pt-col-difficulty pt-col-sortable"
+              role="button"
+              tabIndex={0}
+              onClick={() => toggleSort('difficulty')}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleSort('difficulty');
+                }
+              }}
+            >
+              Difficulty{sortKey === 'difficulty' ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
+            </th>
+            <th
+              className="pt-col-category pt-col-sortable"
+              role="button"
+              tabIndex={0}
+              onClick={() => toggleSort('category')}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleSort('category');
+                }
+              }}
+            >
+              Category{sortKey === 'category' ? (sortDir === 'asc' ? ' ▲' : ' ▼') : ''}
+            </th>
             <th className="pt-col-notes">Notes</th>
           </tr>
         </thead>
