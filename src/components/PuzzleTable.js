@@ -29,7 +29,7 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
     const q = search.trim().toLowerCase();
     return puzzles.filter(p => {
       if (difficultyFilter !== 'all' && p.difficulty !== difficultyFilter) return false;
-      if (q && !p.title.toLowerCase().includes(q)) return false;
+      if (q && !p.title.toLowerCase().includes(q) && !p.category.toLowerCase().includes(q)) return false;
 
       if (statusFilter === 'unsolved') return !isSolved(p.puzzleId);
       if (statusFilter === 'solved') return isSolved(p.puzzleId);
@@ -49,7 +49,7 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
         <input
           type="text"
           className="puzzle-search"
-          placeholder="Search puzzles..."
+          placeholder="Search by title or category..."
           value={search}
           onChange={e => setSearch(e.target.value)}
         />
