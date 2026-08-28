@@ -4,6 +4,11 @@
  * See: https://www.gatsbyjs.com/docs/reference/config-files/gatsby-node/
  */
 
+const fs = require('fs');
+const path = require('path');
+
+const PROGRESS_FILE = path.join(__dirname, 'progress.json');
+
 /**
  * @type {import('gatsby').GatsbyNode['createPages']}
  */
@@ -133,14 +138,46 @@ exports.createPages = async function ({ actions, graphql }) {
     });
   });
 
-  // extra homepage
-  // Difficulty page
+  // extra homepage (album grid + full puzzle list), kept separate from the
+  // practice dashboard that now lives at `/`
   actions.createPage({
     path: `puzzles`,
-    component: require.resolve(`./src/pages/index.js`),
+    component: require.resolve(`./src/templates/albums.js`),
   });
 };
 
+
+// Dev-only endpoints backing the practice tracker's progress.json file.
+// Reads/writes progress.json at the repo root so solved/starred/notes state
+// survives across `gatsby develop` restarts and can be committed to git.
+// Not available under `gatsby build`/`gatsby serve` — ProgressContext falls
+// back to localStorage there.
+exports.onCreateDevServer = ({ app }) => {
+  app.get('/__progress', (req, res) => {
+    try {
+      const raw = fs.readFileSync(PROGRESS_FILE, 'utf8');
+      res.json(JSON.parse(raw));
+    } catch (e) {
+      res.json({ version: 1, puzzles: {} });
+    }
+  });
+
+  app.post('/__progress', (req, res) => {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body);
+        const tmpFile = `${PROGRESS_FILE}.tmp`;
+        fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2));
+        fs.renameSync(tmpFile, PROGRESS_FILE);
+        res.json({ ok: true });
+      } catch (e) {
+        res.status(400).json({ ok: false, error: e.message });
+      }
+    });
+  });
+};
 
 exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({

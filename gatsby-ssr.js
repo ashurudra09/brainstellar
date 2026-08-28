@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ThemeProvider } from './src/contexts/ThemeContext';
+import { ProgressProvider } from './src/contexts/ProgressContext';
 
 
 /**
@@ -19,7 +20,9 @@ export const onRenderBody = ({ setHtmlAttributes }) => {
 export const wrapRootElement = ({ element }) => {
   return (
     <ThemeProvider>
-      {element}
+      <ProgressProvider>
+        {element}
+      </ProgressProvider>
     </ThemeProvider>
   );
 };
