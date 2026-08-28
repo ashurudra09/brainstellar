@@ -4,6 +4,7 @@ import { graphql, Link } from 'gatsby'
 import Layout from '../components/layout'
 import { Helmet } from "react-helmet";
 import Button from '../components/Button';
+import { PuzzleStatusToggles, PuzzleNotes } from '../components/PuzzleTracker';
 import FacebookComments from '../components/FacebookComments';
 import Seo from '../components/seo';
 import he from 'he';
@@ -127,6 +128,7 @@ export default function Puzzle({ data, pageContext }) {
           </tbody>
         </table>
 
+        <PuzzleStatusToggles puzzleId={puzzle.puzzleId} />
 
         {/* <MDXRenderer>{puzzleNode.body}</MDXRenderer> */}
         {/* <div dangerouslySetInnerHTML={{ __html: rawMarkdownBody }} /> */}
@@ -165,6 +167,8 @@ export default function Puzzle({ data, pageContext }) {
             </>
           } />
         }
+
+        <PuzzleNotes puzzleId={puzzle.puzzleId} />
 
         <FacebookComments puzzleId={puzzle.puzzleId} />
 
