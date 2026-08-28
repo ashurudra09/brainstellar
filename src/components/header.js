@@ -11,7 +11,7 @@ const Header = ({ siteTitle }) => (
     <div className="nav" tabIndex="-1" >
       <div className="container-nav">
         {/* <img src="favicon.gif" alt="BrainStellar" align="center" /> */}
-        <a href="/puzzles" className="nav-links pagename">
+        <Link to="/" className="nav-links pagename">
           <img
             src="/favicon.gif"
             style={{
@@ -29,7 +29,7 @@ const Header = ({ siteTitle }) => (
             alt="BRAINSTELLAR"
             style={{ position: 'relative', top: '-7px', height: '20px', width: '211px' }}
           />
-        </a>
+        </Link>
 
         <Link to="/puzzles/easy" className="nav-links">Easy</Link>
         <Link to="/puzzles/medium" className="nav-links">Medium</Link>

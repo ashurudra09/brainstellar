@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState, useCallback, useMemo } from "react"
-import { graphql } from "gatsby"
+import { graphql, Link } from "gatsby"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
@@ -30,6 +30,9 @@ const IndexPage = ({ data }) => {
             <div className="bord2">
               <div className="container">
                 <h2 style={{ textAlign: 'center' }}>Your Progress</h2>
+                <div style={{ textAlign: 'center' }}>
+                  <Link to="/puzzles" className="btn btn-sm link-white smooth">All Puzzles</Link>
+                </div>
                 <ProgressStats puzzles={puzzles} />
                 <RandomPuzzleButton puzzles={visiblePuzzles} />
               </div>
