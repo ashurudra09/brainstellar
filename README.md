@@ -26,6 +26,24 @@ for Node, runs `npm install` on first launch, starts `gatsby develop`, and
 opens the site at `http://localhost:8000`. Keep the window open while you use
 the site; closing it stops the server.
 
+## Adding a puzzle
+
+In a Claude Code session opened in this repo, type `/add-puzzle` — either
+after discussing a puzzle in the conversation, or followed directly by the
+puzzle text, e.g.:
+
+```
+/add-puzzle A fair six-sided die is rolled once. What's the probability
+of rolling an even number? Answer: 1/2, because 3 of 6 faces are even.
+```
+
+It classifies difficulty and category, assigns the next `puzzleId`, and
+writes both `src/data/puzzles/{id}.md` and a matching entry in
+`puzzles.yaml` — nothing is committed automatically, so review the new
+file(s) before committing. See
+[.claude/skills/add-puzzle/SKILL.md](.claude/skills/add-puzzle/SKILL.md)
+for the full format it follows.
+
 ## Develop
 
 In order to run this locally, install Use the Gatsby CLI ([install instructions](https://www.gatsbyjs.com/docs/tutorial/getting-started/part-0/#gatsby-cli)).
