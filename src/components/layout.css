@@ -918,3 +918,397 @@ input[type='text'] {
   text-decoration: underline;
   /* change this to your preferred color */
 }
+/* ==========================================================================
+   Practice tracker additions (progress dashboard, puzzle table, per-puzzle
+   solved/star/notes controls). Reuses the site's existing --color-* tokens
+   so light/dark mode need no extra work.
+   ========================================================================== */
+
+:root {
+  --difficulty-easy: #5fab54;
+  --difficulty-medium: #547bd3;
+  --difficulty-hard: #d35454;
+  --difficulty-deadly: #8a54d3;
+}
+
+/* Missing "deadly" variants of the site's existing difficulty link/button
+   families (easy/medium/hard already have these; deadly puzzles existed
+   without one, rendering as plain grey). */
+.link-deadly {
+  padding: 5px 10px 5px;
+  margin: .6em .6em .6em 0;
+  background: var(--difficulty-deadly);
+  color: var(--color-background);
+}
+
+.btn-deadly {
+  background: var(--difficulty-deadly);
+  margin: 0.2em;
+}
+
+.btn-deadly:hover {
+  background: #7440b8;
+}
+
+.btn-deadly:active,
+.btn-deadly:focus {
+  background: #6636a3;
+}
+
+@media(min-width:600px) {
+  .link-deadly {
+    padding: 10px 15px 11px;
+    margin: .2em .3em .2em 0;
+    background: var(--color-background);
+    color: var(--color-text);
+  }
+}
+
+/* --- Progress stats (dashboard) --- */
+
+.progress-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 10px 0 20px;
+}
+
+.progress-donut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.progress-donut-track {
+  fill: none;
+  stroke: var(--color-background-off);
+  stroke-width: 10;
+}
+
+.progress-donut-fill {
+  fill: none;
+  stroke: var(--difficulty-easy);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset .4s ease;
+}
+
+.progress-donut-number {
+  fill: var(--color-text);
+  font-size: 1.6em;
+  font-weight: bold;
+}
+
+.progress-donut-label {
+  fill: var(--color-text);
+  opacity: 0.6;
+  font-size: 0.8em;
+}
+
+.progress-donut-caption {
+  margin-top: 4px;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+.progress-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 10px;
+  flex: 1;
+  min-width: 260px;
+  max-width: 560px;
+}
+
+.progress-tile {
+  background: var(--color-background-off);
+  border-radius: 8px;
+  padding: 10px 14px;
+  border-left: 4px solid var(--color-text);
+}
+
+.progress-tile-easy {
+  border-left-color: var(--difficulty-easy);
+}
+
+.progress-tile-medium {
+  border-left-color: var(--difficulty-medium);
+}
+
+.progress-tile-hard {
+  border-left-color: var(--difficulty-hard);
+}
+
+.progress-tile-deadly {
+  border-left-color: var(--difficulty-deadly);
+}
+
+.progress-tile-starred {
+  border-left-color: #d3a454;
+}
+
+.progress-tile-label {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.65;
+}
+
+.progress-tile-count {
+  font-size: 1.3em;
+  font-weight: bold;
+  margin: 2px 0 6px;
+}
+
+.progress-tile-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--color-background);
+  overflow: hidden;
+}
+
+.progress-tile-easy .progress-tile-bar-fill {
+  background: var(--difficulty-easy);
+}
+
+.progress-tile-medium .progress-tile-bar-fill {
+  background: var(--difficulty-medium);
+}
+
+.progress-tile-hard .progress-tile-bar-fill {
+  background: var(--difficulty-hard);
+}
+
+.progress-tile-deadly .progress-tile-bar-fill {
+  background: var(--difficulty-deadly);
+}
+
+.progress-tile-bar-fill {
+  height: 100%;
+  transition: width .4s ease;
+}
+
+/* --- Random puzzle button --- */
+
+.random-puzzle-wrap {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.random-puzzle-btn {
+  font-size: 1.1em;
+}
+
+.random-puzzle-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.random-puzzle-empty {
+  margin-top: 6px;
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+/* --- Puzzle table (dashboard) --- */
+
+.puzzle-table-wrap {
+  margin-top: 10px;
+}
+
+.puzzle-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.puzzle-search {
+  width: 100%;
+  max-width: 320px;
+  box-sizing: border-box;
+}
+
+.puzzle-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-chip {
+  background: var(--color-background-off);
+  color: var(--color-text);
+  border: 1px solid rgb(128, 128, 128, 0.31);
+  border-radius: 14px;
+  padding: 5px 12px;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+
+.filter-chip:hover {
+  border-color: #808080;
+}
+
+.filter-chip-active {
+  background: #808080;
+  color: var(--color-background);
+  border-color: #808080;
+}
+
+.filter-chip-easy.filter-chip-active {
+  background: var(--difficulty-easy);
+  border-color: var(--difficulty-easy);
+  color: #fff;
+}
+
+.filter-chip-medium.filter-chip-active {
+  background: var(--difficulty-medium);
+  border-color: var(--difficulty-medium);
+  color: #fff;
+}
+
+.filter-chip-hard.filter-chip-active {
+  background: var(--difficulty-hard);
+  border-color: var(--difficulty-hard);
+  color: #fff;
+}
+
+.filter-chip-deadly.filter-chip-active {
+  background: var(--difficulty-deadly);
+  border-color: var(--difficulty-deadly);
+  color: #fff;
+}
+
+.puzzle-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.puzzle-table th {
+  text-align: left;
+  padding: 6px 8px;
+  border-bottom: 2px solid rgb(128, 128, 128, 0.31);
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.65;
+}
+
+.puzzle-table td {
+  padding: 8px;
+  border-bottom: 1px solid rgb(128, 128, 128, 0.16);
+  vertical-align: middle;
+}
+
+.puzzle-row-solved {
+  opacity: 0.6;
+}
+
+.puzzle-table-empty {
+  text-align: center;
+  opacity: 0.6;
+  padding: 20px 8px;
+}
+
+.pt-col-status,
+.pt-col-star {
+  width: 40px;
+  text-align: center;
+}
+
+.pt-col-difficulty,
+.pt-col-category {
+  width: 110px;
+}
+
+.pt-col-notes {
+  width: 40px;
+  text-align: center;
+}
+
+.pt-status-toggle,
+.pt-star-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgb(128, 128, 128, 0.31);
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.pt-status-solved {
+  background: var(--difficulty-easy);
+  border-color: var(--difficulty-easy);
+  color: #fff;
+}
+
+.pt-star-toggle {
+  border: none;
+  font-size: 1.2em;
+  color: var(--color-text);
+  opacity: 0.5;
+}
+
+.pt-star-active {
+  color: #d3a454;
+  opacity: 1;
+}
+
+.pt-difficulty-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.85em;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.pt-difficulty-easy {
+  background: var(--difficulty-easy);
+}
+
+.pt-difficulty-medium {
+  background: var(--difficulty-medium);
+}
+
+.pt-difficulty-hard {
+  background: var(--difficulty-hard);
+}
+
+.pt-difficulty-deadly {
+  background: var(--difficulty-deadly);
+}
+
+/* --- Per-puzzle tracker (puzzle page) --- */
+
+.puzzle-tracker {
+  margin: 1em 0;
+}
+
+.puzzle-tracker-toggles {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.tracker-star.pushed {
+  background: #d3a454;
+  border-color: #d3a454;
+}
+
+.puzzle-notes-textarea {
+  width: 100%;
+  max-width: 500px;
+  min-height: 90px;
+  box-sizing: border-box;
+  resize: vertical;
+  font-family: inherit;
+}
