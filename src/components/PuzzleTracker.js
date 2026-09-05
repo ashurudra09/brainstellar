@@ -1,5 +1,5 @@
 // src/components/PuzzleTracker.js
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import { ProgressContext } from '../contexts/ProgressContext';
 import Button from './Button';
 
@@ -26,35 +26,59 @@ export const PuzzleStatusToggles = ({ puzzleId }) => {
   );
 };
 
+const FORMAT_COMMANDS = [
+  { command: 'bold', label: 'B', style: { fontWeight: 'bold' } },
+  { command: 'italic', label: 'I', style: { fontStyle: 'italic' } },
+  { command: 'underline', label: 'U', style: { textDecoration: 'underline' } },
+];
+
 export const PuzzleNotes = ({ puzzleId }) => {
   const { loaded, getNotes, setNotes } = useContext(ProgressContext);
-  const [notesDraft, setNotesDraft] = useState('');
+  const editorRef = useRef(null);
 
   useEffect(() => {
-    if (loaded) setNotesDraft(getNotes(puzzleId));
-    // getNotes/puzzleId intentionally excluded: only re-sync the draft when the
-    // context finishes loading, not on every keystroke that flows back through it.
+    // Set innerHTML imperatively (once, on load) instead of a React-controlled
+    // value: contentEditable fights React's rendering and resets the cursor
+    // on every keystroke if it's kept in sync via state.
+    if (loaded && editorRef.current) editorRef.current.innerHTML = getNotes(puzzleId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded]);
 
-  const handleNotesChange = e => {
-    const value = e.target.value;
-    setNotesDraft(value);
-    setNotes(puzzleId, value);
+  const handleInput = () => setNotes(puzzleId, editorRef.current.innerHTML);
+
+  const format = command => {
+    document.execCommand(command);
+    editorRef.current.focus();
   };
 
   return (
     <Button
       id={`notes${puzzleId}`}
       label="Notes"
-      passClass="one-liner"
+      passClass="notes-panel"
       content={
-        <textarea
-          className="puzzle-notes-textarea"
-          placeholder="Notes for future reference..."
-          value={notesDraft}
-          onChange={handleNotesChange}
-        />
+        <div className="puzzle-notes-editor">
+          <div className="puzzle-notes-toolbar">
+            {FORMAT_COMMANDS.map(({ command, label, style }) => (
+              <button
+                key={command}
+                type="button"
+                style={style}
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => format(command)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <div
+            ref={editorRef}
+            className="puzzle-notes-textarea"
+            contentEditable
+            onInput={handleInput}
+            data-placeholder="Notes for future reference..."
+          />
+        </div>
       }
     />
   );
