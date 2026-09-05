@@ -980,4 +980,15 @@
       PS:
       ",
   },
+  {
+    "puzzleId": 1021,
+    "title": "Nine Children",
+    "difficulty": "hard",
+    "category": "discrete",
+    "source": "Custom",
+    "question": "Nine children of distinct ages (a whole number of years each) were born at a fixed interval of time between consecutive children. The sum of the squares of the ages of all nine children equals the square of their father's age. Given that the father is aged at most 60, how old is the father?",
+    "hint": "Don't parametrise by the youngest child \u2014 use the middle child's age. The cross terms then cancel when you square and add. Once you have the resulting equation, look at it modulo 3.",
+    "answer": "48",
+    "solution": "Let $a$ be the age of the middle (5th) child and $d$ the common gap, so the nine ages are $a-4d, a-3d, \\dots, a+4d$. Centering on the middle child makes the cross terms cancel in pairs when we square and sum:\n\n$$\\sum_{j=-4}^{4}(a+jd)^2 = 9a^2 + 2d^2(1^2+2^2+3^2+4^2) = 9a^2 + 60d^2$$\n\nSo with $F$ the father's age, $9a^2 + 60d^2 = F^2$. Since the ages are whole numbers, $a$ and $d$ are positive integers.\n\nThe left side is divisible by $3$, so $3 \\mid F^2$, hence $3 \\mid F$. Write $F = 3k$: $9k^2 = 9a^2 + 60d^2$, i.e. $3k^2 = 3a^2 + 20d^2$.\n\nNow $3$ divides $3k^2 - 3a^2 = 20d^2$, and $\\gcd(3,20) = 1$, so $3 \\mid d$. Write $d = 3e$: $3k^2 = 3a^2 + 180e^2$, i.e. $k^2 - a^2 = 60e^2$.\n\nFactor as $(k-a)(k+a) = 60e^2$. The two factors have the same parity and their product is even, so both are even: put $k - a = 2m$ and $k + a = 2n$. Then $4mn = 60e^2$, i.e. $mn = 15e^2$, with $a = n-m$, $k = n+m$ and $F = 3(n+m)$.\n\nTwo conditions filter the candidates: $F \\le 60$, which forces $n + m \\le 20$, and the youngest child must have a positive age, i.e. $a > 4d = 12e$.\n\nFor $e = 1$ (so $d = 3$) and $mn = 15$: the pair $(1,15)$ gives $a = 14$ and $F = 48$, which works; the pair $(3,5)$ gives $a = 2$ and $F = 24$, rejected since the youngest child's age would be $2 - 12 < 0$.\n\nFor $e = 2$ (so $d = 6$) and $mn = 60$, we need $a > 24$ and $n + m \\le 20$. The admissible-sized pairs $(4,15)$, $(5,12)$, $(6,10)$ give $a = 11, 7, 4$, all far below $24$; the pairs with large enough $a$, such as $(1,60)$, give $F = 183 > 60$. Nothing survives.\n\nFor $e \\ge 3$: then $d \\ge 9$, so $a > 36$, forcing $k > 36$ and $F > 108$. Impossible.\n\nThe only solution is $F = 48$, with $a = 14$ and $d = 3$: the children are aged $2, 5, 8, 11, 14, 17, 20, 23, 26$. Check: $9(14^2) + 60(3^2) = 1764 + 540 = 2304 = 48^2$.\n\nThe two moves that do all the work are centering on the middle child to kill the cross terms, and the mod-3 descent which forces both $3 \\mid F$ and $3 \\mid d$ \u2014 that shrinks the search to a handful of factor pairs.",
+  },
 ]

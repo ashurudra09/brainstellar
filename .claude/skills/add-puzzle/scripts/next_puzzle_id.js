@@ -9,7 +9,18 @@
 const fs = require('fs');
 const path = require('path');
 
-const repoRoot = path.resolve(__dirname, '..', '..', '..', '..');
+// Walk up from this script looking for a dir containing src/data/puzzles;
+// .claude/ may live inside the site repo or beside it (sibling checkout).
+function findRepoRoot(start) {
+  for (let dir = start; ; dir = path.dirname(dir)) {
+    for (const cand of [dir, ...fs.readdirSync(dir, { withFileTypes: true })
+        .filter(d => d.isDirectory()).map(d => path.join(dir, d.name))]) {
+      if (fs.existsSync(path.join(cand, 'src', 'data', 'puzzles'))) return cand;
+    }
+    if (path.dirname(dir) === dir) throw new Error('could not locate src/data/puzzles');
+  }
+}
+const repoRoot = findRepoRoot(path.resolve(__dirname, '..', '..', '..', '..'));
 const puzzlesDir = path.join(repoRoot, 'src', 'data', 'puzzles');
 const yamlPath = path.join(repoRoot, 'src', 'data', 'puzzles.yaml');
 
