@@ -14,6 +14,32 @@ headings, exact frontmatter fields, an exact ID scheme). Follow the format
 precisely; the classification (difficulty/category) and writing are the only
 parts that call for judgment.
 
+## 0. Locate the site root, and don't use heredocs
+
+Two environment traps will waste your time if you skip this.
+
+**The site root may not be the working directory.** Every path in this skill
+(`src/data/puzzles`, `src/data/puzzles.yaml`, `gatsby-config.js`) is relative
+to the Gatsby site root, which is sometimes the working directory and
+sometimes a `brainstellar/` subdirectory of it (a parent folder holding the
+site checkout alongside other notes). Find it once before doing anything else:
+
+```bash
+find . -maxdepth 4 -type d -name puzzles -path "*/src/data/*" -not -path "*/public/*"
+```
+
+`cd` into the directory containing `src/data/puzzles` and stay there for the
+whole task. Note that `.claude/` may live at *either* level, so the presence
+of `.claude/` is not a reliable marker of the site root.
+
+**Never write puzzle content through a shell heredoc.** Puzzle text is dense
+with LaTeX, and a `bash <<'EOF'` heredoc in this harness silently eats one
+level of backslashes — `\dots` and `\mid` arrive stripped, and in the YAML
+case that turns into a hard parse error, in the markdown case into silently
+broken math. Use the **Write tool** for the `.md` file, and for the
+`puzzles.yaml` append write a small Python/Node script to a file with the
+Write tool and then execute it. Do not pipe the content through the shell.
+
 ## 1. Find the puzzle(s) to add
 
 Look first at what's already been discussed in this conversation — if the user
@@ -70,11 +96,18 @@ reasoning and correct it if you got it wrong.
 
 ## 3. Assign the puzzleId
 
-Run the bundled script from the repo root:
+Run the bundled script from the site root found in step 0:
 
 ```bash
 node .claude/skills/add-puzzle/scripts/next_puzzle_id.js
 ```
+
+If `.claude/` sits one level above the site root, adjust the path
+accordingly (`node ../.claude/skills/add-puzzle/scripts/next_puzzle_id.js`).
+The script itself finds `src/data/puzzles` by walking up from its own
+location and checking each directory and its immediate children, so it works
+from either layout — but if it ever throws `could not locate src/data/puzzles`,
+that resolution is what needs fixing, not your invocation.
 
 It scans every `src/data/puzzles/*.md` frontmatter block and `puzzles.yaml`
 for existing `puzzleId` values and prints the next free one (max + 1). Use
@@ -189,6 +222,24 @@ the trailing comma the existing last entry has), in this shape:
 - This file only ever grows — never edit or remove an existing entry while
   doing this.
 
+The reliable way to produce that escaping is to let a serialiser do it rather
+than hand-typing `\\`: in the script from step 0, hold each field as an
+ordinary string (Python raw strings work well for the LaTeX) and emit the
+lines with `json.dumps(value)`. JSON string syntax is a subset of YAML's
+double-quoted scalar syntax, so the result parses correctly and you never have
+to count backslashes.
+
+Then **verify the file still parses** before reporting success — a botched
+escape produces a file that looks fine but breaks every consumer of it:
+
+```bash
+node -e "const y=require('./node_modules/js-yaml');const d=y.load(require('fs').readFileSync('src/data/puzzles.yaml','utf8'));const e=d[d.length-1];console.log(d.length,e.puzzleId,e.title,e.difficulty,e.category);"
+```
+
+Make the append script idempotent (strip any pre-existing entry with the same
+`puzzleId` before adding) so a failed attempt can simply be re-run rather than
+leaving a half-written entry behind.
+
 ## 6. Report back
 
 For each puzzle added, tell the user:
@@ -202,3 +253,14 @@ For each puzzle added, tell the user:
 
 Don't commit anything to git — leave that to the user, since new puzzle
 content is exactly the kind of thing they'll want to read over first.
+
+## 7. Keep the two copies of this skill in sync
+
+This skill exists twice: once in the site repo's own `.claude/skills/`, and
+once in the parent workspace's `.claude/skills/`. Whichever copy you loaded,
+any edit you make to `SKILL.md` or to `scripts/` must be mirrored to the
+other, or the next session will load the stale one. Check with:
+
+```bash
+diff -r .claude/skills/add-puzzle ../.claude/skills/add-puzzle
+```
