@@ -1,20 +1,9 @@
 // src/components/QuestionTable.js
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'gatsby';
 import useProgress from '../hooks/useProgress';
 import { DIFFICULTIES, DIFFICULTY_ORDER, DOMAINS } from '../data/domains';
-
-const STATUS_FILTERS = [
-  { key: 'all', label: 'All' },
-  { key: 'unsolved', label: 'Unsolved' },
-  { key: 'solved', label: 'Solved' },
-  { key: 'starred', label: 'Starred' },
-  { key: 'notes', label: 'Has notes' },
-  { key: 'revisit', label: 'Revisit' },
-  { key: 'due', label: 'Due for review' },
-];
-
-const NEUTRAL_ACCENT = '#808080';
+import QuestionFilters from './QuestionFilters';
 
 export const progressKey = q => `${q.domain}:${q.qid}`;
 export const questionRoute = q => (q.domain === 'quant' ? `/puzzles/${q.qid}` : `/q/${q.domain}/${q.qid}`);
@@ -27,15 +16,12 @@ const QuestionTable = ({ questions, domain, onVisibleChange }) => {
   const { loaded, isSolved, isStarred, isRevisit, isDueForReview, getNotes, toggleSolved, toggleStarred } = useProgress();
   const [statusFilter, setStatusFilter] = useState('all');
   const [difficultyFilter, setDifficultyFilter] = useState('all');
-  const [categoryFilter, setCategoryFilter] = useState('all');
-  const [domainFilter, setDomainFilter] = useState('all');
+  const [topicFilter, setTopicFilter] = useState('all');
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState(null);
   const [sortDir, setSortDir] = useState('asc');
 
   const showDomainColumn = !domain;
-  const difficultyOptions = domain ? domain.difficulties : DIFFICULTIES.map(d => d.key);
-  const categoryOptions = domain ? domain.categories : null;
 
   const toggleSort = key => {
     if (sortKey !== key) {
@@ -50,8 +36,7 @@ const QuestionTable = ({ questions, domain, onVisibleChange }) => {
     const q = search.trim().toLowerCase();
     const filtered = questions.filter(item => {
       if (difficultyFilter !== 'all' && item.difficulty !== difficultyFilter) return false;
-      if (categoryFilter !== 'all' && item.category !== categoryFilter) return false;
-      if (domainFilter !== 'all' && item.domain !== domainFilter) return false;
+      if (topicFilter !== 'all' && (domain ? item.category : item.domain) !== topicFilter) return false;
       if (q &&
           !item.title.toLowerCase().includes(q) &&
           !(item.category || '').toLowerCase().includes(q) &&
@@ -88,12 +73,33 @@ const QuestionTable = ({ questions, domain, onVisibleChange }) => {
     });
     if (sortDir === 'desc') sorted.reverse();
     return sorted;
-  }, [questions, statusFilter, difficultyFilter, categoryFilter, domainFilter, search, sortKey, sortDir,
+  }, [questions, domain, statusFilter, difficultyFilter, topicFilter, search, sortKey, sortDir,
       isSolved, isStarred, isRevisit, isDueForReview, getNotes]);
 
   useEffect(() => {
     if (onVisibleChange) onVisibleChange(visible);
   }, [visible, onVisibleChange]);
+
+  // Counts are over the whole question set, not the current filter, so
+  // numbers stay put while you click around and never read as "0".
+  const facetCounts = useMemo(() => {
+    const topic = {};
+    const difficulty = {};
+    const topicOf = domain ? q => q.category : q => q.domain;
+    questions.forEach(q => {
+      const t = topicOf(q);
+      if (t) topic[t] = (topic[t] || 0) + 1;
+      if (q.difficulty) difficulty[q.difficulty] = (difficulty[q.difficulty] || 0) + 1;
+    });
+    return { topic, difficulty, total: questions.length };
+  }, [questions, domain]);
+
+  const handleReset = useCallback(() => {
+    setSearch('');
+    setStatusFilter('all');
+    setDifficultyFilter('all');
+    setTopicFilter('all');
+  }, []);
 
   const sortIndicator = key => (sortKey === key ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '');
   const sortableHeaderProps = key => ({
@@ -112,92 +118,15 @@ const QuestionTable = ({ questions, domain, onVisibleChange }) => {
 
   return (
     <div className="puzzle-table-wrap">
-      <div className="puzzle-filters">
-        <input
-          type="text"
-          className="puzzle-search"
-          placeholder="Search by title, category, qid, or domain..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-        />
-
-        <div className="puzzle-filter-chips">
-          {STATUS_FILTERS.map(f => (
-            <button
-              key={f.key}
-              className={`filter-chip ${statusFilter === f.key ? 'filter-chip-active' : ''}`}
-              style={{ '--accent': NEUTRAL_ACCENT }}
-              onClick={() => setStatusFilter(f.key)}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="puzzle-filter-chips">
-          <button
-            className={`filter-chip ${difficultyFilter === 'all' ? 'filter-chip-active' : ''}`}
-            style={{ '--accent': NEUTRAL_ACCENT }}
-            onClick={() => setDifficultyFilter('all')}
-          >
-            All
-          </button>
-          {DIFFICULTIES.filter(d => difficultyOptions.includes(d.key)).map(d => (
-            <button
-              key={d.key}
-              className={`filter-chip ${difficultyFilter === d.key ? 'filter-chip-active' : ''}`}
-              style={{ '--accent': d.accent }}
-              onClick={() => setDifficultyFilter(d.key)}
-            >
-              {d.label}
-            </button>
-          ))}
-        </div>
-
-        {categoryOptions && (
-          <div className="puzzle-filter-chips">
-            <button
-              className={`filter-chip ${categoryFilter === 'all' ? 'filter-chip-active' : ''}`}
-              style={{ '--accent': NEUTRAL_ACCENT }}
-              onClick={() => setCategoryFilter('all')}
-            >
-              All categories
-            </button>
-            {categoryOptions.map(c => (
-              <button
-                key={c}
-                className={`filter-chip ${categoryFilter === c ? 'filter-chip-active' : ''}`}
-                style={{ '--accent': NEUTRAL_ACCENT }}
-                onClick={() => setCategoryFilter(c)}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {showDomainColumn && (
-          <div className="puzzle-filter-chips">
-            <button
-              className={`filter-chip ${domainFilter === 'all' ? 'filter-chip-active' : ''}`}
-              style={{ '--accent': NEUTRAL_ACCENT }}
-              onClick={() => setDomainFilter('all')}
-            >
-              All domains
-            </button>
-            {DOMAINS.map(d => (
-              <button
-                key={d.slug}
-                className={`filter-chip ${domainFilter === d.slug ? 'filter-chip-active' : ''}`}
-                style={{ '--accent': d.accent }}
-                onClick={() => setDomainFilter(d.slug)}
-              >
-                {d.icon} {d.label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <QuestionFilters
+        domain={domain}
+        counts={facetCounts}
+        search={search} setSearch={setSearch}
+        statusFilter={statusFilter} setStatusFilter={setStatusFilter}
+        difficultyFilter={difficultyFilter} setDifficultyFilter={setDifficultyFilter}
+        topicFilter={topicFilter} setTopicFilter={setTopicFilter}
+        onReset={handleReset}
+      />
 
       <table className="puzzle-table">
         <thead>
