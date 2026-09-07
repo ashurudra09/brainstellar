@@ -1046,8 +1046,12 @@ code {
 }
 
 .progress-tiles {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  /* flex+wrap (not grid's auto-fit) so an incomplete last row -- e.g. a
+     lone 9th tile -- centers under the row instead of hugging the left
+     edge of its grid column. */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
   flex: 1;
   min-width: 260px;
@@ -1055,6 +1059,7 @@ code {
 }
 
 .progress-tile {
+  flex: 1 1 110px;
   background: var(--color-background-off);
   border-radius: 8px;
   padding: 10px 14px;
