@@ -6,9 +6,29 @@
 
 const fs = require('fs');
 const path = require('path');
+const { splitSections } = require('./src/utils/sections');
 
 const PROGRESS_FILE = path.join(__dirname, 'progress.json');
 const PROGRESS_V1_BACKUP_FILE = path.join(__dirname, 'progress.v1.backup.json');
+
+// Named entities remark's HTML renderer actually emits (amp/lt/gt/quot/#39
+// cover everything markdown produces -- there's no need for the full HTML5
+// entity table `he` ships).
+const NAMED_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" };
+const decodeEntities = s => s.replace(/&(amp|lt|gt|quot|#39);/g, (_, e) => NAMED_ENTITIES[e]);
+
+// Plain-text meta description for a question's <Head>, computed once at
+// build time instead of shipping a full HTML parser (cheerio) to the browser.
+const descriptionFor = html => {
+  const sections = splitSections(html);
+  const question = sections.find(s => s.name === 'Question') || sections[0];
+  const content = question ? question.content : '';
+  // KaTeX renders a <math> MathML block alongside its visual HTML, whose text
+  // content is raw LaTeX/MathML noise -- drop the whole element, not just its tags.
+  const withoutMath = content.replace(/<math[^>]*>[\s\S]*?<\/math>/g, '');
+  const text = decodeEntities(withoutMath.replace(/<[^>]*>/g, ' '));
+  return text.replace(/\s+/g, ' ').trim();
+};
 
 /**
  * @type {import('gatsby').GatsbyNode['createSchemaCustomization']}
@@ -50,6 +70,7 @@ exports.createPages = async function ({ actions, graphql }) {
       allMarkdownRemark(sort: {frontmatter: {qid: ASC}}) {
         nodes {
           id
+          html
           fields { domain }
           frontmatter { qid category difficulty }
         }
@@ -82,6 +103,7 @@ exports.createPages = async function ({ actions, graphql }) {
           id: node.id,
           previousPuzzleRoute: count > 1 ? `/q/${domain}/${prevNode.frontmatter.qid}` : null,
           nextPuzzleRoute: count > 1 ? `/q/${domain}/${nextNode.frontmatter.qid}` : null,
+          description: descriptionFor(node.html),
         },
       });
     });
@@ -93,75 +115,12 @@ exports.createPages = async function ({ actions, graphql }) {
     });
   });
 
-  // --- Legacy routes, quant only: same paths and rendered output as before
-  // the domain migration, so old links keep working. ---
+  // --- Legacy routes, quant only: the illustrated album grid and its
+  // category/difficulty list pages. Per-question aliases are gone -- quant's
+  // canonical question URL is /q/quant/{qid}, same as every other domain. ---
   const puzzles = byDomain['quant'] || [];
-  const puzzleCount = puzzles.length;
   const categories = Array.from(new Set(puzzles.map(node => node.frontmatter.category)));
   const difficulties = Array.from(new Set(puzzles.map(node => node.frontmatter.difficulty)));
-
-  puzzles.forEach((node, index) => {
-    const puzzle = node.frontmatter;
-
-    const nextPuzzleId = puzzles[(index + 1) % puzzleCount].frontmatter.qid;
-    const previousPuzzleId = puzzles[(index - 1 + puzzleCount) % puzzleCount].frontmatter.qid;
-
-    const nextCategoryPuzzleId = puzzles.find(
-      (n, i) => n.frontmatter.category === puzzle.category && i > index
-    )?.frontmatter.qid;
-
-    const nextDifficultyPuzzleId = puzzles.find(
-      (n, i) => n.frontmatter.difficulty === puzzle.difficulty && i > index
-    )?.frontmatter.qid;
-
-    const previousCategoryPuzzleId = puzzles
-      .slice(0, index)
-      .reverse()
-      .find(n => n.frontmatter.category === puzzle.category)?.frontmatter.qid;
-
-    const previousDifficultyPuzzleId = puzzles
-      .slice(0, index)
-      .reverse()
-      .find(n => n.frontmatter.difficulty === puzzle.difficulty)?.frontmatter.qid;
-
-    // Puzzle page
-    actions.createPage({
-      path: `puzzles/${puzzle.qid}`,
-      component: require.resolve(`./src/templates/question.js`),
-      context: {
-        id: node.id,
-        previousPuzzleRoute: `/puzzles/${previousPuzzleId}`,
-        nextPuzzleRoute: `/puzzles/${nextPuzzleId}`,
-      },
-    });
-
-    // Category puzzle page
-    actions.createPage({
-      path: `puzzles/${puzzle.category}/${puzzle.qid}`,
-      component: require.resolve(`./src/templates/question.js`),
-      context: {
-        id: node.id,
-        previousPuzzleRoute: previousCategoryPuzzleId ? `/puzzles/${puzzle.category}/${previousCategoryPuzzleId}` : null,
-        nextPuzzleRoute: nextCategoryPuzzleId ? `/puzzles/${puzzle.category}/${nextCategoryPuzzleId}` : null,
-        category: puzzle.category,
-      },
-    });
-
-    difficulties.forEach((difficulty) => {
-      // Difficulty puzzle page
-      actions.createPage({
-        // allow old URL's to work even if the difficulty level gets changed later.
-        path: `puzzles/${difficulty}/${puzzle.qid}`,
-        component: require.resolve(`./src/templates/question.js`),
-        context: {
-          id: node.id,
-          previousPuzzleRoute: previousDifficultyPuzzleId ? `/puzzles/${puzzle.difficulty}/${previousDifficultyPuzzleId}` : null,
-          nextPuzzleRoute: nextDifficultyPuzzleId ? `/puzzles/${puzzle.difficulty}/${nextDifficultyPuzzleId}` : null,
-          difficulty: difficulty,
-        },
-      });
-    });
-  });
 
   categories.forEach((category) => {
     actions.createPage({
@@ -237,10 +196,6 @@ exports.onCreateDevServer = ({ app }) => {
 
 exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({
-    // cheerio's undici dependency conditionally requires node:sqlite (a
-    // Node 22+ built-in) for an HTTP cache feature this site never uses;
-    // webpack can't bundle it, so treat it as external rather than resolve it.
-    externals: [{ 'node:sqlite': 'commonjs node:sqlite' }],
     module: {
       rules: [
         {

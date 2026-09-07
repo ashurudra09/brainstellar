@@ -18,7 +18,6 @@ export const DOMAINS = [
     label: 'Quant Puzzles',
     icon: '🎲',
     accent: '#993333',
-    legacyPathPrefix: 'puzzles',
     difficulties: ['easy', 'medium', 'hard', 'deadly'],
     categories: ['probability', 'discrete', 'strategy', 'general'],
     sections: {

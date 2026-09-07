@@ -9,8 +9,6 @@ import FacebookComments from '../components/FacebookComments';
 import Seo from '../components/seo';
 import { getDomain } from '../data/domains';
 import { splitSections } from '../utils/sections';
-import he from 'he';
-const cheerio = require('cheerio');
 
 export const query = graphql`
   query($id: String!) {
@@ -42,24 +40,17 @@ export default function Question({ data, pageContext }) {
   const domainSlug = data.markdownRemark.fields.domain
   const domain = getDomain(domainSlug)
   const rawMarkdownBody = data.markdownRemark.html
-  // quant keeps its pre-migration canonical URL; every other domain only ever
-  // had the /q/{domain}/{qid} form.
-  const canonicalRoute = domainSlug === 'quant' ? `/puzzles/${puzzle.qid}` : `/q/${domainSlug}/${puzzle.qid}`
+  const canonicalRoute = `/q/${domainSlug}/${puzzle.qid}`
 
   const sections = splitSections(rawMarkdownBody);
   const openNames = puzzle.open || (domain ? domain.sections.open : ['Question']);
   const progressKey = `${domainSlug}:${puzzle.qid}`;
 
-  const { previousPuzzleRoute, nextPuzzleRoute, category, difficulty } = pageContext
+  const { previousPuzzleRoute, nextPuzzleRoute } = pageContext
 
   return (
     <Layout>
       <div className="stylishpage"><div className="bord1"><div className="bord2"><div className="container">
-        {category && <h2 style={{ textAlign: `center`, marginTop: `1.5em`, marginBottom: `1em` }}>{category} puzzles</h2>}
-
-        {difficulty && <h2 style={{ textAlign: `center`, marginTop: `1.5em`, marginBottom: `1em` }}>{difficulty} puzzles</h2>}
-
-
         <br /><br />
 
         <table style={{ border: '0px solid black', width: '100%', padding: '0px', margin: '0px' }}>
@@ -147,18 +138,12 @@ export default function Question({ data, pageContext }) {
   )
 }
 
-export const Head = ({ data }) => {
+export const Head = ({ data, pageContext }) => {
   const puzzle = data.markdownRemark.frontmatter;
-  const sections = splitSections(data.markdownRemark.html);
-  const question = sections.find(s => s.name === 'Question') || sections[0];
-
-  const $ = cheerio.load(question ? question.content : '');
-  $("math").remove(); // Replace 'math' with the actual tag name for your LaTeX equations
-  const description = he.decode($.text());
 
   return (
     <>
-      <Seo title={puzzle.title} description={description} />
+      <Seo title={puzzle.title} description={pageContext.description} />
       <link rel="icon" href="/favicon.gif" />
     </>
   );

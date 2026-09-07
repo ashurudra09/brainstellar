@@ -6,7 +6,7 @@ import { DIFFICULTIES, DIFFICULTY_ORDER, DOMAINS } from '../data/domains';
 import QuestionFilters from './QuestionFilters';
 
 export const progressKey = q => `${q.domain}:${q.qid}`;
-export const questionRoute = q => (q.domain === 'quant' ? `/puzzles/${q.qid}` : `/q/${q.domain}/${q.qid}`);
+export const questionRoute = q => `/q/${q.domain}/${q.qid}`;
 
 // `domain` is a single domain's config (from src/data/domains.js) when this
 // table is scoped to one domain's page -- it drives the difficulty/category

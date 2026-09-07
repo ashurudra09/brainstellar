@@ -111,6 +111,15 @@ body {
   padding: 2px;
 }
 
+/* .content-text covers open sections, .around covers collapsed ones (Hint,
+   Solution, ...) rendered through Button.js -- markdown images can appear
+   in either. */
+.content-text img,
+.around img {
+  max-width: 100%;
+  height: auto;
+}
+
 .bord1 {
   border-bottom: 1px solid rgb(128, 128, 128, 0.31)
 }

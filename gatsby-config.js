@@ -16,17 +16,15 @@ module.exports = {
           `gatsby-remark-prismjs`,
           // ... other plugins
           {
-            resolve: 'gatsby-remark-images',
+            resolve: 'gatsby-remark-copy-linked-files',
             options: {
-              maxWidth: 200,
-              backgroundColor: 'transparent',
-              withWebp: false,
-              loading: "eager",
-              quality: 100,
-              linkImagesToOriginal: false,
+              // Default ignores png/jpg/etc, expecting gatsby-remark-images
+              // to handle those -- now that plugin is gone, this is the only
+              // thing that copies question images into public/ and rewrites
+              // their src, so it needs to handle every extension in use.
+              ignoreFileExtensions: [],
             },
           },
-          `gatsby-remark-copy-linked-files`,
         ],
       },
     },
@@ -37,8 +35,6 @@ module.exports = {
         path: `${__dirname}/src/data/questions`,
       },
     },
-    `gatsby-transformer-sharp`,
-    `gatsby-plugin-sharp`,
     'gatsby-plugin-react-helmet',
     {
       resolve: `gatsby-plugin-manifest`,

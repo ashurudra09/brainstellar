@@ -32,7 +32,6 @@ export default function LegacyList({ data, pageContext }) {
   const puzzles = data.allMarkdownRemark.nodes
     .map(node => node.frontmatter)
     .filter(p => p[field] === value);
-  const baseRoute = `/puzzles/${value}`;
 
   return (
     <Layout>
@@ -46,7 +45,7 @@ export default function LegacyList({ data, pageContext }) {
 
         {puzzles.map(puzzle => (
           <span key={puzzle.qid}>
-            <Link to={`${baseRoute}/${puzzle.qid}`} className={`btn btn-sm link-${puzzle.difficulty} smooth`}>{puzzle.title}</Link>
+            <Link to={`/q/quant/${puzzle.qid}`} className={`btn btn-sm link-${puzzle.difficulty} smooth`}>{puzzle.title}</Link>
           </span>
         ))}
 

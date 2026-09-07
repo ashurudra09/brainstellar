@@ -78,7 +78,7 @@ const AlbumsPage = ({ data }) => {
 
           {puzzles.map(puzzle => (
             <span key={puzzle.qid}>
-              <Link to={`/puzzles/${puzzle.qid}`} className={`btn btn-sm link-${puzzle.difficulty} smooth`}>{puzzle.title}</Link>
+              <Link to={`/q/quant/${puzzle.qid}`} className={`btn btn-sm link-${puzzle.difficulty} smooth`}>{puzzle.title}</Link>
             </span>
           ))}
         </div></div></div></div>
