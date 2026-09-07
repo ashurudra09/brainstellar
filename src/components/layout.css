@@ -1541,6 +1541,12 @@ code {
   color: #d3a454;
 }
 
+.tracker-sync-warning {
+  align-self: center;
+  color: #d3544a;
+  font-size: 0.85em;
+}
+
 /* --- Review queue (Due for review / Revisit lists) --- */
 
 .review-queue {

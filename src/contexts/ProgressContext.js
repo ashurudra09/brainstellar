@@ -50,6 +50,7 @@ const readLocalStorage = () => {
 export const ProgressProvider = ({ children }) => {
   const [progress, setProgress] = useState(emptyState());
   const [loaded, setLoaded] = useState(false);
+  const [synced, setSynced] = useState(true);
   const saveTimer = useRef(null);
   // Only the dev server exposes /__progress; gatsby build/serve fall back to
   // localStorage alone.
@@ -86,6 +87,7 @@ export const ProgressProvider = ({ children }) => {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch (e) {
       // ignore unavailable localStorage (e.g. private browsing quota)
+      setSynced(false);
     }
 
     if (!useFileBackend.current) return;
@@ -96,25 +98,34 @@ export const ProgressProvider = ({ children }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(next),
-      }).catch(() => {
-        useFileBackend.current = false;
-      });
+      })
+        .then(res => {
+          if (!res.ok) throw new Error('progress save failed');
+          setSynced(true);
+        })
+        .catch(() => {
+          useFileBackend.current = false;
+          setSynced(false);
+        });
     }, 600);
   }, []);
 
-  // Persisting here (rather than inside the setProgress updater) also means
-  // a load that triggers a v1->v2 migration persists immediately, since
-  // that migration itself is a progress change.
-  useEffect(() => {
-    if (!loaded) return;
-    persist(progress);
-  }, [progress, loaded, persist]);
+  // saveRef lets `update` stay a stable useCallback([]) while always calling
+  // the latest persist -- and, once Firestore lands, lets sign-in swap the
+  // save path (local file vs. remote) without changing update's identity.
+  const saveRef = useRef(persist);
+  saveRef.current = persist;
 
+  // Persistence lives here, not in a useEffect keyed on `progress`: once a
+  // remote onSnapshot feeds back into setProgress, that effect would create
+  // local write -> remote ack -> setProgress -> effect -> write -> ... loop.
   const update = useCallback((key, patch) => {
     setProgress(prev => {
       const prevEntry = prev.questions[key] || EMPTY_ENTRY;
       const nextEntry = { ...prevEntry, ...patch };
-      return { ...prev, questions: { ...prev.questions, [key]: nextEntry } };
+      const next = { ...prev, questions: { ...prev.questions, [key]: nextEntry } };
+      saveRef.current(next);
+      return next;
     });
   }, []);
 
@@ -126,7 +137,7 @@ export const ProgressProvider = ({ children }) => {
 
   const toggleSolved = useCallback(key => {
     const wasSolved = isSolved(key);
-    update(key, { solved: !wasSolved, solvedAt: !wasSolved ? Date.now() : undefined });
+    update(key, { solved: !wasSolved, solvedAt: !wasSolved ? Date.now() : null });
   }, [isSolved, update]);
 
   const toggleStarred = useCallback(key => {
@@ -175,6 +186,7 @@ export const ProgressProvider = ({ children }) => {
 
   const value = useMemo(() => ({
     loaded,
+    synced,
     entry,
     isSolved,
     isStarred,
@@ -189,7 +201,7 @@ export const ProgressProvider = ({ children }) => {
     counts,
     settings: progress.settings,
     setReviewIntervals,
-  }), [loaded, entry, isSolved, isStarred, isRevisit, getNotes, toggleSolved, toggleStarred,
+  }), [loaded, synced, entry, isSolved, isStarred, isRevisit, getNotes, toggleSolved, toggleStarred,
       toggleRevisit, setNotes, markReviewed, isDueForReview, counts, progress.settings, setReviewIntervals]);
 
   return (

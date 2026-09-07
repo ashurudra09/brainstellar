@@ -9,7 +9,7 @@ import Button from './Button';
 const SANITIZE_CONFIG = { ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'br', 'div', 'span', 'p'], ALLOWED_ATTR: [] };
 
 export const PuzzleStatusToggles = ({ puzzleId }) => {
-  const { loaded, isSolved, isStarred, isRevisit, isDueForReview, toggleSolved, toggleStarred, toggleRevisit, markReviewed } = useProgress();
+  const { loaded, synced, isSolved, isStarred, isRevisit, isDueForReview, toggleSolved, toggleStarred, toggleRevisit, markReviewed } = useProgress();
   const solved = loaded && isSolved(puzzleId);
   const starred = loaded && isStarred(puzzleId);
   const revisit = loaded && isRevisit(puzzleId);
@@ -43,6 +43,9 @@ export const PuzzleStatusToggles = ({ puzzleId }) => {
         >
           {due ? 'Due — Mark Reviewed' : 'Mark Reviewed'}
         </button>
+      )}
+      {loaded && !synced && (
+        <span className="tracker-sync-warning" title="Your last change couldn't be saved">⚠ not synced</span>
       )}
     </div>
   );
