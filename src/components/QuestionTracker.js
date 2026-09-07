@@ -1,7 +1,12 @@
 // src/components/QuestionTracker.js
 import React, { useEffect, useRef } from 'react';
+import DOMPurify from 'dompurify';
 import useProgress from '../hooks/useProgress';
 import Button from './Button';
+
+// The B/I/U toolbar produces nothing else; stripping every attribute closes
+// the onerror/href XSS vectors that a pasted <img>/<a> would otherwise carry.
+const SANITIZE_CONFIG = { ALLOWED_TAGS: ['b', 'i', 'u', 'strong', 'em', 'br', 'div', 'span', 'p'], ALLOWED_ATTR: [] };
 
 export const PuzzleStatusToggles = ({ puzzleId }) => {
   const { loaded, isSolved, isStarred, isRevisit, isDueForReview, toggleSolved, toggleStarred, toggleRevisit, markReviewed } = useProgress();
@@ -57,15 +62,20 @@ export const PuzzleNotes = ({ puzzleId }) => {
     // Set innerHTML imperatively (once, on load) instead of a React-controlled
     // value: contentEditable fights React's rendering and resets the cursor
     // on every keystroke if it's kept in sync via state.
-    if (loaded && editorRef.current) editorRef.current.innerHTML = getNotes(puzzleId);
+    if (loaded && editorRef.current) editorRef.current.innerHTML = DOMPurify.sanitize(getNotes(puzzleId), SANITIZE_CONFIG);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded]);
 
-  const handleInput = () => setNotes(puzzleId, editorRef.current.innerHTML);
+  const handleInput = () => setNotes(puzzleId, DOMPurify.sanitize(editorRef.current.innerHTML, SANITIZE_CONFIG));
 
   const format = command => {
     document.execCommand(command);
     editorRef.current.focus();
+  };
+
+  const handlePaste = e => {
+    e.preventDefault();
+    document.execCommand('insertText', false, e.clipboardData.getData('text/plain'));
   };
 
   return (
@@ -93,6 +103,7 @@ export const PuzzleNotes = ({ puzzleId }) => {
             className="puzzle-notes-textarea"
             contentEditable
             onInput={handleInput}
+            onPaste={handlePaste}
             data-placeholder="Notes for future reference..."
           />
         </div>

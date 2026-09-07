@@ -5,7 +5,6 @@ import { graphql, Link } from 'gatsby'
 import Layout from '../components/layout'
 import Button from '../components/Button';
 import { PuzzleStatusToggles, PuzzleNotes } from '../components/QuestionTracker';
-import FacebookComments from '../components/FacebookComments';
 import Seo from '../components/seo';
 import { getDomain } from '../data/domains';
 import { splitSections } from '../utils/sections';
@@ -105,9 +104,6 @@ export default function Question({ data, pageContext }) {
         })}
 
         <PuzzleNotes puzzleId={progressKey} />
-
-        <FacebookComments puzzleId={puzzle.qid} />
-
 
         <br />
         <div style={{ marginBottom: `50px` }}>
