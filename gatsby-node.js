@@ -55,10 +55,20 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
   const parent = getNode(node.parent);
   actions.createNodeField({
     node,
-    name: 'domain',
-    // src/data/questions/{domain}/{qid}.md -> relativeDirectory is just "{domain}"
-    value: parent.relativeDirectory,
+    name: 'collection',
+    // Which gatsby-source-filesystem instance this file came from -- lets
+    // queries tell questions and cheatsheets apart.
+    value: parent.sourceInstanceName,
   });
+
+  if (parent.sourceInstanceName === 'questions') {
+    actions.createNodeField({
+      node,
+      name: 'domain',
+      // src/data/questions/{domain}/{qid}.md -> relativeDirectory is just "{domain}"
+      value: parent.relativeDirectory,
+    });
+  }
 };
 
 /**
@@ -67,12 +77,23 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
 exports.createPages = async function ({ actions, graphql }) {
   const { data } = await graphql(`
     query {
-      allMarkdownRemark(sort: {frontmatter: {qid: ASC}}) {
+      allMarkdownRemark(
+        filter: { fields: { collection: { eq: "questions" } } }
+        sort: {frontmatter: {qid: ASC}}
+      ) {
         nodes {
           id
           html
           fields { domain }
           frontmatter { qid category difficulty }
+        }
+      }
+      cheatsheets: allMarkdownRemark(
+        filter: { fields: { collection: { eq: "cheatsheets" } } }
+      ) {
+        nodes {
+          id
+          frontmatter { slug }
         }
       }
     }
@@ -143,6 +164,14 @@ exports.createPages = async function ({ actions, graphql }) {
   actions.createPage({
     path: `puzzles`,
     component: require.resolve(`./src/templates/albums.js`),
+  });
+
+  data.cheatsheets.nodes.forEach(node => {
+    actions.createPage({
+      path: `cheatsheets/${node.frontmatter.slug}`,
+      component: require.resolve(`./src/templates/cheatsheet.js`),
+      context: { id: node.id },
+    });
   });
 };
 

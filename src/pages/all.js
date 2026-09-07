@@ -38,7 +38,10 @@ const AllQuestionsPage = ({ data }) => {
 
 export const query = graphql`
   query {
-    allMarkdownRemark(sort: {frontmatter: {qid: ASC}}){
+    allMarkdownRemark(
+      filter: { fields: { collection: { eq: "questions" } } }
+      sort: {frontmatter: {qid: ASC}}
+    ){
       nodes {
         fields { domain }
         frontmatter {

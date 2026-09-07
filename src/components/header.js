@@ -34,6 +34,7 @@ const Header = ({ siteTitle }) => (
 
         <Link to="/" className="nav-links">Dashboard</Link>
         <Link to="/all" className="nav-links">All Questions</Link>
+        <Link to="/cheatsheets" className="nav-links">Cheatsheets</Link>
         <select
           className="nav-select"
           defaultValue=""

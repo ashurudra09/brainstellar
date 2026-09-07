@@ -35,6 +35,13 @@ module.exports = {
         path: `${__dirname}/src/data/questions`,
       },
     },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `cheatsheets`,
+        path: `${__dirname}/src/data/cheatsheets`,
+      },
+    },
     'gatsby-plugin-react-helmet',
     {
       resolve: `gatsby-plugin-manifest`,
