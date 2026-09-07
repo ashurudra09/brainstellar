@@ -1,10 +1,10 @@
 // src/components/RandomPuzzleButton.js
-import React, { useContext, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { navigate } from 'gatsby';
-import { ProgressContext } from '../contexts/ProgressContext';
+import useProgress from '../hooks/useProgress';
 
 const RandomPuzzleButton = ({ puzzles }) => {
-  const { loaded, isSolved } = useContext(ProgressContext);
+  const { loaded, isSolved } = useProgress();
 
   const unsolved = useMemo(
     () => (loaded ? puzzles.filter(p => !isSolved(p.qid)) : []),

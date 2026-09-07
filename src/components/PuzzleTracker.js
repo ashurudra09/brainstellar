@@ -1,10 +1,10 @@
 // src/components/PuzzleTracker.js
-import React, { useContext, useEffect, useRef } from 'react';
-import { ProgressContext } from '../contexts/ProgressContext';
+import React, { useEffect, useRef } from 'react';
+import useProgress from '../hooks/useProgress';
 import Button from './Button';
 
 export const PuzzleStatusToggles = ({ puzzleId }) => {
-  const { loaded, isSolved, isStarred, toggleSolved, toggleStarred } = useContext(ProgressContext);
+  const { loaded, isSolved, isStarred, toggleSolved, toggleStarred } = useProgress();
   const solved = loaded && isSolved(puzzleId);
   const starred = loaded && isStarred(puzzleId);
 
@@ -33,7 +33,7 @@ const FORMAT_COMMANDS = [
 ];
 
 export const PuzzleNotes = ({ puzzleId }) => {
-  const { loaded, getNotes, setNotes } = useContext(ProgressContext);
+  const { loaded, getNotes, setNotes } = useProgress();
   const editorRef = useRef(null);
 
   useEffect(() => {

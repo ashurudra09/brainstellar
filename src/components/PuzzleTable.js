@@ -1,7 +1,7 @@
 // src/components/PuzzleTable.js
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'gatsby';
-import { ProgressContext } from '../contexts/ProgressContext';
+import useProgress from '../hooks/useProgress';
 
 const STATUS_FILTERS = [
   { key: 'all', label: 'All' },
@@ -22,7 +22,7 @@ const DIFFICULTY_FILTERS = [
 const DIFFICULTY_ORDER = { easy: 0, medium: 1, hard: 2, deadly: 3 };
 
 const PuzzleTable = ({ puzzles, onVisibleChange }) => {
-  const { loaded, isSolved, isStarred, getNotes, toggleSolved, toggleStarred } = useContext(ProgressContext);
+  const { loaded, isSolved, isStarred, getNotes, toggleSolved, toggleStarred } = useProgress();
   const [statusFilter, setStatusFilter] = useState('all');
   const [difficultyFilter, setDifficultyFilter] = useState('all');
   const [search, setSearch] = useState('');

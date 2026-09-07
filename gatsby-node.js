@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PROGRESS_FILE = path.join(__dirname, 'progress.json');
+const PROGRESS_V1_BACKUP_FILE = path.join(__dirname, 'progress.v1.backup.json');
 
 /**
  * @type {import('gatsby').GatsbyNode['createSchemaCustomization']}
@@ -198,7 +199,7 @@ exports.onCreateDevServer = ({ app }) => {
       const raw = fs.readFileSync(PROGRESS_FILE, 'utf8');
       res.json(JSON.parse(raw));
     } catch (e) {
-      res.json({ version: 1, puzzles: {} });
+      res.json({ version: 2, questions: {}, settings: { reviewIntervals: [7, 14, 30, 60] } });
     }
   });
 
@@ -208,6 +209,21 @@ exports.onCreateDevServer = ({ app }) => {
     req.on('end', () => {
       try {
         const data = JSON.parse(body);
+
+        // One-time safety copy: the client migrates progress.json's schema
+        // (v1 -> v2) in memory and writes the result back through this same
+        // endpoint, so back up the pre-migration file before it's overwritten.
+        if (data.version === 2 && !fs.existsSync(PROGRESS_V1_BACKUP_FILE)) {
+          try {
+            const existing = JSON.parse(fs.readFileSync(PROGRESS_FILE, 'utf8'));
+            if (existing.version === 1 || existing.puzzles) {
+              fs.writeFileSync(PROGRESS_V1_BACKUP_FILE, JSON.stringify(existing, null, 2));
+            }
+          } catch (e) {
+            // no pre-existing progress.json (or it's unreadable) -- nothing to back up
+          }
+        }
+
         const tmpFile = `${PROGRESS_FILE}.tmp`;
         fs.writeFileSync(tmpFile, JSON.stringify(data, null, 2));
         fs.renameSync(tmpFile, PROGRESS_FILE);

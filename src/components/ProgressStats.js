@@ -1,6 +1,6 @@
 // src/components/ProgressStats.js
-import React, { useContext, useMemo } from 'react';
-import { ProgressContext } from '../contexts/ProgressContext';
+import React, { useMemo } from 'react';
+import useProgress from '../hooks/useProgress';
 
 const DIFFICULTIES = [
   { key: 'easy', label: 'Easy' },
@@ -13,7 +13,7 @@ const RADIUS = 40;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 const ProgressStats = ({ puzzles }) => {
-  const { loaded, counts } = useContext(ProgressContext);
+  const { loaded, counts } = useProgress();
 
   const stats = useMemo(() => {
     const byDifficulty = {};
