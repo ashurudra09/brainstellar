@@ -1,5 +1,6 @@
 // src/components/ProgressStats.js
 import React, { useMemo } from 'react';
+import { Link } from 'gatsby';
 import useProgress from '../hooks/useProgress';
 import { progressKey } from './QuestionTable';
 import { DIFFICULTIES, DOMAINS } from '../data/domains';
@@ -84,11 +85,11 @@ const ProgressStats = ({ questions, domain }) => {
               const bucket = stats.byDomain[d.slug];
               const pct = bucket.total ? Math.round((bucket.solved / bucket.total) * 100) : 0;
               return (
-                <div className="progress-tile" style={{ '--accent': d.accent }} key={d.slug}>
+                <Link to={`/q/${d.slug}`} className="progress-tile progress-tile-link" style={{ '--accent': d.accent }} key={d.slug}>
                   <div className="progress-tile-label">{d.icon} {d.label}</div>
                   <div className="progress-tile-count">{loaded ? bucket.solved : '–'} / {bucket.total}</div>
                   <div className="progress-tile-bar"><div className="progress-tile-bar-fill" style={{ width: `${loaded ? pct : 0}%` }} /></div>
-                </div>
+                </Link>
               );
             })}
 

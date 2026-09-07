@@ -5,7 +5,6 @@ import { graphql, Link } from "gatsby"
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import ProgressStats from "../components/ProgressStats"
-import DomainCards from "../components/DomainCards"
 import ReviewQueue from "../components/ReviewQueue"
 import * as styles from "../components/index.module.css"
 
@@ -29,17 +28,6 @@ const IndexPage = ({ data }) => {
                   <Link to="/all" className="btn btn-sm link-white smooth">All Questions</Link>
                 </div>
                 <ProgressStats questions={questions} />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="stylishpage">
-          <div className="bord1">
-            <div className="bord2">
-              <div className="container">
-                <h2>Domains</h2>
-                <DomainCards questions={questions} />
               </div>
             </div>
           </div>
