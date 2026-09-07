@@ -121,7 +121,10 @@ const AlbumsPage = ({ data }) => {
 
 export const query = graphql`
   query {
-    allMarkdownRemark(sort: {frontmatter: {qid: ASC}}){
+    allMarkdownRemark(
+      filter: { fields: { domain: { eq: "quant" } } }
+      sort: {frontmatter: {qid: ASC}}
+    ){
       nodes {
         frontmatter {
           qid
