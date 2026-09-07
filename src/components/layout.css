@@ -97,6 +97,9 @@ body {
 .container-nav {
   margin: 0 15px;
   width: auto;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .stylishpage {
@@ -451,16 +454,6 @@ input[type='text'] {
   position: relative;
 }
 
-.btn.btn-close {
-  padding: 0px 3px 0px;
-  background: var(--color-text);
-  visibility: hidden;
-  float: right;
-  margin-top: -35px;
-  font-size: 18px;
-  margin-right: 17px;
-}
-
 .nav .pagename {
   font-size: 1.6em;
   top: 1px;
@@ -472,53 +465,71 @@ input[type='text'] {
   padding: 20px 25px 20px 25px;
 }
 
+.nav-wordmark {
+  position: relative;
+  top: -7px;
+  height: 20px;
+  max-width: min(211px, 45vw);
+  width: auto;
+}
 
-@media(max-width:800px)
+.nav-toggle {
+  display: none;
+  margin-left: auto;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 1.1em;
+  line-height: 1.4;
+  cursor: pointer;
+}
 
-/*show navigation button*/
-  {
-  .container-nav {}
+.nav-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+}
 
-  .nav-links:hover,
-  .nav-links:active,
-  .nav-links:focus {
-    background: var(--color-text);
+/* ponytail: no focus trap / Escape / scroll-lock on .nav-menu -- it's an
+   inline dropdown that pushes content, not a modal, so aria-expanded on a
+   real <button> covers a11y. Add a focus trap if it ever becomes an overlay. */
+@media (max-width: 1023px) {
+  .container-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
-  .btn.btn-close {
-    visibility: visible
-  }
-
-  .nav {
-    overflow: hidden
-  }
-
-  .pagename {
-    margin-top: -11px
-  }
-
-  .nav:focus {
-    height: auto
-  }
-
-  .nav div:before {
-    content: '';
-    border-top: 5px solid;
-    border-bottom: 14px double;
-    float: right;
-    height: 4px;
-    right: 2px;
-    top: 12px;
-    width: 25px;
-    position: relative;
-    background: var(--color-text);
-  }
-
-  .nav a {
-    padding: .5em 0;
-    width: 90%;
+  .nav-toggle {
     display: block;
-    border: 0px solid red;
+  }
+
+  .nav-menu {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav-menu-open {
+    display: flex;
+  }
+
+  .nav-menu .nav-links {
+    display: block;
+    padding: 12px 15px;
+  }
+
+  .nav-menu .nav-select {
+    display: block;
+    width: 100%;
+    margin: 6px 0;
+  }
+
+  .nav-menu .auth-widget {
+    display: flex;
+    justify-content: flex-start;
+    padding: 6px 15px;
   }
 }
 
@@ -1116,6 +1127,11 @@ code {
   height: 100%;
   transition: width .4s ease;
   background: var(--accent, var(--color-text));
+}
+
+@media (max-width: 700px) {
+  .progress-stats { flex-direction: column; gap: 16px; }
+  .progress-tiles { min-width: 0; max-width: 100%; width: 100%; }
 }
 
 /* --- Random puzzle button --- */
