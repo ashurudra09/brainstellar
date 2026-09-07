@@ -19,7 +19,16 @@ const Footer = () => (
             >
               <tbody>
                 <tr>
-                  <td style={{ opacity: `0.5` }}>© BRAINSTELLAR</td>
+                  <td style={{ opacity: `0.5` }}>
+                    <div>
+                      Puzzle content is not owned by this site -- see the original at{' '}
+                      <a href="https://brainstellar.com" style={{ color: 'inherit' }}>brainstellar.com</a>.
+                    </div>
+                    <div>
+                      Created by{' '}
+                      <a href="https://github.com/ashurudra09" style={{ color: 'inherit' }}>ashurudra09</a>
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>

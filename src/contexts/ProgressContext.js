@@ -197,6 +197,42 @@ export const ProgressProvider = ({ children }) => {
     };
   }, [user, persistLocal, persistCloud, loadLocal]);
 
+  // Full replace, for clear-all / import: {merge:true} (persistCloud) can
+  // only add/overwrite keys in the questions map, never remove one, so
+  // clearing progress needs a write where the resulting document is
+  // authoritatively exactly `next`. saveTimer is cleared unconditionally,
+  // not only on the local-storage branch, so an edit made while signed out
+  // (debounce pending) followed by a sign-in and then a clear can't leave
+  // a stale POST to fire afterward.
+  const replaceAll = useCallback(next => {
+    if (saveTimer.current) {
+      clearTimeout(saveTimer.current);
+      saveTimer.current = null;
+    }
+    setProgress(next);
+
+    const uid = uidRef.current;
+    if (uid) {
+      const db = getDb();
+      if (!db) return;
+      setDoc(
+        doc(db, 'users', uid),
+        { version: 2, questions: next.questions, settings: next.settings, updatedAt: serverTimestamp() }
+      )
+        .then(() => setSynced(true))
+        .catch(() => setSynced(false));
+      return;
+    }
+
+    persistLocal(next);
+  }, [persistLocal]);
+
+  const clearAll = useCallback(() => replaceAll(emptyState()), [replaceAll]);
+
+  const importProgress = useCallback(importedRaw => {
+    replaceAll(mergeProgress(progressRef.current, migrate(importedRaw)));
+  }, [replaceAll]);
+
   // Persistence lives here, not in a useEffect keyed on `progress`: see the
   // sign-in effect above for why that shape is an infinite write loop once
   // a remote onSnapshot exists.
@@ -268,6 +304,7 @@ export const ProgressProvider = ({ children }) => {
   const value = useMemo(() => ({
     loaded,
     synced,
+    progress,
     entry,
     isSolved,
     isStarred,
@@ -282,8 +319,11 @@ export const ProgressProvider = ({ children }) => {
     counts,
     settings: progress.settings,
     setReviewIntervals,
-  }), [loaded, synced, entry, isSolved, isStarred, isRevisit, getNotes, toggleSolved, toggleStarred,
-      toggleRevisit, setNotes, markReviewed, isDueForReview, counts, progress.settings, setReviewIntervals]);
+    clearAll,
+    importProgress,
+  }), [loaded, synced, progress, entry, isSolved, isStarred, isRevisit, getNotes, toggleSolved, toggleStarred,
+      toggleRevisit, setNotes, markReviewed, isDueForReview, counts, progress.settings, setReviewIntervals,
+      clearAll, importProgress]);
 
   return (
     <ProgressContext.Provider value={value}>

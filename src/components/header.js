@@ -2,6 +2,7 @@ import * as React from "react"
 import { Link, navigate } from "gatsby"
 import ThemeToggle from "./ThemeToggle"
 import AuthButton from "./AuthButton"
+import ProgressControls from "./ProgressControls"
 import { DOMAINS } from "../data/domains"
 
 const Header = ({ siteTitle }) => (
@@ -52,6 +53,7 @@ const Header = ({ siteTitle }) => (
 
         <ThemeToggle />
         <AuthButton />
+        <ProgressControls />
 
       </div>
     </div>
