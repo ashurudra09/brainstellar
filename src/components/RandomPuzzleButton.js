@@ -7,14 +7,14 @@ const RandomPuzzleButton = ({ puzzles }) => {
   const { loaded, isSolved } = useContext(ProgressContext);
 
   const unsolved = useMemo(
-    () => (loaded ? puzzles.filter(p => !isSolved(p.puzzleId)) : []),
+    () => (loaded ? puzzles.filter(p => !isSolved(p.qid)) : []),
     [loaded, puzzles, isSolved]
   );
 
   const handleClick = () => {
     if (unsolved.length === 0) return;
     const pick = unsolved[Math.floor(Math.random() * unsolved.length)];
-    navigate(`/puzzles/${pick.puzzleId}`);
+    navigate(`/puzzles/${pick.qid}`);
   };
 
   const disabled = !loaded || unsolved.length === 0;

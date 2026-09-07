@@ -11,16 +11,13 @@ import Seo from '../components/seo';
 import he from 'he';
 const cheerio = require('cheerio');
 
-
-
-
-
 export const query = graphql`
-  query($puzzleId: Int!) {
-    markdownRemark(frontmatter: { puzzleId: { eq: $puzzleId } }) {
+  query($id: String!) {
+    markdownRemark(id: { eq: $id }) {
       html
+      fields { domain }
       frontmatter {
-        puzzleId
+        qid
         difficulty
         category
         title
@@ -48,20 +45,17 @@ const splitContent = (htmlContent) => {
   if (answer && answer.trim() === '') { answer = undefined };
   if (solution && solution.trim() === '') { solution = undefined };
 
-  // console.log({ question, hint, answer, solution });
   return { question, hint, answer, solution };
 }
 
 
-export default function Puzzle({ data, pageContext }) {
-  // const puzzleNode = data.allMarkdownRemark.edges[0].node;  // The first node matched by the query
-
-  // const puzzle = data.allMarkdownRemark.edges[0].node.frontmatter
-  // const rawMarkdown = data.allMarkdownRemark.edges[0].node.body;
-  // const html = puzzleNode.html; // HTML content
-  // const puzzle = puzzleNode.frontmatter; // Metadata
+export default function Question({ data, pageContext }) {
   const puzzle = data.markdownRemark.frontmatter
+  const domain = data.markdownRemark.fields.domain
   const rawMarkdownBody = data.markdownRemark.html
+  // quant keeps its pre-migration canonical URL; every other domain only ever
+  // had the /q/{domain}/{qid} form.
+  const canonicalRoute = domain === 'quant' ? `/puzzles/${puzzle.qid}` : `/q/${domain}/${puzzle.qid}`
 
   const { question, hint, answer, solution } = splitContent(rawMarkdownBody);
 
@@ -116,7 +110,7 @@ export default function Puzzle({ data, pageContext }) {
               </td>
               <td style={{ padding: '0px', margin: '0px' }}>
                 <div className="content-text" style={{ padding: '0px', margin: '0px', textAlign: 'center', fontSize: '1.3em' }}>
-                  <a href={`/puzzles/${puzzle.puzzleId}`} title="Permanent link to this post">
+                  <a href={canonicalRoute} title="Permanent link to this post">
                     {puzzle.title}
                   </a>
                 </div>
@@ -129,20 +123,14 @@ export default function Puzzle({ data, pageContext }) {
           </tbody>
         </table>
 
-        <PuzzleStatusToggles puzzleId={puzzle.puzzleId} />
-
-        {/* <MDXRenderer>{puzzleNode.body}</MDXRenderer> */}
-        {/* <div dangerouslySetInnerHTML={{ __html: rawMarkdownBody }} /> */}
+        <PuzzleStatusToggles puzzleId={puzzle.qid} />
 
         {question && <div className="content-text" style={{ marginTop: `1em`, marginBottom: `1em` }}>
-          {/* <ComponentToDisplayMarkdown markdown={rawMarkdownBody} /> */}
           <div dangerouslySetInnerHTML={{ __html: question }} />
         </div>}
 
-        {puzzle.questionImage && <img src={`/puzzle-images/${puzzle.questionImage}`} style={{ width: `200px`, height: 'auto', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto' }} alt={`QuestionImage ${puzzle.puzzleId}`} />}
-
         {hint &&
-          <Button id={`hint${puzzle.puzzleId}`} label="Hint" content={
+          <Button id={`hint${puzzle.qid}`} label="Hint" content={
             <div dangerouslySetInnerHTML={{ __html: hint }} />
           }
             passClass="one-liner"
@@ -150,7 +138,7 @@ export default function Puzzle({ data, pageContext }) {
         }
 
         {answer &&
-          <Button id={`answer${puzzle.puzzleId}`} label="Answer" content={
+          <Button id={`answer${puzzle.qid}`} label="Answer" content={
             <div passClass="one-liner" dangerouslySetInnerHTML={{ __html: answer }} />
           }
             passClass="one-liner"
@@ -158,20 +146,14 @@ export default function Puzzle({ data, pageContext }) {
         }
 
         {solution &&
-          <Button id={`solution${puzzle.puzzleId}`} label="Solution" content={
-            <>
-              {/* <ComponentToDisplayMarkdown markdown={puzzle.solution} />
-              {puzzle.solutionImage &&
-                <img src={`/puzzle-images/${puzzle.solutionImage}`} style={{ width: `200px`, height: 'auto', display: 'block', 'marginLeft': 'auto', 'marginRight': 'auto' }} alt={`SolutionImage ${puzzle.puzzleId}`} />
-              } */}
-              <div class="solution" dangerouslySetInnerHTML={{ __html: solution }} />
-            </>
+          <Button id={`solution${puzzle.qid}`} label="Solution" content={
+            <div className="solution" dangerouslySetInnerHTML={{ __html: solution }} />
           } />
         }
 
-        <PuzzleNotes puzzleId={puzzle.puzzleId} />
+        <PuzzleNotes puzzleId={puzzle.qid} />
 
-        <FacebookComments puzzleId={puzzle.puzzleId} />
+        <FacebookComments puzzleId={puzzle.qid} />
 
 
         <br />
@@ -181,13 +163,11 @@ export default function Puzzle({ data, pageContext }) {
               <tr>
                 <td>
 
-                  {/* TODO: fix this margin */}
                   {previousPuzzleRoute && (
                     <Link style={{ float: `left` }} to={previousPuzzleRoute} className={"btn  btn-sm link-white smooth"}>Previous</Link>
                   )}
                 </td>
 
-                {/* like button here */}
                 <td>
 
                   {nextPuzzleRoute && (

@@ -58,10 +58,13 @@ const IndexPage = ({ data }) => {
 
 export const query = graphql`
   query {
-    allMarkdownRemark(sort: {frontmatter: {puzzleId: ASC}}){
+    allMarkdownRemark(
+      filter: { fields: { domain: { eq: "quant" } } }
+      sort: {frontmatter: {qid: ASC}}
+    ){
       nodes {
         frontmatter {
-          puzzleId
+          qid
           difficulty
           category
           title

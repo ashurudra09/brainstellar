@@ -25,7 +25,7 @@ const ProgressStats = ({ puzzles }) => {
       const bucket = byDifficulty[p.difficulty];
       if (!bucket) return;
       bucket.total += 1;
-      if (counts.solvedIds.has(String(p.puzzleId))) bucket.solved += 1;
+      if (counts.solvedIds.has(String(p.qid))) bucket.solved += 1;
     });
 
     const totalSolved = Object.values(byDifficulty).reduce((sum, b) => sum + b.solved, 0);

@@ -44,10 +44,10 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
       if (difficultyFilter !== 'all' && p.difficulty !== difficultyFilter) return false;
       if (q && !p.title.toLowerCase().includes(q) && !p.category.toLowerCase().includes(q)) return false;
 
-      if (statusFilter === 'unsolved') return !isSolved(p.puzzleId);
-      if (statusFilter === 'solved') return isSolved(p.puzzleId);
-      if (statusFilter === 'starred') return isStarred(p.puzzleId);
-      if (statusFilter === 'notes') return getNotes(p.puzzleId).trim().length > 0;
+      if (statusFilter === 'unsolved') return !isSolved(p.qid);
+      if (statusFilter === 'solved') return isSolved(p.qid);
+      if (statusFilter === 'starred') return isStarred(p.qid);
+      if (statusFilter === 'notes') return getNotes(p.qid).trim().length > 0;
       return true;
     });
 
@@ -147,12 +147,12 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
           )}
 
           {visible.map(p => {
-            const solved = loaded && isSolved(p.puzzleId);
-            const starred = loaded && isStarred(p.puzzleId);
-            const hasNotes = loaded && getNotes(p.puzzleId).trim().length > 0;
+            const solved = loaded && isSolved(p.qid);
+            const starred = loaded && isStarred(p.qid);
+            const hasNotes = loaded && getNotes(p.qid).trim().length > 0;
 
             return (
-              <tr key={p.puzzleId} className={solved ? 'puzzle-row-solved' : ''}>
+              <tr key={p.qid} className={solved ? 'puzzle-row-solved' : ''}>
                 <td className="pt-col-status">
                   <span
                     className={`pt-status-toggle ${solved ? 'pt-status-solved' : ''}`}
@@ -160,11 +160,11 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
                     tabIndex={0}
                     aria-pressed={solved}
                     title={solved ? 'Mark unsolved' : 'Mark solved'}
-                    onClick={() => toggleSolved(p.puzzleId)}
+                    onClick={() => toggleSolved(p.qid)}
                     onKeyDown={e => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        toggleSolved(p.puzzleId);
+                        toggleSolved(p.qid);
                       }
                     }}
                   >
@@ -178,11 +178,11 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
                     tabIndex={0}
                     aria-pressed={starred}
                     title={starred ? 'Unstar' : 'Star'}
-                    onClick={() => toggleStarred(p.puzzleId)}
+                    onClick={() => toggleStarred(p.qid)}
                     onKeyDown={e => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
-                        toggleStarred(p.puzzleId);
+                        toggleStarred(p.qid);
                       }
                     }}
                   >
@@ -190,7 +190,7 @@ const PuzzleTable = ({ puzzles, onVisibleChange }) => {
                   </span>
                 </td>
                 <td className="pt-col-puzzle">
-                  <Link to={`/puzzles/${p.puzzleId}`}>{p.title}</Link>
+                  <Link to={`/puzzles/${p.qid}`}>{p.title}</Link>
                 </td>
                 <td className="pt-col-difficulty">
                   <span className={`pt-difficulty-badge pt-difficulty-${p.difficulty}`}>{p.difficulty}</span>

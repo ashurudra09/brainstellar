@@ -33,8 +33,8 @@ module.exports = {
     {
       resolve: `gatsby-source-filesystem`,
       options: {
-        name: `data2`,
-        path: `${__dirname}/src/data/puzzles`,
+        name: `questions`,
+        path: `${__dirname}/src/data/questions`,
       },
     },
     `gatsby-transformer-sharp`,

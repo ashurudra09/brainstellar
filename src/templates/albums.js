@@ -36,6 +36,9 @@ const AlbumsPage = ({ data }) => {
                       <img src="/images/hard.png" alt=" " /> <br />
                       Hard Puzzles
                     </Link>
+                    <Link to="/puzzles/deadly" className="btn btn-deadly activewhite smooth">
+                      Deadly Puzzles
+                    </Link>
 
                   </span>
                   <span style={{ display: `inline-block` }}>

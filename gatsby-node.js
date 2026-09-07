@@ -10,89 +10,123 @@ const path = require('path');
 const PROGRESS_FILE = path.join(__dirname, 'progress.json');
 
 /**
+ * @type {import('gatsby').GatsbyNode['onCreateNode']}
+ */
+exports.onCreateNode = ({ node, actions, getNode }) => {
+  if (node.internal.type !== 'MarkdownRemark') return;
+
+  const parent = getNode(node.parent);
+  actions.createNodeField({
+    node,
+    name: 'domain',
+    // src/data/questions/{domain}/{qid}.md -> relativeDirectory is just "{domain}"
+    value: parent.relativeDirectory,
+  });
+};
+
+/**
  * @type {import('gatsby').GatsbyNode['createPages']}
  */
-
-
-
 exports.createPages = async function ({ actions, graphql }) {
   const { data } = await graphql(`
     query {
       allMarkdownRemark(sort: {frontmatter: {qid: ASC}}) {
-          nodes {
-            frontmatter{
-            qid
-            category
-            difficulty
-          }
+        nodes {
+          id
+          fields { domain }
+          frontmatter { qid category difficulty }
         }
       }
     }
   `);
 
+  const nodes = data.allMarkdownRemark.nodes;
+  console.log({ "length": nodes.length });
 
+  const byDomain = {};
+  nodes.forEach(node => {
+    const domain = node.fields.domain;
+    (byDomain[domain] = byDomain[domain] || []).push(node);
+  });
 
-  // Create a page for each puzzle
-  const puzzles = data.allMarkdownRemark.nodes.map((node) => node.frontmatter);
+  // Canonical routes: /q/{domain}/{qid} (detail, prev/next scoped within the
+  // domain) and /q/{domain} (per-domain list).
+  Object.keys(byDomain).forEach(domain => {
+    const domainNodes = byDomain[domain];
+    const count = domainNodes.length;
+
+    domainNodes.forEach((node, index) => {
+      const prevNode = domainNodes[(index - 1 + count) % count];
+      const nextNode = domainNodes[(index + 1) % count];
+      actions.createPage({
+        path: `q/${domain}/${node.frontmatter.qid}`,
+        component: require.resolve(`./src/templates/question.js`),
+        context: {
+          id: node.id,
+          previousPuzzleRoute: count > 1 ? `/q/${domain}/${prevNode.frontmatter.qid}` : null,
+          nextPuzzleRoute: count > 1 ? `/q/${domain}/${nextNode.frontmatter.qid}` : null,
+        },
+      });
+    });
+
+    actions.createPage({
+      path: `q/${domain}`,
+      component: require.resolve(`./src/templates/domain.js`),
+      context: { domain },
+    });
+  });
+
+  // --- Legacy routes, quant only: same paths and rendered output as before
+  // the domain migration, so old links keep working. ---
+  const puzzles = byDomain['quant'] || [];
   const puzzleCount = puzzles.length;
+  const categories = Array.from(new Set(puzzles.map(node => node.frontmatter.category)));
+  const difficulties = Array.from(new Set(puzzles.map(node => node.frontmatter.difficulty)));
 
-  console.log({ "length": puzzleCount })
+  puzzles.forEach((node, index) => {
+    const puzzle = node.frontmatter;
 
-  const categoriesSet = new Set();
-
-  const difficultiesSet = new Set();
-
-
-  // Extracting list of categories
-  const categories = Array.from(new Set(puzzles.map(puzzle => puzzle.category)));
-  const difficulties = Array.from(new Set(puzzles.map(puzzle => puzzle.difficulty)));
-
-
-  puzzles.forEach((puzzle, index) => {
-    categoriesSet.add(puzzle.category);
-    difficultiesSet.add(puzzle.difficulty);
-
-    const nextPuzzleId = puzzles[(index + 1) % puzzleCount].qid;
-    const previousPuzzleId = puzzles[(index - 1 + puzzleCount) % puzzleCount].qid;
+    const nextPuzzleId = puzzles[(index + 1) % puzzleCount].frontmatter.qid;
+    const previousPuzzleId = puzzles[(index - 1 + puzzleCount) % puzzleCount].frontmatter.qid;
 
     const nextCategoryPuzzleId = puzzles.find(
-      (p, i) => p.category === puzzle.category && i > index
-    )?.qid;
+      (n, i) => n.frontmatter.category === puzzle.category && i > index
+    )?.frontmatter.qid;
 
     const nextDifficultyPuzzleId = puzzles.find(
-      (p, i) => p.difficulty === puzzle.difficulty && i > index
-    )?.qid;
+      (n, i) => n.frontmatter.difficulty === puzzle.difficulty && i > index
+    )?.frontmatter.qid;
 
     const previousCategoryPuzzleId = puzzles
       .slice(0, index)
       .reverse()
-      .find(p => p.category === puzzle.category)?.qid;
+      .find(n => n.frontmatter.category === puzzle.category)?.frontmatter.qid;
 
     const previousDifficultyPuzzleId = puzzles
       .slice(0, index)
       .reverse()
-      .find(p => p.difficulty === puzzle.difficulty)?.qid;
+      .find(n => n.frontmatter.difficulty === puzzle.difficulty)?.frontmatter.qid;
 
     // Puzzle page
     actions.createPage({
       path: `puzzles/${puzzle.qid}`,
-      component: require.resolve(`./src/templates/puzzle.js`),
+      component: require.resolve(`./src/templates/question.js`),
       context: {
-        puzzleId: puzzle.qid,
+        id: node.id,
         previousPuzzleRoute: `/puzzles/${previousPuzzleId}`,
-        nextPuzzleRoute: `/puzzles/${nextPuzzleId}`
-      }
+        nextPuzzleRoute: `/puzzles/${nextPuzzleId}`,
+      },
     });
 
     // Category puzzle page
     actions.createPage({
       path: `puzzles/${puzzle.category}/${puzzle.qid}`,
-      component: require.resolve(`./src/templates/puzzle.js`),
+      component: require.resolve(`./src/templates/question.js`),
       context: {
-        puzzleId: puzzle.qid,
+        id: node.id,
         previousPuzzleRoute: previousCategoryPuzzleId ? `/puzzles/${puzzle.category}/${previousCategoryPuzzleId}` : null,
         nextPuzzleRoute: nextCategoryPuzzleId ? `/puzzles/${puzzle.category}/${nextCategoryPuzzleId}` : null,
-        category: puzzle.category
+        category: puzzle.category,
       },
     });
 
@@ -101,40 +135,30 @@ exports.createPages = async function ({ actions, graphql }) {
       actions.createPage({
         // allow old URL's to work even if the difficulty level gets changed later.
         path: `puzzles/${difficulty}/${puzzle.qid}`,
-        component: require.resolve(`./src/templates/puzzle.js`),
+        component: require.resolve(`./src/templates/question.js`),
         context: {
-          puzzleId: puzzle.qid,
+          id: node.id,
           previousPuzzleRoute: previousDifficultyPuzzleId ? `/puzzles/${puzzle.difficulty}/${previousDifficultyPuzzleId}` : null,
           nextPuzzleRoute: nextDifficultyPuzzleId ? `/puzzles/${puzzle.difficulty}/${nextDifficultyPuzzleId}` : null,
-          difficulty: puzzle.difficulty,
+          difficulty: difficulty,
         },
       });
     });
-
   });
 
   categories.forEach((category) => {
-    // Category page
     actions.createPage({
       path: `puzzles/${category}`,
-      component: require.resolve(`./src/templates/category.js`),
-      context: {
-        category: category,
-      }
+      component: require.resolve(`./src/templates/legacy-list.js`),
+      context: { field: 'category', value: category },
     });
   });
 
   difficulties.forEach((difficulty) => {
-    // Difficulty page
     actions.createPage({
       path: `puzzles/${difficulty}`,
-      component: require.resolve(`./src/templates/difficulty.js`),
-      context: {
-        puzzleId: null,
-        previousPuzzleRoute: null,
-        nextPuzzleRoute: null,
-        difficulty: difficulty,
-      }
+      component: require.resolve(`./src/templates/legacy-list.js`),
+      context: { field: 'difficulty', value: difficulty },
     });
   });
 
@@ -181,6 +205,10 @@ exports.onCreateDevServer = ({ app }) => {
 
 exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({
+    // cheerio's undici dependency conditionally requires node:sqlite (a
+    // Node 22+ built-in) for an HTTP cache feature this site never uses;
+    // webpack can't bundle it, so treat it as external rather than resolve it.
+    externals: [{ 'node:sqlite': 'commonjs node:sqlite' }],
     module: {
       rules: [
         {
