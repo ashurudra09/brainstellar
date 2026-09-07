@@ -4,33 +4,29 @@ const PrivacyPolicy = () => (
   <div>
     <h1>Privacy Policy</h1>
 
-    <p>Last updated: 2023-05-27</p>
+    <p>Last updated: 2026-09-07</p>
 
-    <p>We respect and protect the privacy of our users. This Privacy Policy explains that we DO NOT Collect OR Use any user information.</p>
+    <h2>Signed Out</h2>
 
-    <h2>Information We Collect: None</h2>
+    <p>If you don't sign in, this site collects no personal data. Your solved/starred/notes progress is stored only in your browser's local storage and never leaves your device.</p>
 
-    <p>We does not collect any personal data. We do not collect any information through cookies or other tracking technologies.</p>
+    <h2>Signed In</h2>
 
-    <h2>How We Use Your Information</h2>
+    <p>Signing in with Google or GitHub is optional and lets your progress follow you across devices. Sign-in is handled by Firebase Authentication, which stores your account identifier, email address, and display name as provided by Google or GitHub. Your progress data (solved/starred/notes) is stored in Firestore, a Google Cloud database, keyed to your account.</p>
 
-    <p>As we do not collect any personal data, we do not use any such information.</p>
+    <p>This data is never shared with any third party, is not used for advertising or analytics, and is readable only by your own signed-in account -- Firestore security rules deny every other request.</p>
 
     <h2>Data Deletion</h2>
 
-    <p>Since we do not collect or store personal data, there is no personal data to delete.</p>
+    <p>To delete your account and progress data, sign in and contact us at the address below; we will delete your Firestore document and Firebase Authentication account. Signing out at any time returns you to the signed-out, no-data-collected experience above.</p>
 
     <h2>Changes to This Privacy Policy</h2>
 
-    <p>This policy will never change as long as the author (Varun Seth) is alive. Otherwise, any changes will appear on this page.</p>
+    <p>Any future changes will appear on this page.</p>
 
     <h2>Contact Us</h2>
 
     <p>If you have any questions about this Privacy Policy, please contact us at: BrainStellarPuzzles@facebook.com</p>
-
-    <h2>Facebook Comments</h2>
-
-    <p>The Facebook comments and other features can be individually enabled for each page. The user has to manually press the "Comments" buttons. The plugin is only loaded after it is enabled by the user. Before enabling, no request is made to the facebook's servers. So, we protect our users from being tracked by other services too.</p>
 
   </div>
 )
