@@ -1,24 +1,19 @@
 import * as React from "react"
-import { useState, useCallback, useMemo } from "react"
+import { useMemo } from "react"
 import { graphql, Link } from "gatsby"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import ProgressStats from "../components/ProgressStats"
-import RandomPuzzleButton from "../components/RandomPuzzleButton"
-import PuzzleTable from "../components/PuzzleTable"
+import DomainCards from "../components/DomainCards"
+import ReviewQueue from "../components/ReviewQueue"
 import * as styles from "../components/index.module.css"
 
 const IndexPage = ({ data }) => {
-  // Memoized so this array keeps a stable reference across re-renders: PuzzleTable
-  // reports its filtered list back up via onVisibleChange, and a fresh array here
-  // on every render would otherwise retrigger that effect in an infinite loop.
-  const puzzles = useMemo(
-    () => data.allMarkdownRemark.nodes.map((node) => node.frontmatter),
+  const questions = useMemo(
+    () => data.allMarkdownRemark.nodes.map(node => ({ ...node.frontmatter, domain: node.fields.domain })),
     [data]
   );
-  const [visiblePuzzles, setVisiblePuzzles] = useState(puzzles);
-  const handleVisibleChange = useCallback((list) => setVisiblePuzzles(list), []);
 
   return (
     <Layout id="wrapper">
@@ -31,10 +26,9 @@ const IndexPage = ({ data }) => {
               <div className="container">
                 <h2 style={{ textAlign: 'center' }}>Your Progress</h2>
                 <div style={{ textAlign: 'center' }}>
-                  <Link to="/puzzles" className="btn btn-sm link-white smooth">All Puzzles</Link>
+                  <Link to="/all" className="btn btn-sm link-white smooth">All Questions</Link>
                 </div>
-                <ProgressStats puzzles={puzzles} />
-                <RandomPuzzleButton puzzles={visiblePuzzles} />
+                <ProgressStats questions={questions} />
               </div>
             </div>
           </div>
@@ -44,8 +38,30 @@ const IndexPage = ({ data }) => {
           <div className="bord1">
             <div className="bord2">
               <div className="container">
-                <h2>All Puzzles</h2>
-                <PuzzleTable puzzles={puzzles} onVisibleChange={handleVisibleChange} />
+                <h2>Domains</h2>
+                <DomainCards questions={questions} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="stylishpage">
+          <div className="bord1">
+            <div className="bord2">
+              <div className="container">
+                <h2>Due for review</h2>
+                <ReviewQueue mode="due" questions={questions} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="stylishpage">
+          <div className="bord1">
+            <div className="bord2">
+              <div className="container">
+                <h2>Revisit</h2>
+                <ReviewQueue mode="revisit" questions={questions} />
               </div>
             </div>
           </div>
@@ -58,11 +74,9 @@ const IndexPage = ({ data }) => {
 
 export const query = graphql`
   query {
-    allMarkdownRemark(
-      filter: { fields: { domain: { eq: "quant" } } }
-      sort: {frontmatter: {qid: ASC}}
-    ){
+    allMarkdownRemark(sort: {frontmatter: {qid: ASC}}){
       nodes {
+        fields { domain }
         frontmatter {
           qid
           difficulty

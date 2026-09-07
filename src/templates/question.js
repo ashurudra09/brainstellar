@@ -4,7 +4,7 @@ import React from 'react'
 import { graphql, Link } from 'gatsby'
 import Layout from '../components/layout'
 import Button from '../components/Button';
-import { PuzzleStatusToggles, PuzzleNotes } from '../components/PuzzleTracker';
+import { PuzzleStatusToggles, PuzzleNotes } from '../components/QuestionTracker';
 import FacebookComments from '../components/FacebookComments';
 import Seo from '../components/seo';
 import { getDomain } from '../data/domains';
@@ -48,6 +48,7 @@ export default function Question({ data, pageContext }) {
 
   const sections = splitSections(rawMarkdownBody);
   const openNames = puzzle.open || (domain ? domain.sections.open : ['Question']);
+  const progressKey = `${domainSlug}:${puzzle.qid}`;
 
   const { previousPuzzleRoute, nextPuzzleRoute, category, difficulty } = pageContext
 
@@ -84,7 +85,7 @@ export default function Question({ data, pageContext }) {
           </tbody>
         </table>
 
-        <PuzzleStatusToggles puzzleId={puzzle.qid} />
+        <PuzzleStatusToggles puzzleId={progressKey} />
 
         {sections.map(section => {
           const isSolution = section.name === 'Solution';
@@ -112,7 +113,7 @@ export default function Question({ data, pageContext }) {
           );
         })}
 
-        <PuzzleNotes puzzleId={puzzle.qid} />
+        <PuzzleNotes puzzleId={progressKey} />
 
         <FacebookComments puzzleId={puzzle.qid} />
 

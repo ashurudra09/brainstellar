@@ -1,12 +1,14 @@
-// src/components/PuzzleTracker.js
+// src/components/QuestionTracker.js
 import React, { useEffect, useRef } from 'react';
 import useProgress from '../hooks/useProgress';
 import Button from './Button';
 
 export const PuzzleStatusToggles = ({ puzzleId }) => {
-  const { loaded, isSolved, isStarred, toggleSolved, toggleStarred } = useProgress();
+  const { loaded, isSolved, isStarred, isRevisit, isDueForReview, toggleSolved, toggleStarred, toggleRevisit, markReviewed } = useProgress();
   const solved = loaded && isSolved(puzzleId);
   const starred = loaded && isStarred(puzzleId);
+  const revisit = loaded && isRevisit(puzzleId);
+  const due = loaded && isDueForReview(puzzleId);
 
   return (
     <div className="puzzle-tracker-toggles">
@@ -22,6 +24,21 @@ export const PuzzleStatusToggles = ({ puzzleId }) => {
       >
         {starred ? '★ Starred' : '☆ Star'}
       </button>
+      <button
+        className={`push tracker-toggle tracker-revisit ${revisit ? 'pushed' : ''}`}
+        onClick={() => toggleRevisit(puzzleId)}
+      >
+        {revisit ? '🔖 Revisit' : 'Mark for Revisit'}
+      </button>
+      {starred && solved && (
+        <button
+          className={`push tracker-toggle tracker-reviewed ${due ? 'tracker-reviewed-due' : ''}`}
+          onClick={() => markReviewed(puzzleId)}
+          title="Reset the review schedule for this question"
+        >
+          {due ? 'Due — Mark Reviewed' : 'Mark Reviewed'}
+        </button>
+      )}
     </div>
   );
 };

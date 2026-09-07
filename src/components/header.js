@@ -1,6 +1,7 @@
 import * as React from "react"
-import { Link } from "gatsby"
+import { Link, navigate } from "gatsby"
 import ThemeToggle from "./ThemeToggle"
+import { DOMAINS } from "../data/domains"
 
 const Header = ({ siteTitle }) => (
   <header
@@ -31,10 +32,21 @@ const Header = ({ siteTitle }) => (
           />
         </Link>
 
-        <Link to="/puzzles/easy" className="nav-links">Easy</Link>
-        <Link to="/puzzles/medium" className="nav-links">Medium</Link>
-        <Link to="/puzzles/hard" className="nav-links">Hard</Link>
-        <Link to="/puzzles/deadly" className="nav-links">Deadly</Link>
+        <Link to="/" className="nav-links">Dashboard</Link>
+        <Link to="/all" className="nav-links">All Questions</Link>
+        <select
+          className="nav-domain-select"
+          defaultValue=""
+          onChange={e => {
+            if (e.target.value) navigate(e.target.value);
+            e.target.value = '';
+          }}
+        >
+          <option value="" disabled>Domains</option>
+          {DOMAINS.map(d => (
+            <option key={d.slug} value={`/q/${d.slug}`}>{d.icon} {d.label}</option>
+          ))}
+        </select>
 
         <ThemeToggle />
 

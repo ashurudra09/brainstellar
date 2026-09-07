@@ -10,8 +10,8 @@
   --color-background-off: #2d2d2d;
 }
 
-[data-theme="auto"] {
-  @media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] {
     --color-text: white;
     --color-background: #1d1d1d;
     --color-background-off: #2d2d2d;
@@ -1055,23 +1055,7 @@ code {
   background: var(--color-background-off);
   border-radius: 8px;
   padding: 10px 14px;
-  border-left: 4px solid var(--color-text);
-}
-
-.progress-tile-easy {
-  border-left-color: var(--difficulty-easy);
-}
-
-.progress-tile-medium {
-  border-left-color: var(--difficulty-medium);
-}
-
-.progress-tile-hard {
-  border-left-color: var(--difficulty-hard);
-}
-
-.progress-tile-deadly {
-  border-left-color: var(--difficulty-deadly);
+  border-left: 4px solid var(--accent, var(--color-text));
 }
 
 .progress-tile-starred {
@@ -1098,25 +1082,10 @@ code {
   overflow: hidden;
 }
 
-.progress-tile-easy .progress-tile-bar-fill {
-  background: var(--difficulty-easy);
-}
-
-.progress-tile-medium .progress-tile-bar-fill {
-  background: var(--difficulty-medium);
-}
-
-.progress-tile-hard .progress-tile-bar-fill {
-  background: var(--difficulty-hard);
-}
-
-.progress-tile-deadly .progress-tile-bar-fill {
-  background: var(--difficulty-deadly);
-}
-
 .progress-tile-bar-fill {
   height: 100%;
   transition: width .4s ease;
+  background: var(--accent, var(--color-text));
 }
 
 /* --- Random puzzle button --- */
@@ -1181,32 +1150,8 @@ code {
 }
 
 .filter-chip-active {
-  background: #808080;
-  color: var(--color-background);
-  border-color: #808080;
-}
-
-.filter-chip-easy.filter-chip-active {
-  background: var(--difficulty-easy);
-  border-color: var(--difficulty-easy);
-  color: #fff;
-}
-
-.filter-chip-medium.filter-chip-active {
-  background: var(--difficulty-medium);
-  border-color: var(--difficulty-medium);
-  color: #fff;
-}
-
-.filter-chip-hard.filter-chip-active {
-  background: var(--difficulty-hard);
-  border-color: var(--difficulty-hard);
-  color: #fff;
-}
-
-.filter-chip-deadly.filter-chip-active {
-  background: var(--difficulty-deadly);
-  border-color: var(--difficulty-deadly);
+  background: var(--accent);
+  border-color: var(--accent);
   color: #fff;
 }
 
@@ -1249,7 +1194,8 @@ code {
 }
 
 .pt-col-difficulty,
-.pt-col-category {
+.pt-col-category,
+.pt-col-domain {
   width: 110px;
 }
 
@@ -1308,22 +1254,7 @@ code {
   font-size: 0.85em;
   color: #fff;
   text-transform: capitalize;
-}
-
-.pt-difficulty-easy {
-  background: var(--difficulty-easy);
-}
-
-.pt-difficulty-medium {
-  background: var(--difficulty-medium);
-}
-
-.pt-difficulty-hard {
-  background: var(--difficulty-hard);
-}
-
-.pt-difficulty-deadly {
-  background: var(--difficulty-deadly);
+  background: var(--accent);
 }
 
 /* --- Per-puzzle tracker (puzzle page) --- */
@@ -1386,4 +1317,84 @@ code {
 .puzzle-notes-textarea:empty:before {
   content: attr(data-placeholder);
   color: #888;
+}
+
+.tracker-revisit.pushed {
+  background: #4a8fd3;
+  border-color: #4a8fd3;
+}
+
+.tracker-reviewed-due {
+  border-color: #d3a454;
+  color: #d3a454;
+}
+
+/* --- Domain cards (hub) --- */
+
+.domain-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.domain-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-background-off);
+  border-radius: 8px;
+  border-top: 4px solid var(--accent);
+  padding: 14px 10px;
+  text-decoration: none;
+  color: var(--color-text);
+}
+
+.domain-card-icon {
+  font-size: 1.8em;
+}
+
+.domain-card-label {
+  font-weight: bold;
+}
+
+.domain-card-count {
+  opacity: 0.7;
+  font-size: 0.9em;
+}
+
+/* --- Review queue (Due for review / Revisit lists) --- */
+
+.review-queue {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.review-queue li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 4px;
+  border-bottom: 1px solid rgb(128, 128, 128, 0.16);
+}
+
+.review-queue-mark-reviewed {
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.review-queue-empty {
+  opacity: 0.7;
+  text-align: center;
+}
+
+.nav-domain-select {
+  background: transparent;
+  color: inherit;
+  border: 1px solid rgb(128, 128, 128, 0.5);
+  border-radius: 4px;
+  padding: 4px 6px;
+  margin: 0 6px;
 }
