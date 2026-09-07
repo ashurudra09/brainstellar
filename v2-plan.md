@@ -1,5 +1,10 @@
 # Placement Prep Dashboard — multi-domain overhaul
 
+> **Status: complete.** This plan's phases have all landed. Further work
+> (build speed, a tenth domain, cheatsheets, and the README/doc pass) is
+> tracked in [`v2.1-plan.md`](v2.1-plan.md), which supersedes parts of this
+> document (its Phase 2 build pipeline, Phase 1's domain list).
+
 ## Context
 
 This repo is a fork of Brainstellar (Gatsby 5) holding 114 quant puzzles as markdown, extended with progress tracking, starring, filtering and notes. The goal is to turn it from a puzzle site into a single placement-prep dashboard covering nine domains: Quant Puzzles, DSA, SQL, LLD, HLD, OS & Networks, Data Science, AI/ML, and Behavioural.

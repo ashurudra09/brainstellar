@@ -6,9 +6,9 @@ description: Alias of add-question, kept so old muscle memory (`/add-puzzle`) st
 # Add Puzzle (alias)
 
 This skill was renamed to **add-question** when the site grew from
-quant-only puzzles to nine domains (Quant, DSA, SQL, LLD, HLD, OS &
-Networks, Data Science, AI/ML, Behavioural). This file is kept only so
-`/add-puzzle` still works out of habit.
+quant-only puzzles to multiple domains. This file is kept only so
+`/add-puzzle` still works out of habit — see `src/data/domains.js` for the
+current domain list rather than restating it here, since it can change.
 
 Do not follow any instructions from this file beyond this pointer. Instead,
 read and follow **[.claude/skills/add-question/SKILL.md](../add-question/SKILL.md)**
