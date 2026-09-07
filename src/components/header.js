@@ -35,7 +35,7 @@ const Header = ({ siteTitle }) => (
         <Link to="/" className="nav-links">Dashboard</Link>
         <Link to="/all" className="nav-links">All Questions</Link>
         <select
-          className="nav-domain-select"
+          className="nav-select"
           defaultValue=""
           onChange={e => {
             if (e.target.value) navigate(e.target.value);
