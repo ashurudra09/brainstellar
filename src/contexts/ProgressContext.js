@@ -1,5 +1,9 @@
 // src/contexts/ProgressContext.js
-import React, { createContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { createContext, useState, useEffect, useRef, useCallback, useMemo, useContext } from 'react';
+import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { getDb } from '../firebase';
+import { AuthContext } from './AuthContext';
+import mergeProgress from '../utils/mergeProgress';
 
 export const ProgressContext = createContext();
 
@@ -48,6 +52,7 @@ const readLocalStorage = () => {
 };
 
 export const ProgressProvider = ({ children }) => {
+  const { user } = useContext(AuthContext);
   const [progress, setProgress] = useState(emptyState());
   const [loaded, setLoaded] = useState(false);
   const [synced, setSynced] = useState(true);
@@ -55,34 +60,19 @@ export const ProgressProvider = ({ children }) => {
   // Only the dev server exposes /__progress; gatsby build/serve fall back to
   // localStorage alone.
   const useFileBackend = useRef(true);
+  const progressRef = useRef(progress);
+  progressRef.current = progress;
+  // uid of the account currently driving saves/subscription, or null when
+  // signed out. Tracked outside React state since it's read from inside
+  // update()'s setProgress updater, not rendered itself.
+  const uidRef = useRef(null);
+  const saveRef = useRef(null);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetch('/__progress')
-      .then(res => {
-        if (!res.ok) throw new Error('progress endpoint unavailable');
-        return res.json();
-      })
-      .then(data => {
-        if (cancelled) return;
-        useFileBackend.current = true;
-        setProgress(migrate(data));
-        setLoaded(true);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        useFileBackend.current = false;
-        setProgress(migrate(readLocalStorage()));
-        setLoaded(true);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const persist = useCallback(next => {
+  // Signed-out persistence: existing localStorage + dev-only /__progress
+  // path, unchanged. While signed in this is never called -- 4d requires
+  // not mirroring to localStorage so a shared device can't leak one
+  // account's progress to the next signed-out visitor.
+  const persistLocal = useCallback(next => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     } catch (e) {
@@ -110,21 +100,112 @@ export const ProgressProvider = ({ children }) => {
     }, 600);
   }, []);
 
-  // saveRef lets `update` stay a stable useCallback([]) while always calling
-  // the latest persist -- and, once Firestore lands, lets sign-in swap the
-  // save path (local file vs. remote) without changing update's identity.
-  const saveRef = useRef(persist);
-  saveRef.current = persist;
+  // Signed-in persistence: writes only the touched entry, merged into the
+  // user's document, so device A toggling one question can't clobber
+  // device B's concurrent edit to a different one.
+  const persistCloud = useCallback((next, key) => {
+    const db = getDb();
+    const uid = uidRef.current;
+    if (!db || !uid) return;
+    setDoc(
+      doc(db, 'users', uid),
+      { version: 2, questions: { [key]: next.questions[key] }, settings: next.settings, updatedAt: serverTimestamp() },
+      { merge: true }
+    )
+      .then(() => setSynced(true))
+      .catch(() => setSynced(false));
+  }, []);
 
-  // Persistence lives here, not in a useEffect keyed on `progress`: once a
-  // remote onSnapshot feeds back into setProgress, that effect would create
-  // local write -> remote ack -> setProgress -> effect -> write -> ... loop.
+  const loadLocal = useCallback(() => {
+    let cancelled = false;
+
+    fetch('/__progress')
+      .then(res => {
+        if (!res.ok) throw new Error('progress endpoint unavailable');
+        return res.json();
+      })
+      .then(data => {
+        if (cancelled) return;
+        useFileBackend.current = true;
+        setProgress(migrate(data));
+        setLoaded(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        useFileBackend.current = false;
+        setProgress(migrate(readLocalStorage()));
+        setLoaded(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Initial load always starts from the signed-out path -- Firebase auth
+  // state restoration is async, so this loads first and the sign-in effect
+  // below reconciles moments later if a session turns out to be active.
+  useEffect(() => {
+    saveRef.current = persistLocal;
+    return loadLocal();
+  }, [loadLocal, persistLocal]);
+
+  // Reconcile local + cloud on sign-in, subscribe to remote changes, and
+  // fall back to the untouched pre-sign-in local view on sign-out.
+  useEffect(() => {
+    if (!user) {
+      if (uidRef.current) {
+        uidRef.current = null;
+        saveRef.current = persistLocal;
+        loadLocal();
+      }
+      return undefined;
+    }
+
+    const db = getDb();
+    if (!db) return undefined;
+
+    const ref = doc(db, 'users', user.uid);
+    let cancelled = false;
+
+    getDoc(ref)
+      .then(snap => {
+        if (cancelled) return;
+        const merged = mergeProgress(progressRef.current, snap.exists() ? snap.data() : null);
+        setProgress(merged);
+        uidRef.current = user.uid;
+        saveRef.current = persistCloud;
+        return setDoc(
+          ref,
+          { version: 2, questions: merged.questions, settings: merged.settings, updatedAt: serverTimestamp() },
+          { merge: true }
+        );
+      })
+      .catch(() => setSynced(false));
+
+    // Remote snapshots set state directly, without going through saveRef --
+    // feeding them back into a save would be local write -> server ack ->
+    // setProgress -> write -> ... forever.
+    const unsubscribe = onSnapshot(ref, snap => {
+      if (!snap.exists()) return;
+      setProgress(migrate(snap.data()));
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [user, persistLocal, persistCloud, loadLocal]);
+
+  // Persistence lives here, not in a useEffect keyed on `progress`: see the
+  // sign-in effect above for why that shape is an infinite write loop once
+  // a remote onSnapshot exists.
   const update = useCallback((key, patch) => {
     setProgress(prev => {
       const prevEntry = prev.questions[key] || EMPTY_ENTRY;
-      const nextEntry = { ...prevEntry, ...patch };
+      const nextEntry = { ...prevEntry, ...patch, updatedAt: Date.now() };
       const next = { ...prev, questions: { ...prev.questions, [key]: nextEntry } };
-      saveRef.current(next);
+      if (saveRef.current) saveRef.current(next, key);
       return next;
     });
   }, []);

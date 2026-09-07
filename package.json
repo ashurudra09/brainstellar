@@ -6,6 +6,7 @@
   "author": "Varun Seth <8343593+varun-seth@users.noreply.github.com>",
   "dependencies": {
     "dompurify": "^3.4.15",
+    "firebase": "^12.18.0",
     "gatsby": "^5.9.1",
     "gatsby-plugin-manifest": "^5.9.0",
     "gatsby-plugin-react-helmet": "^6.10.0",

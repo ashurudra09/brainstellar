@@ -441,7 +441,7 @@ input[type='text'] {
 }
 
 .nav {
-  height: 20px;
+  min-height: 20px;
   padding: 14px 0 15px
 }
 
@@ -1545,6 +1545,62 @@ code {
   align-self: center;
   color: #d3544a;
   font-size: 0.85em;
+}
+
+.auth-widget {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.auth-name {
+  font-size: 0.85em;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.auth-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--color-background);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  padding: 6px;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.auth-error {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 6px;
+  background: var(--color-background);
+  border: 1px solid #d3544a;
+  color: #d3544a;
+  border-radius: 4px;
+  padding: 6px 24px 6px 8px;
+  font-size: 0.85em;
+  max-width: 280px;
+  z-index: 10;
+}
+
+.auth-error-dismiss {
+  position: absolute;
+  top: 2px;
+  right: 6px;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
 }
 
 /* --- Review queue (Due for review / Revisit lists) --- */

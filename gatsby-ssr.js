@@ -1,9 +1,3 @@
-
-import React from 'react';
-import { ThemeProvider } from './src/contexts/ThemeContext';
-import { ProgressProvider } from './src/contexts/ProgressContext';
-
-
 /**
  * Implement Gatsby's SSR (Server Side Rendering) APIs in this file.
  *
@@ -17,12 +11,4 @@ export const onRenderBody = ({ setHtmlAttributes }) => {
   setHtmlAttributes({ lang: `en` });
 };
 
-export const wrapRootElement = ({ element }) => {
-  return (
-    <ThemeProvider>
-      <ProgressProvider>
-        {element}
-      </ProgressProvider>
-    </ThemeProvider>
-  );
-};
+export { default as wrapRootElement } from './wrap-root-element';
