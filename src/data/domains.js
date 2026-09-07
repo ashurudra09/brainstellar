@@ -53,7 +53,7 @@ export const DOMAINS = [
   },
   {
     slug: 'lld',
-    label: 'LLD',
+    label: 'LLD & OOP',
     icon: '🧱',
     accent: '#b5651d',
     difficulties: ['easy', 'medium', 'hard'],
@@ -109,6 +109,18 @@ export const DOMAINS = [
     sections: {
       open: ['Question'],
       collapsed: ['Hint', 'Approach', 'Answer', 'Solution'],
+    },
+  },
+  {
+    slug: 'language-specific',
+    label: 'Language-Specific',
+    icon: '🔤',
+    accent: '#4aa8a0',
+    difficulties: ['easy', 'medium', 'hard'],
+    categories: ['python', 'cpp', 'java', 'javascript', 'go', 'comparative'],
+    sections: {
+      open: ['Question'],
+      collapsed: ['Hint', 'Answer', 'Code', 'Solution'],
     },
   },
   {

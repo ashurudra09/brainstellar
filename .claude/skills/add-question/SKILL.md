@@ -1,6 +1,6 @@
 ---
 name: add-question
-description: Add one or more new questions to this placement-prep dashboard (a Gatsby app under src/data/questions), across any of its nine domains (Quant Puzzles, DSA, SQL, LLD, HLD, OS & Networks, Data Science, AI/ML, Behavioural) — classifying domain/difficulty/category, assigning the next qid (scoped per domain), and writing the markdown file in the section format that domain's template renders. Trigger this whenever the user invokes /add-question or /add-puzzle, or asks to "add a question", "add a puzzle", "add this to the site", "put this in brainstellar", or similar — whether the content was just discussed in the conversation or is being pasted in directly.
+description: Add one or more new questions to this placement-prep dashboard (a Gatsby app under src/data/questions), across any of its ten domains (Quant Puzzles, DSA, SQL, LLD & OOP, HLD, OS & Networks, Data Science, AI/ML, Behavioural, Language-Specific) — classifying domain/difficulty/category, assigning the next qid (scoped per domain), and writing the markdown file in the section format that domain's template renders. Trigger this whenever the user invokes /add-question or /add-puzzle, or asks to "add a question", "add a puzzle", "add this to the site", "put this in brainstellar", or similar — whether the content was just discussed in the conversation or is being pasted in directly.
 ---
 
 # Add Question
@@ -58,17 +58,29 @@ ids relate to each other (per domain).
 
 Read `src/data/domains.js` for the current list of domains (`slug`,
 `label`) — don't restate them here since the list can change. As of this
-writing there are nine: Quant Puzzles, DSA, SQL, LLD, HLD, OS & Networks,
-Data Science, AI/ML, Behavioural.
+writing there are ten: Quant Puzzles, DSA, SQL, LLD & OOP, HLD, OS &
+Networks, Data Science, AI/ML, Behavioural, Language-Specific.
 
 Infer the domain from the content's shape: a brain-teaser/probability
 puzzle → `quant`; a data-structures-and-algorithms problem (arrays, trees,
 graphs, DP, ...) → `dsa`; a query-writing exercise over tables → `sql`;
-an object-design/design-patterns question → `lld`; a system-design
-question → `hld`; a processes/memory/networking concept question →
-`os-networks`; a statistics/experiment-design/pandas question →
-`data-science`; an ML/DL/NLP/LLM question → `ai-ml`; a "tell me about a
-time..." / leadership / conflict story → `behavioural`.
+an object-design/design-patterns question, **or an OOP concept question**
+→ `lld`; a system-design question → `hld`; a processes/memory/networking
+concept question → `os-networks`; a statistics/experiment-design/pandas
+question → `data-science`; an ML/DL/NLP/LLM question → `ai-ml`; a "tell me
+about a time..." / leadership / conflict story → `behavioural`; a question
+about how a specific language implements something, or a cross-language
+comparison → `language-specific`.
+
+Two tie-breaks, since they're the only ambiguous calls the above list
+introduces:
+- **Names a language → `language-specific`**, even when the topic is OOP.
+  "How does Python's MRO resolve diamond inheritance?" is
+  `language-specific`/`python`; "what is the diamond problem?" is
+  `lld`/`oop-principles`.
+- **Explain vs design, within `lld`**: a question that asks you to *design*
+  something goes to `case-study`/`design-patterns`; a question that asks
+  you to *explain* an OOP idea goes to `oop-principles`. Both are `lld`.
 
 Domain is a bigger call than difficulty or category — unlike those, **ask
 the user to confirm** whenever the domain is genuinely ambiguous (e.g. a
@@ -190,8 +202,7 @@ For each question added, tell the user:
   category, with your one-line reasoning for each classification.
 - The files written (the new `.md`, the image if any).
 - That they can check it renders correctly by running `gatsby develop` and
-  visiting `/q/{domain}/{qid}` (or `/puzzles/{qid}` if the domain is
-  `quant`, which keeps its pre-migration URL).
+  visiting `/q/{domain}/{qid}`.
 
 Don't commit anything to git — leave that to the user, since new question
 content is exactly the kind of thing they'll want to read over first.
