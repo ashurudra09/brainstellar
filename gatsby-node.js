@@ -18,10 +18,10 @@ const PROGRESS_FILE = path.join(__dirname, 'progress.json');
 exports.createPages = async function ({ actions, graphql }) {
   const { data } = await graphql(`
     query {
-      allMarkdownRemark(sort: {frontmatter: {puzzleId: ASC}}) {
+      allMarkdownRemark(sort: {frontmatter: {qid: ASC}}) {
           nodes {
             frontmatter{
-            puzzleId
+            qid
             category
             difficulty
           }
@@ -52,33 +52,33 @@ exports.createPages = async function ({ actions, graphql }) {
     categoriesSet.add(puzzle.category);
     difficultiesSet.add(puzzle.difficulty);
 
-    const nextPuzzleId = puzzles[(index + 1) % puzzleCount].puzzleId;
-    const previousPuzzleId = puzzles[(index - 1 + puzzleCount) % puzzleCount].puzzleId;
+    const nextPuzzleId = puzzles[(index + 1) % puzzleCount].qid;
+    const previousPuzzleId = puzzles[(index - 1 + puzzleCount) % puzzleCount].qid;
 
     const nextCategoryPuzzleId = puzzles.find(
       (p, i) => p.category === puzzle.category && i > index
-    )?.puzzleId;
+    )?.qid;
 
     const nextDifficultyPuzzleId = puzzles.find(
       (p, i) => p.difficulty === puzzle.difficulty && i > index
-    )?.puzzleId;
+    )?.qid;
 
     const previousCategoryPuzzleId = puzzles
       .slice(0, index)
       .reverse()
-      .find(p => p.category === puzzle.category)?.puzzleId;
+      .find(p => p.category === puzzle.category)?.qid;
 
     const previousDifficultyPuzzleId = puzzles
       .slice(0, index)
       .reverse()
-      .find(p => p.difficulty === puzzle.difficulty)?.puzzleId;
+      .find(p => p.difficulty === puzzle.difficulty)?.qid;
 
     // Puzzle page
     actions.createPage({
-      path: `puzzles/${puzzle.puzzleId}`,
+      path: `puzzles/${puzzle.qid}`,
       component: require.resolve(`./src/templates/puzzle.js`),
       context: {
-        puzzleId: puzzle.puzzleId,
+        puzzleId: puzzle.qid,
         previousPuzzleRoute: `/puzzles/${previousPuzzleId}`,
         nextPuzzleRoute: `/puzzles/${nextPuzzleId}`
       }
@@ -86,10 +86,10 @@ exports.createPages = async function ({ actions, graphql }) {
 
     // Category puzzle page
     actions.createPage({
-      path: `puzzles/${puzzle.category}/${puzzle.puzzleId}`,
+      path: `puzzles/${puzzle.category}/${puzzle.qid}`,
       component: require.resolve(`./src/templates/puzzle.js`),
       context: {
-        puzzleId: puzzle.puzzleId,
+        puzzleId: puzzle.qid,
         previousPuzzleRoute: previousCategoryPuzzleId ? `/puzzles/${puzzle.category}/${previousCategoryPuzzleId}` : null,
         nextPuzzleRoute: nextCategoryPuzzleId ? `/puzzles/${puzzle.category}/${nextCategoryPuzzleId}` : null,
         category: puzzle.category
@@ -100,10 +100,10 @@ exports.createPages = async function ({ actions, graphql }) {
       // Difficulty puzzle page
       actions.createPage({
         // allow old URL's to work even if the difficulty level gets changed later.
-        path: `puzzles/${difficulty}/${puzzle.puzzleId}`,
+        path: `puzzles/${difficulty}/${puzzle.qid}`,
         component: require.resolve(`./src/templates/puzzle.js`),
         context: {
-          puzzleId: puzzle.puzzleId,
+          puzzleId: puzzle.qid,
           previousPuzzleRoute: previousDifficultyPuzzleId ? `/puzzles/${puzzle.difficulty}/${previousDifficultyPuzzleId}` : null,
           nextPuzzleRoute: nextDifficultyPuzzleId ? `/puzzles/${puzzle.difficulty}/${nextDifficultyPuzzleId}` : null,
           difficulty: puzzle.difficulty,

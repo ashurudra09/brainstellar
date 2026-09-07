@@ -74,8 +74,8 @@ const AlbumsPage = ({ data }) => {
           {/* This section has all puzzles ordered from oldest to newest. This is the order I discovered them in. */}
 
           {puzzles.map(puzzle => (
-            <span key={puzzle.puzzleId}>
-              <Link to={`/puzzles/${puzzle.puzzleId}`} className={`btn btn-sm link-${puzzle.difficulty} smooth`}>{puzzle.title}</Link>
+            <span key={puzzle.qid}>
+              <Link to={`/puzzles/${puzzle.qid}`} className={`btn btn-sm link-${puzzle.difficulty} smooth`}>{puzzle.title}</Link>
             </span>
           ))}
         </div></div></div></div>
@@ -118,10 +118,10 @@ const AlbumsPage = ({ data }) => {
 
 export const query = graphql`
   query {
-    allMarkdownRemark(sort: {frontmatter: {puzzleId: ASC}}){
+    allMarkdownRemark(sort: {frontmatter: {qid: ASC}}){
       nodes {
         frontmatter {
-          puzzleId
+          qid
           difficulty
           category
           title

@@ -16,7 +16,6 @@
     "gatsby-remark-katex": "^7.10.0",
     "gatsby-remark-prismjs": "^7.16.0",
     "gatsby-source-filesystem": "^5.10.0",
-    "gatsby-transformer-json": "^5.9.0",
     "gatsby-transformer-remark": "^6.10.0",
     "gatsby-transformer-sharp": "^5.10.0",
     "he": "^1.2.0",

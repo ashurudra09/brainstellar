@@ -38,9 +38,8 @@ of rolling an even number? Answer: 1/2, because 3 of 6 faces are even.
 ```
 
 It classifies difficulty and category, assigns the next `puzzleId`, and
-writes both `src/data/puzzles/{id}.md` and a matching entry in
-`puzzles.yaml` — nothing is committed automatically, so review the new
-file(s) before committing. See
+writes `src/data/puzzles/{id}.md` — nothing is committed automatically, so
+review the new file before committing. See
 [.claude/skills/add-puzzle/SKILL.md](.claude/skills/add-puzzle/SKILL.md)
 for the full format it follows.
 
