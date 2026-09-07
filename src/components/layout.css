@@ -923,6 +923,29 @@ input[type='text'] {
   text-decoration: underline;
   /* change this to your preferred color */
 }
+
+/* --- Code blocks (DSA/SQL content) --- */
+
+pre {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  text-align: left;
+  overflow-x: auto;
+  background: var(--color-background-off);
+  padding: 12px 14px;
+  border-radius: 6px;
+  line-height: 1.5;
+}
+
+code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+:not(pre) > code {
+  background: var(--color-background-off);
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
 /* ==========================================================================
    Practice tracker additions (progress dashboard, puzzle table, per-puzzle
    solved/star/notes controls). Reuses the site's existing --color-* tokens

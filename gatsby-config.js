@@ -8,13 +8,12 @@ module.exports = {
   },
   plugins: [
     // `gatsby-plugin-mdx`,
-    `gatsby-remark-katex`,
-    `gatsby-transformer-remark`,
     {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [
           `gatsby-remark-katex`,
+          `gatsby-remark-prismjs`,
           // ... other plugins
           {
             resolve: 'gatsby-remark-images',

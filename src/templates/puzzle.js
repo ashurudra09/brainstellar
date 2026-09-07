@@ -1,4 +1,5 @@
 import 'katex/dist/katex.min.css'; // important: this styles the math output
+import 'prismjs/themes/prism-tomorrow.css'; // code block syntax highlighting
 import React, { useEffect } from 'react'
 import { graphql, Link } from 'gatsby'
 import Layout from '../components/layout'
