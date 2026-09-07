@@ -10,6 +10,22 @@ const path = require('path');
 const PROGRESS_FILE = path.join(__dirname, 'progress.json');
 
 /**
+ * @type {import('gatsby').GatsbyNode['createSchemaCustomization']}
+ */
+exports.createSchemaCustomization = ({ actions }) => {
+  // No question currently overrides its domain's default open/collapsed
+  // sections, so without an explicit type Gatsby's schema inference would
+  // never see these frontmatter fields and question.js's query would fail
+  // the moment it asked for them.
+  actions.createTypes(`
+    type MarkdownRemarkFrontmatter {
+      open: [String]
+      collapsed: [String]
+    }
+  `);
+};
+
+/**
  * @type {import('gatsby').GatsbyNode['onCreateNode']}
  */
 exports.onCreateNode = ({ node, actions, getNode }) => {

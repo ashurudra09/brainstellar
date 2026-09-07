@@ -1,13 +1,14 @@
 import 'katex/dist/katex.min.css'; // important: this styles the math output
 import 'prismjs/themes/prism-tomorrow.css'; // code block syntax highlighting
-import React, { useEffect } from 'react'
+import React from 'react'
 import { graphql, Link } from 'gatsby'
 import Layout from '../components/layout'
-import { Helmet } from "react-helmet";
 import Button from '../components/Button';
 import { PuzzleStatusToggles, PuzzleNotes } from '../components/PuzzleTracker';
 import FacebookComments from '../components/FacebookComments';
 import Seo from '../components/seo';
+import { getDomain } from '../data/domains';
+import { splitSections } from '../utils/sections';
 import he from 'he';
 const cheerio = require('cheerio');
 
@@ -21,79 +22,37 @@ export const query = graphql`
         difficulty
         category
         title
+        open
+        collapsed
       }
     }
   }
 `
 
-const splitContent = (htmlContent) => {
-  const parts = htmlContent.split(/<h2>(.*?)<\/h2>/);
-  let question, hint, answer, solution;
+// Sections rendered inline use a "one-liner" reveal panel too small for
+// longer content, so only the genuinely short ones (a nudge, a final
+// answer) get it -- everything else (Solution and any domain-specific
+// section) renders as a normal block, matching Solution's original style.
+const ONE_LINER_SECTIONS = new Set(['Hint', 'Answer']);
 
-  for (let i = 1; i < parts.length; i += 2) {
-    const section = parts[i];
-    const content = parts[i + 1];
-
-    if (section === 'Question') question = content;
-    else if (section === 'Hint') hint = content;
-    else if (section === 'Answer') answer = content;
-    else if (section === 'Solution') solution = content;
-  }
-
-  if (question && question.trim() === '') { question = undefined };
-  if (hint && hint.trim() === '') { hint = undefined };
-  if (answer && answer.trim() === '') { answer = undefined };
-  if (solution && solution.trim() === '') { solution = undefined };
-
-  return { question, hint, answer, solution };
-}
-
+const sectionId = (name, qid) => `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}${qid}`;
 
 export default function Question({ data, pageContext }) {
   const puzzle = data.markdownRemark.frontmatter
-  const domain = data.markdownRemark.fields.domain
+  const domainSlug = data.markdownRemark.fields.domain
+  const domain = getDomain(domainSlug)
   const rawMarkdownBody = data.markdownRemark.html
   // quant keeps its pre-migration canonical URL; every other domain only ever
   // had the /q/{domain}/{qid} form.
-  const canonicalRoute = domain === 'quant' ? `/puzzles/${puzzle.qid}` : `/q/${domain}/${puzzle.qid}`
+  const canonicalRoute = domainSlug === 'quant' ? `/puzzles/${puzzle.qid}` : `/q/${domainSlug}/${puzzle.qid}`
 
-  const { question, hint, answer, solution } = splitContent(rawMarkdownBody);
-
-  const $ = cheerio.load(question);
-
-  $("math").remove(); // Replace 'math' with the actual tag name for your LaTeX equations
-  let description = $.text();
-  description = he.decode(description);
-
+  const sections = splitSections(rawMarkdownBody);
+  const openNames = puzzle.open || (domain ? domain.sections.open : ['Question']);
 
   const { previousPuzzleRoute, nextPuzzleRoute, category, difficulty } = pageContext
 
-  useEffect(() => {
-    document.querySelectorAll('.push').forEach(button => {
-      button.addEventListener('click', function () {
-        const content = document.getElementById(this.id.replace('Button', ''))
-        if (content) {
-          const isHidden = content.classList.contains('hidden')
-          content.classList.toggle('hidden', !isHidden)
-          content.classList.toggle('unhidden', isHidden)
-          this.classList.toggle('pushed', isHidden)
-          this.classList.toggle('push', !isHidden)
-        }
-      })
-    })
-
-  }, [])
-
-
-
-
   return (
     <Layout>
-      <Seo title={puzzle.title} description={description} />
-      <Helmet>
-        <link rel="icon" href="/favicon.gif" />
-        <title>{puzzle.title} | Brainstellar Puzzles</title>
-      </Helmet>
       <div className="stylishpage"><div className="bord1"><div className="bord2"><div className="container">
         {category && <h2 style={{ textAlign: `center`, marginTop: `1.5em`, marginBottom: `1em` }}>{category} puzzles</h2>}
 
@@ -106,7 +65,9 @@ export default function Question({ data, pageContext }) {
           <tbody>
             <tr style={{ padding: '0px', margin: '0px' }}>
               <td style={{ padding: '0px', margin: '0px', border: '0px solid black', width: '20%', text: '' }}>
-                <Link className={`btn  btn-sm btn-${puzzle.difficulty} smooth`} to={`/puzzles/${puzzle.difficulty}`} title={`More ${puzzle.difficulty} puzzles`}>{puzzle.difficulty}</Link>
+                {puzzle.difficulty &&
+                  <Link className={`btn  btn-sm btn-${puzzle.difficulty} smooth`} to={`/puzzles/${puzzle.difficulty}`} title={`More ${puzzle.difficulty} puzzles`}>{puzzle.difficulty}</Link>
+                }
               </td>
               <td style={{ padding: '0px', margin: '0px' }}>
                 <div className="content-text" style={{ padding: '0px', margin: '0px', textAlign: 'center', fontSize: '1.3em' }}>
@@ -125,31 +86,31 @@ export default function Question({ data, pageContext }) {
 
         <PuzzleStatusToggles puzzleId={puzzle.qid} />
 
-        {question && <div className="content-text" style={{ marginTop: `1em`, marginBottom: `1em` }}>
-          <div dangerouslySetInnerHTML={{ __html: question }} />
-        </div>}
+        {sections.map(section => {
+          const isSolution = section.name === 'Solution';
+          const isOpen = openNames.includes(section.name);
 
-        {hint &&
-          <Button id={`hint${puzzle.qid}`} label="Hint" content={
-            <div dangerouslySetInnerHTML={{ __html: hint }} />
+          if (isOpen) {
+            return (
+              <div key={section.name} className={`content-text${isSolution ? ' solution' : ''}`} style={{ marginTop: `1em`, marginBottom: `1em` }}>
+                {section.name !== 'Question' && <h3>{section.name}</h3>}
+                <div dangerouslySetInnerHTML={{ __html: section.content }} />
+              </div>
+            );
           }
-            passClass="one-liner"
-          />
-        }
 
-        {answer &&
-          <Button id={`answer${puzzle.qid}`} label="Answer" content={
-            <div passClass="one-liner" dangerouslySetInnerHTML={{ __html: answer }} />
-          }
-            passClass="one-liner"
-          />
-        }
-
-        {solution &&
-          <Button id={`solution${puzzle.qid}`} label="Solution" content={
-            <div className="solution" dangerouslySetInnerHTML={{ __html: solution }} />
-          } />
-        }
+          return (
+            <Button
+              key={section.name}
+              id={sectionId(section.name, puzzle.qid)}
+              label={section.name}
+              passClass={ONE_LINER_SECTIONS.has(section.name) ? 'one-liner' : undefined}
+              content={
+                <div className={isSolution ? 'solution' : undefined} dangerouslySetInnerHTML={{ __html: section.content }} />
+              }
+            />
+          );
+        })}
 
         <PuzzleNotes puzzleId={puzzle.qid} />
 
@@ -184,3 +145,20 @@ export default function Question({ data, pageContext }) {
     </Layout>
   )
 }
+
+export const Head = ({ data }) => {
+  const puzzle = data.markdownRemark.frontmatter;
+  const sections = splitSections(data.markdownRemark.html);
+  const question = sections.find(s => s.name === 'Question') || sections[0];
+
+  const $ = cheerio.load(question ? question.content : '');
+  $("math").remove(); // Replace 'math' with the actual tag name for your LaTeX equations
+  const description = he.decode($.text());
+
+  return (
+    <>
+      <Seo title={puzzle.title} description={description} />
+      <link rel="icon" href="/favicon.gif" />
+    </>
+  );
+};
