@@ -233,38 +233,59 @@ Adding helps iff  f(1−p) + gp > f   ⟺   g > f   — independent of p
 <div class="cs-grid">
 
 <div class="cs-card">
-<h4>Conditioning</h4>
+
+#### Conditioning
+
 $P(A)=\sum P(A\vert B_i)P(B_i)$ &middot; odds-form Bayes &middot; always ask <em>how</em> the information was revealed.
+
 </div>
 
 <div class="cs-card">
-<h4>Counting</h4>
+
+#### Counting
+
 $C(n,k)$ &middot; stars and bars $C(n+k-1,k-1)$ &middot; inclusion&ndash;exclusion &middot; count the complement &middot; symmetry before summing &middot; continuous &rArr; area ratio.
+
 </div>
 
 <div class="cs-card">
-<h4>Expectation</h4>
+
+#### Expectation
+
 Linearity needs no independence &middot; $E[\text{count}]=\sum P(\text{event}_i)$ &middot; first-step recursion &middot; waiting time $1/p$ &middot; coupon collector $\approx n\ln n$ &middot; $E[X_{(k)}]=k/(n+1)$ for $U[0,1]$.
+
 </div>
 
 <div class="cs-card">
-<h4>Distributions</h4>
+
+#### Distributions
+
 Binomial $np, np(1-p)$ &middot; geometric $1/p, (1-p)/p^2$ &middot; Poisson $\lambda,\lambda$ &middot; exponential $1/\lambda, 1/\lambda^2$ &middot; uniform $(a+b)/2, (b-a)^2/12$ &middot; memorylessness &rArr; geometric and exponential only.
+
 </div>
 
 <div class="cs-card">
-<h4>Statistics</h4>
+
+#### Statistics
+
 $\bar X \sim N(\mu,\sigma^2/n)$ &middot; $SE=\sigma/\sqrt n$, 4&times; the data halves it &middot; sample variance divides by $n-1$ &middot; MLE = log, differentiate, solve &middot; $\mathrm{Var}(aX+b)=a^2\mathrm{Var}(X)$ &middot; $\beta=\mathrm{Cov}(X,Y)/\mathrm{Var}(X)$ &middot; $R^2=\rho^2$ in simple regression &middot; zero correlation &ne; independence &middot; regression to the mean &ne; causation &middot; p-value &ne; $P(H_0\text{ true})$.
+
 </div>
 
 <div class="cs-card">
-<h4>Markov</h4>
+
+#### Markov
+
 Birth&ndash;death &rArr; detailed balance, ignore the self-loops &middot; absorption &rArr; one equation per transient state.
+
 </div>
 
 <div class="cs-card">
-<h4>Stopping</h4>
+
+#### Stopping
+
 The threshold <em>is</em> the value of continuing; solve by indifference.
+
 </div>
 
 </div>
