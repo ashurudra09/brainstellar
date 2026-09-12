@@ -22,17 +22,22 @@ Two environment traps will waste your time if you skip this.
 **The site root may not be the working directory.** Every path in this
 skill (`src/data/questions`, `src/data/domains.js`, `gatsby-config.js`) is
 relative to the Gatsby site root, which is sometimes the working directory
-and sometimes a `brainstellar/` subdirectory of it (a parent folder holding
-the site checkout alongside other notes). Find it once before doing
-anything else:
+and sometimes the `brainstellar/` checkout nested some number of levels
+below it (a parent workspace folder holding the site alongside other,
+unrelated notes — the nesting depth varies, e.g. `brainstellar/` directly,
+or `quant/brainstellar/`). Find it once before doing anything else, with no
+depth limit (excluding the directories that would make an unbounded search
+slow or produce false matches):
 
 ```bash
-find . -maxdepth 4 -type d -name questions -path "*/src/data/*" -not -path "*/public/*"
+find . -type d -name questions -path "*/src/data/*" \
+  -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/public/*"
 ```
 
 `cd` into the directory containing `src/data/questions` and stay there for
-the whole task. Note that `.claude/` may live at *either* level, so the
-presence of `.claude/` is not a reliable marker of the site root.
+the whole task. Note that `.claude/` may live at *any* level above the site
+root, so the presence of `.claude/` is not a reliable marker of the site
+root — and don't assume the nesting depth either.
 
 **Never write question content through a shell heredoc.** Question text is
 often dense with LaTeX or code, and a `bash <<'EOF'` heredoc in this harness
@@ -126,10 +131,13 @@ domain slug from step 2:
 node .claude/skills/add-question/scripts/next_question_id.js --domain <slug>
 ```
 
-If `.claude/` sits one level above the site root, adjust the path
-accordingly. The script finds `src/data/questions` by walking up from its
-own location and checking each directory and its immediate children, so it
-works from either layout — but if it ever throws
+If `.claude/` doesn't live at the site root itself, adjust the path to
+wherever it does — the script resolves its own repo root internally, so it
+doesn't matter how many `../` you use to reach it. The script finds
+`src/data/questions` by walking up from its own location and, at each
+ancestor, recursively searching that ancestor's whole subtree (skipping
+`node_modules`/`.git`), so it works no matter how many levels the site
+checkout is nested below `.claude/` — but if it ever throws
 `could not locate src/data/questions`, that resolution is what needs
 fixing, not your invocation.
 
