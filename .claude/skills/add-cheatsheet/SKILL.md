@@ -14,11 +14,15 @@ the artifact's.
 
 Same two traps as `add-question`:
 
-**The site root may not be the working directory.** Find it once before
-doing anything else:
+**The site root may not be the working directory.** The site checkout can
+be nested arbitrarily many levels below it (e.g. `brainstellar/`, or
+`quant/brainstellar/`). Find it once before doing anything else, with no
+depth limit (excluding the directories that would make an unbounded search
+slow or produce false matches):
 
 ```bash
-find . -maxdepth 4 -type d -name questions -path "*/src/data/*" -not -path "*/public/*"
+find . -type d -name questions -path "*/src/data/*" \
+  -not -path "*/node_modules/*" -not -path "*/.git/*" -not -path "*/public/*"
 ```
 
 `cd` into the directory containing `src/data/questions` (the cheatsheet

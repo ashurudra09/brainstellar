@@ -13,13 +13,32 @@ const fs = require('fs');
 const path = require('path');
 
 // Walk up from this script looking for a dir containing src/data/questions;
-// .claude/ may live inside the site repo or beside it (sibling checkout).
+// .claude/ may live inside the site repo, or arbitrarily many levels above
+// it in a parent workspace. At each ancestor, search its whole subtree
+// (skipping node_modules/.git, the only realistic blowup risk) rather than
+// just its immediate children, since the site checkout can be nested.
+const SKIP_DIRS = new Set(['node_modules', '.git']);
+
+function searchDown(dir) {
+  if (fs.existsSync(path.join(dir, 'src', 'data', 'questions'))) return dir;
+  let entries;
+  try {
+    entries = fs.readdirSync(dir, { withFileTypes: true });
+  } catch {
+    return null;
+  }
+  for (const entry of entries) {
+    if (!entry.isDirectory() || SKIP_DIRS.has(entry.name)) continue;
+    const found = searchDown(path.join(dir, entry.name));
+    if (found) return found;
+  }
+  return null;
+}
+
 function findRepoRoot(start) {
   for (let dir = start; ; dir = path.dirname(dir)) {
-    for (const cand of [dir, ...fs.readdirSync(dir, { withFileTypes: true })
-        .filter(d => d.isDirectory()).map(d => path.join(dir, d.name))]) {
-      if (fs.existsSync(path.join(cand, 'src', 'data', 'questions'))) return cand;
-    }
+    const found = searchDown(dir);
+    if (found) return found;
     if (path.dirname(dir) === dir) throw new Error('could not locate src/data/questions');
   }
 }
