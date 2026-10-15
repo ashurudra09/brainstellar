@@ -1,0 +1,1020 @@
+{
+ "topics": [
+  {
+   "id": "basics",
+   "title": "The basics",
+   "html": "<div class=\"cs-card\"><h3>What a model actually does</h3>\n<p>A machine learning <b>model</b> is a function that learns a pattern from examples instead of being hand-coded. You give it many rows of data. Each row has <b>features</b> (the inputs, like a user's age, phone model and the time of day) and, usually, a <b>label</b> (the answer you want, like \"clicked the ad: yes/no\"). <b>Training</b> means adjusting the model's internal numbers, its <b>parameters</b> or <b>weights</b>, until its guesses match the labels well.</p>\n<dl class=\"cs-terms\">\n<dt>Supervised</dt><dd>The data has labels and the model learns to predict them. Predicting a <b>category</b> (spam / not spam) is <b>classification</b>. Predicting a <b>number</b> (house price) is <b>regression</b>.</dd>\n<dt>Unsupervised</dt><dd>No labels. The model finds structure on its own, such as groups of similar users (<b>clustering</b>) or a smaller summary of many columns (<b>dimensionality reduction</b>).</dd>\n<dt>Reinforcement</dt><dd>An agent learns by trial and error, collecting rewards. Rarely needed for classic ML questions.</dd>\n<dt>Hyperparameter</dt><dd>A setting <i>you</i> choose before training, such as the number of trees or the learning rate. Parameters are learned; hyperparameters are picked.</dd>\n</dl>\n<p>You never judge a model on the data it trained on, because it may have simply memorised it. So the data is split: a <b>training set</b> to learn from, a <b>validation set</b> to tune hyperparameters, and a <b>test set</b> kept aside until the very end to measure the final score honestly.</p>\n</div>\n<div class=\"cs-card\"><h3>Overfitting, underfitting and the bias–variance trade-off</h3>\n<p>Imagine a student preparing for an exam.</p>\n<dl class=\"cs-terms\">\n<dt>Underfitting</dt><dd>The student barely studied and does badly on practice papers <i>and</i> the real exam. The model is <b>too simple</b> to capture the pattern. This is called <b>high bias</b>.</dd>\n<dt>Overfitting</dt><dd>The student memorised the practice papers word for word. Perfect on those, poor on new questions. The model learned the <b>noise</b> in the training data. This is called <b>high variance</b>, because the model would change a lot if trained on a slightly different sample.</dd>\n</dl>\n<div class=\"cs-callout\"><p><b>How to tell them apart</b></p>\n<p>Training error high, test error high → <b>underfitting</b>. Fix: a more complex model, more features, less regularisation.<br/>Training error low, test error much higher → <b>overfitting</b>. Fix: more data, a simpler model, regularisation, dropout, early stopping.</p>\n</div>\n<p>Making a model more flexible lowers bias but raises variance, and vice versa. The goal is the sweet spot in between. Total error = bias² + variance + noise that no model can remove.</p>\n<p><b>Handy facts:</b> a deeper decision tree → more variance. A bigger k in k-nearest-neighbours → more bias. Stronger regularisation → more bias, less variance.</p>\n</div>\n<div class=\"cs-card\"><h3>Regularisation: stopping a model from overfitting</h3>\n<p>A model that overfits usually has some very large weights, leaning hard on a few features. <b>Regularisation</b> adds a penalty for large weights to the training loss, so the model prefers simpler explanations. The strength of the penalty is a hyperparameter, written <b>λ</b> (lambda).</p>\n<dl class=\"cs-terms\">\n<dt>L1 / Lasso</dt><dd>Penalty = λ × (sum of |weights|). It pushes many weights to <b>exactly zero</b>, which removes those features. So L1 also does <b>feature selection</b>.</dd>\n<dt>L2 / Ridge</dt><dd>Penalty = λ × (sum of weights²). It shrinks all weights towards zero but rarely <i>to</i> zero. Good when features are correlated with each other.</dd>\n<dt>Elastic Net</dt><dd>L1 and L2 together.</dd>\n<dt>Dropout</dt><dd>For neural networks: randomly switch off some neurons during each training step, so the network can't rely on any single one.</dd>\n<dt>Early stopping</dt><dd>Stop training when the validation error starts rising, even if training error is still falling.</dd>\n</dl>\n<p><b>Memory hook:</b> L1 → zeros (sparse). L2 → small. Bigger λ → simpler model.</p>\n</div>",
+   "short": "Basics"
+  },
+  {
+   "id": "models",
+   "title": "Classic models",
+   "html": "<div class=\"cs-card\"><h3>Linear regression: predicting a number</h3>\n<p>Fit a straight line (or a flat plane, with many features) through the data:</p>\n<pre><code>prediction = w₁·x₁ + w₂·x₂ + … + b</code></pre>\n<p>Each weight w says how much the prediction moves when that feature goes up by 1. Training picks the weights that minimise the <b>MSE (mean squared error)</b>: the average of (actual − predicted)². Squaring makes all errors positive and punishes big misses more.</p>\n<dl class=\"cs-terms\">\n<dt>R²</dt><dd>How much of the variation in the target the model explains. 1 = perfect, 0 = no better than always predicting the average. Adding any feature, even a useless one, never lowers R², so <b>adjusted R²</b> adds a penalty for extra features.</dd>\n<dt>Multicollinearity</dt><dd>Two features that move together (height in cm and in inches). Predictions are fine, but the individual weights become unstable and hard to interpret.</dd>\n</dl>\n</div>\n<div class=\"cs-card\"><h3>Logistic regression: predicting a probability</h3>\n<p>Despite the name, it is a <b>classification</b> model. It computes the same weighted sum as linear regression, then squashes it through the <b>sigmoid</b> function so the output lands between 0 and 1. That output is read as a probability.</p>\n<pre><code>sigmoid(z) = 1 / (1 + e^(−z))     z = 0 → 0.5,  big positive z → near 1,  big negative z → near 0</code></pre>\n<p>If the probability is above a <b>threshold</b> (usually 0.5), predict \"yes\". Because the threshold falls where z = 0, and z is a straight-line formula, the <b>decision boundary is a straight line</b>.</p>\n<p>It is trained with <b>log loss</b>, also called <b>binary cross-entropy</b>. Log loss punishes a <i>confident wrong</i> answer very hard: predicting 0.99 for something that turned out to be 0 costs far more than predicting 0.6. MSE is not used here because, combined with the sigmoid, it gives a bumpy loss that is hard to minimise.</p>\n<div class=\"cs-callout\"><p><b>Why CTR matters</b></p>\n<p>The probability that a user clicks an ad is called <b>CTR (click-through rate)</b>. Logistic regression is the classic CTR model because it is fast, works on millions of sparse features, and outputs a probability you can directly use to decide how much to bid.</p>\n</div>\n<p><b>Softmax</b> is the multi-class version: it turns K scores into K probabilities that add up to 1.</p>\n</div>\n<div class=\"cs-card\"><h3>k-nearest neighbours (kNN)</h3>\n<p>To classify a new point, look at the <b>k closest training points</b> and take a majority vote (or the average, for regression). There's no training step at all; it just stores the data. That is why it's called a <b>lazy learner</b>. All the work happens at prediction time, which is slow on large data.</p>\n<ul>\n<li><b>Small k</b> (like 1) follows every noisy point → overfits. <b>Large k</b> smooths too much → underfits.</li>\n<li>It measures distance, so <b>features must be scaled</b>. Otherwise salary in rupees (0–10,00,000) drowns out age (0–100).</li>\n<li>With many features, all points end up roughly equally far apart, so \"nearest\" stops meaning much. This is the <b>curse of dimensionality</b>.</li>\n</ul>\n</div>\n<div class=\"cs-card\"><h3>Naive Bayes</h3>\n<p>Uses Bayes' theorem (see the Stats section) to compute P(class | features). The \"naive\" part is the assumption that <b>every feature is independent of the others once you know the class</b>. That's rarely true, but the model still works well, especially for text like spam filtering, and it's very fast.</p>\n<p><b>Zero-frequency problem:</b> if a word never appeared with \"spam\" in training, its probability is 0, and multiplying by 0 wipes out everything. <b>Laplace smoothing</b> fixes it by adding 1 to every count.</p>\n</div>\n<div class=\"cs-card\"><h3>Support vector machine (SVM)</h3>\n<p>Draws the boundary between two classes that leaves the <b>widest possible gap</b> (the <b>margin</b>) to the nearest points of each class. Those nearest points are the <b>support vectors</b>; they alone decide where the boundary goes, and moving any other point changes nothing.</p>\n<dl class=\"cs-terms\">\n<dt>C</dt><dd>How much the SVM hates misclassifying training points. <b>Large C</b> → tries hard to get every point right, narrow margin, risk of overfitting. <b>Small C</b> → wider margin, tolerates some mistakes.</dd>\n<dt>Kernel trick</dt><dd>When the classes can't be split by a straight line, a <b>kernel</b> (like RBF, the radial basis function) lets the SVM act as if the data were mapped into a higher-dimensional space where a straight split works, without computing that mapping.</dd>\n</dl>\n</div>\n<div class=\"cs-card\"><h3>Two ways to group models</h3>\n<dl class=\"cs-terms\">\n<dt>Generative</dt><dd>Learns how each class's data looks, P(features and class). Example: <b>Naive Bayes</b>.</dd>\n<dt>Discriminative</dt><dd>Learns only the boundary, P(class | features). Examples: logistic regression, SVM, decision trees, neural networks.</dd>\n<dt>Parametric</dt><dd>A fixed number of parameters no matter how much data you have. Example: logistic regression.</dd>\n<dt>Non-parametric</dt><dd>Grows with the data. Examples: kNN (stores all points), decision trees.</dd>\n</dl>\n</div>",
+   "short": "Models"
+  },
+  {
+   "id": "trees",
+   "title": "Decision trees & ensembles",
+   "html": "<div class=\"cs-card\"><h3>Decision trees</h3>\n<p>A tree asks a series of yes/no questions (\"age &lt; 30?\", \"uses Android?\") and each leaf gives a prediction. At every step it picks the question that best separates the classes, measured by how <b>pure</b> (all one class) the resulting groups are.</p>\n<dl class=\"cs-terms\">\n<dt>Gini impurity</dt><dd>1 − Σ pᵢ², where pᵢ is the share of class i in the node. A pure node scores 0. A 50/50 split scores 0.5, the worst for two classes.</dd>\n<dt>Entropy</dt><dd>−Σ pᵢ log₂ pᵢ. Also 0 for a pure node, and 1 for a 50/50 split.</dd>\n<dt>Information gain</dt><dd>Entropy before the split − weighted entropy after it. The tree picks the split with the highest gain.</dd>\n</dl>\n<div class=\"cs-callout\"><p><b>Worked example</b></p>\n<p>A node has 8 \"click\" and 2 \"no click\". p = 0.8 and 0.2. Gini = 1 − (0.64 + 0.04) = <b>0.32</b>.</p>\n</div>\n<ul>\n<li>Trees compare one feature to a threshold at a time, so they <b>don't need feature scaling</b>.</li>\n<li>A tree allowed to grow fully will memorise the data, so it <b>overfits</b> easily. Limit its depth or prune it.</li>\n</ul>\n</div>\n<div class=\"cs-card\"><h3>Ensembles: bagging vs boosting</h3>\n<p>An <b>ensemble</b> combines many models into one, usually many trees. There are two main styles.</p>\n<p><b>Bagging</b> (short for bootstrap aggregating) trains many trees <b>independently, side by side</b>. Each one sees a different random sample of the rows, drawn <b>with replacement</b> (a <b>bootstrap sample</b>; it contains about 63% of the unique rows). Their predictions are averaged or voted. Each deep tree is noisy, but their mistakes point in different directions and cancel out. So bagging <b>reduces variance</b>.</p>\n<p><b>Random Forest</b> is bagging plus one extra trick: each split may only look at a random subset of the features. That makes the trees more different from each other, so averaging helps even more.</p>\n<p><b>Boosting</b> trains small, weak trees <b>one after another</b>. Each new tree focuses on what the previous ones got wrong: AdaBoost gives the misclassified rows more weight, and <b>gradient boosting</b> fits the next tree to the remaining errors (the <b>residuals</b>). Many weak learners add up to a strong one, so boosting mainly <b>reduces bias</b>. XGBoost, LightGBM and CatBoost are popular, fast versions.</p>\n<table class=\"cs-table\">\n<tr><th></th><th>Bagging</th><th>Boosting</th></tr>\n<tr><td>Training order</td><td>parallel, independent</td><td>sequential, each fixes the last</td></tr>\n<tr><td>Base trees</td><td>deep (overfit-prone)</td><td>shallow (weak)</td></tr>\n<tr><td>Mainly reduces</td><td>variance</td><td>bias</td></tr>\n<tr><td>Noisy data / outliers</td><td>robust</td><td>sensitive</td></tr>\n<tr><td>Examples</td><td>Random Forest</td><td>AdaBoost, XGBoost, LightGBM</td></tr>\n</table>\n<p><b>A free extra from bagging:</b> each tree never saw about 37% of the rows. Testing each tree on its unseen rows gives a free accuracy estimate, the <b>OOB (out-of-bag) error</b>.</p>\n</div>",
+   "short": "Trees"
+  },
+  {
+   "id": "unsup",
+   "title": "Clustering & dimensionality reduction",
+   "html": "<div class=\"cs-card\"><h3>k-means clustering</h3>\n<p>Splits the data into k groups. The algorithm:</p>\n<ol>\n<li>Place k centre points (<b>centroids</b>) at random.</li>\n<li>Assign every point to its nearest centroid.</li>\n<li>Move each centroid to the average of the points assigned to it.</li>\n<li>Repeat steps 2–3 until nothing changes.</li>\n</ol>\n<ul>\n<li>You must choose k yourself. The <b>elbow method</b> plots the error against k and picks the bend where adding clusters stops helping much. The <b>silhouette score</b> (−1 to 1, higher is better) measures how well each point fits its cluster.</li>\n<li>A bad random start can give a bad result. <b>k-means++</b> picks smarter starting points.</li>\n<li>It uses averages and distances, so it is <b>sensitive to outliers</b> and needs <b>scaled</b> features. It assumes roughly round, similar-sized clusters.</li>\n</ul>\n</div>\n<div class=\"cs-card\"><h3>Other clustering methods</h3>\n<dl class=\"cs-terms\">\n<dt>Hierarchical</dt><dd>Start with every point as its own cluster and repeatedly merge the two closest. The result is a tree diagram (<b>dendrogram</b>); cut it at any height to get your clusters. No need to pick k up front.</dd>\n<dt>DBSCAN</dt><dd>Density-based. Clusters are areas where points are packed closely together. It finds <b>any shape</b>, doesn't need k, and labels isolated points as <b>noise / outliers</b>.</dd>\n<dt>GMM</dt><dd><b>Gaussian mixture model</b>. Soft clustering: each point gets a probability of belonging to each cluster. Fitted with the <b>EM (expectation–maximisation)</b> algorithm.</dd>\n</dl>\n</div>\n<div class=\"cs-card\"><h3>PCA (principal component analysis)</h3>\n<p>You have 100 columns, many of them overlapping. PCA builds a few new columns, called <b>principal components</b>, that keep most of the information. The first component points in the direction where the data <b>spreads out the most</b>; the second is the next-most-spread direction at a right angle to the first, and so on. Keep the first few, drop the rest.</p>\n<ul>\n<li>It is <b>unsupervised</b>: it ignores labels.</li>\n<li><b>Scale the features first.</b> Otherwise a column measured in big units looks like it has the most spread.</li>\n<li>Mathematically, the components are the <b>eigenvectors of the covariance matrix</b>, and each one's <b>eigenvalue</b> is how much spread it captures.</li>\n</ul>\n<div class=\"cs-callout\"><p><b>Worked example</b></p>\n<p>Eigenvalues are 4, 3, 2 and 1 (total 10). The first two components keep (4 + 3)/10 = <b>70%</b> of the variance.</p>\n</div>\n<p>Don't confuse it with <b>LDA (linear discriminant analysis)</b>, which <i>does</i> use labels and looks for directions that separate the classes. <b>t-SNE</b> and <b>UMAP</b> are used mainly to draw high-dimensional data in 2D.</p>\n</div>",
+   "short": "Clustering"
+  },
+  {
+   "id": "metrics",
+   "title": "Measuring a model",
+   "html": "<div class=\"cs-card\"><h3>The confusion matrix</h3>\n<p>For a yes/no classifier, every prediction falls into one of four boxes. The first word says whether the model was right; the second says what it predicted.</p>\n<table class=\"cs-table\">\n<tr><th></th><th>Predicted yes</th><th>Predicted no</th></tr>\n<tr><td><b>Actually yes</b></td><td>TP (true positive)</td><td>FN (false negative), a miss</td></tr>\n<tr><td><b>Actually no</b></td><td>FP (false positive), a false alarm</td><td>TN (true negative)</td></tr>\n</table>\n<dl class=\"cs-terms\">\n<dt>Accuracy</dt><dd>(TP + TN) / everything. The share of all predictions that were right.</dd>\n<dt>Precision</dt><dd>TP / (TP + FP). <i>Of everything I flagged as yes, how much really was yes?</i> Matters when false alarms are costly: a spam filter must not bin real email.</dd>\n<dt>Recall</dt><dd>TP / (TP + FN). Also called <b>sensitivity</b> or <b>TPR (true positive rate)</b>. <i>Of all the real yeses, how many did I catch?</i> Matters when misses are costly: cancer screening, fraud.</dd>\n<dt>F1 score</dt><dd>2 × P × R / (P + R), the <b>harmonic mean</b> of precision and recall. It's only high when both are high.</dd>\n<dt>Specificity</dt><dd>TN / (TN + FP). Recall for the \"no\" class.</dd>\n</dl>\n<div class=\"cs-callout\"><p><b>Worked example</b></p>\n<p>TP = 40, FP = 10, FN = 20, TN = 30 (100 rows).<br/>Accuracy = 70/100 = <b>0.70</b>. Precision = 40/50 = <b>0.80</b>. Recall = 40/60 = <b>0.67</b>. F1 = 2 × 0.8 × 0.67 / 1.47 ≈ <b>0.73</b>.</p>\n</div>\n<p><b>The threshold trade-off.</b> Raise the threshold (say \"yes\" only when very sure) and precision goes up while recall goes down. Lower it and the opposite happens.</p>\n</div>\n<div class=\"cs-card\"><h3>Why accuracy lies on imbalanced data</h3>\n<p>Only about 1 in 100 ad views gets a click. A model that <i>always</i> says \"no click\" is 99% accurate and completely useless. When one class is rare, look at precision, recall, F1, PR-AUC or log loss instead.</p>\n<dl class=\"cs-terms\">\n<dt>ROC curve</dt><dd>Plots recall (TPR) against <b>FPR (false positive rate)</b> = FP / (FP + TN), for every possible threshold.</dd>\n<dt>ROC-AUC</dt><dd>The <b>area under</b> that curve. Meaning: pick one random positive and one random negative; AUC is the chance the model scores the positive higher. <b>0.5 = random guessing, 1 = perfect.</b></dd>\n<dt>PR-AUC</dt><dd>Area under the precision–recall curve. More honest than ROC-AUC when positives are very rare.</dd>\n<dt>Log loss</dt><dd>Measures how good the predicted <i>probabilities</i> are, not just the yes/no calls. Key in ad-tech, where the probability itself sets the bid.</dd>\n</dl>\n</div>\n<div class=\"cs-card\"><h3>Regression metrics</h3>\n<dl class=\"cs-terms\">\n<dt>MAE</dt><dd><b>Mean absolute error</b>: average of |actual − predicted|. Easy to read, and <b>robust to outliers</b>.</dd>\n<dt>MSE</dt><dd><b>Mean squared error</b>. Squaring makes big errors count much more, so it is <b>sensitive to outliers</b>.</dd>\n<dt>RMSE</dt><dd>√MSE, back in the original units.</dd>\n</dl>\n</div>",
+   "short": "Metrics"
+  },
+  {
+   "id": "data",
+   "title": "Preparing data & validating fairly",
+   "html": "<div class=\"cs-card\"><h3>Cross-validation</h3>\n<p>One train/test split can be lucky or unlucky. <b>k-fold cross-validation</b> splits the data into k parts, trains on k − 1 of them and tests on the remaining one, repeats k times so each part is the test once, and averages the k scores.</p>\n<dl class=\"cs-terms\">\n<dt>Stratified</dt><dd>Each fold keeps the same class proportions as the full data. Use it for imbalanced data.</dd>\n<dt>Time series</dt><dd><b>Never shuffle.</b> Always train on the past and test on the future, or the model \"sees\" the future.</dd>\n<dt>Leave-one-out</dt><dd>k = number of rows. Very thorough, very slow.</dd>\n</dl>\n</div>\n<div class=\"cs-card\"><h3>Data leakage</h3>\n<p><b>Leakage</b> means information from the test data, or from the future, sneaks into training. The test score looks great and the real-world score is poor. Common causes:</p>\n<ul>\n<li>Scaling or filling missing values using the <b>whole dataset</b> before splitting. Always fit these steps on the training data only, then apply them to the test data.</li>\n<li>A feature that is only known after the outcome, like using \"refund issued\" to predict \"will the customer complain\".</li>\n<li>Shuffling time-ordered data.</li>\n</ul>\n</div>\n<div class=\"cs-card\"><h3>Feature preparation</h3>\n<dl class=\"cs-terms\">\n<dt>Scaling</dt><dd>Put features on similar ranges. <b>Standardisation</b> makes each one mean 0 and standard deviation 1. <b>Normalisation</b> squeezes into 0–1. Needed for anything based on distances or gradients: kNN, SVM, k-means, PCA, neural networks, regularised regression. <b>Not needed for trees.</b></dd>\n<dt>One-hot encoding</dt><dd>Turns a category (\"red/green/blue\") into one 0/1 column per value. Fine for a few values.</dd>\n<dt>Target encoding</dt><dd>Replaces each category with the average label for that category. Works for many values but can leak, so compute it carefully.</dd>\n<dt>Feature hashing</dt><dd>Maps a huge number of categories (millions of app or user IDs) into a fixed number of columns using a hash function. Fixed memory; the cost is that some IDs collide. Standard in ad-tech.</dd>\n<dt>Missing values</dt><dd>Fill with the mean, median or most common value, or add a \"was missing\" flag column. XGBoost handles missing values on its own.</dd>\n</dl>\n</div>\n<div class=\"cs-card\"><h3>Imbalanced classes</h3>\n<p>When one class is rare (fraud, clicks):</p>\n<ul>\n<li>Give the rare class a bigger weight in the loss (<b>class weights</b>).</li>\n<li><b>Oversample</b> the rare class (<b>SMOTE</b> creates synthetic examples between existing ones) or <b>undersample</b> the common one.</li>\n<li>Move the decision threshold.</li>\n<li>Judge with precision, recall, F1 or PR-AUC, <b>not accuracy</b>.</li>\n</ul>\n</div>\n<div class=\"cs-card\"><h3>Time series in one minute</h3>\n<p>Data ordered in time, like daily ad impressions. It's made of a <b>trend</b> (long-term up or down), <b>seasonality</b> (repeating patterns, like weekends) and leftover noise. Many classic models need it to be <b>stationary</b> (average and spread don't change over time); <b>differencing</b> (today − yesterday) usually achieves that. <b>ARIMA</b> is the classic model: <b>AR</b> uses past values, <b>I</b> is the differencing, <b>MA</b> uses past errors.</p>\n</div>",
+   "short": "Data"
+  },
+  {
+   "id": "nn",
+   "title": "Neural networks & transformers",
+   "html": "<div class=\"cs-card\"><h3>How a neural network learns</h3>\n<p>A neural network is layers of simple units (<b>neurons</b>). Each neuron takes a weighted sum of its inputs and passes it through an <b>activation function</b>, which adds a bend. Without activation functions, any number of layers would collapse into one straight-line model.</p>\n<p>Training uses <b>gradient descent</b>: measure the loss, work out which direction each weight should move to reduce it (the <b>gradient</b>), and take a small step that way. <b>Backpropagation</b> is just the chain rule from calculus, used to compute all those gradients efficiently from the output layer backwards.</p>\n<dl class=\"cs-terms\">\n<dt>Learning rate</dt><dd>The size of each step. <b>Too high</b> → the loss jumps around or blows up. <b>Too low</b> → training crawls.</dd>\n<dt>Batch / SGD</dt><dd>Computing the gradient on all data each step is slow. <b>SGD (stochastic gradient descent)</b> uses one row or a small <b>mini-batch</b> per step: noisier but much faster.</dd>\n<dt>Epoch</dt><dd>One full pass over the training data.</dd>\n<dt>Adam</dt><dd>The default optimiser. It adapts the step size for each weight and adds <b>momentum</b> (keeps moving in the recent direction).</dd>\n</dl>\n</div>\n<div class=\"cs-card\"><h3>Activation functions</h3>\n<dl class=\"cs-terms\">\n<dt>Sigmoid</dt><dd>Output 0 to 1. For large inputs it goes flat, so its gradient is almost zero. In deep networks these tiny gradients multiply and shrink to nothing, so early layers stop learning: the <b>vanishing gradient</b> problem.</dd>\n<dt>Tanh</dt><dd>Output −1 to 1. Same flattening issue, a bit better than sigmoid.</dd>\n<dt>ReLU</dt><dd>max(0, x). Cheap, doesn't flatten for positive inputs, the default for hidden layers. A neuron stuck with negative input outputs 0 forever, the <b>dying ReLU</b> problem; <b>Leaky ReLU</b> fixes it with a small slope below 0.</dd>\n<dt>Softmax</dt><dd>For the output layer in multi-class problems: turns scores into probabilities that sum to 1.</dd>\n</dl>\n<p>Fixes for vanishing gradients: ReLU, <b>residual (skip) connections</b>, <b>batch normalisation</b>, and good starting weights (<b>He</b> initialisation for ReLU, <b>Xavier</b> for tanh/sigmoid). For <b>exploding</b> gradients, cap them with <b>gradient clipping</b>.</p>\n</div>\n<div class=\"cs-card\"><h3>CNNs and RNNs</h3>\n<p>A <b>CNN (convolutional neural network)</b> slides small filters over an image to detect edges, then shapes, then objects. <b>Pooling</b> layers shrink the image and have no weights to learn.</p>\n<pre><code>output size = (input − filter + 2 × padding) / stride + 1</code></pre>\n<div class=\"cs-callout\"><p><b>Worked example</b></p>\n<p>32×32×3 image, six 5×5 filters, stride 1, no padding. Output = (32 − 5)/1 + 1 = 28, so <b>28×28×6</b>. Each filter has 5 × 5 × 3 = 75 weights + 1 bias = 76, and 6 filters give <b>456 parameters</b>.</p>\n</div>\n<p>A fully connected (<b>dense</b>) layer from n inputs to m outputs has <b>n × m + m</b> parameters (weights plus one bias per output).</p>\n<p>An <b>RNN (recurrent neural network)</b> reads a sequence one step at a time, carrying a memory forward. Plain RNNs forget long-range information because of vanishing gradients. <b>LSTM</b> (long short-term memory) and <b>GRU</b> add <b>gates</b> that decide what to keep and what to forget.</p>\n</div>\n<div class=\"cs-card\"><h3>Transformers and LLMs</h3>\n<p>A <b>transformer</b> processes all the words of a sentence at once instead of one at a time. Its core idea is <b>attention</b>: for each word, it scores how relevant every other word is, then builds a blend of them weighted by those scores. In \"the bank of the river\", attention lets \"bank\" look at \"river\" to pick the right meaning.</p>\n<ul>\n<li>Each word makes a <b>query</b> (what am I looking for?), a <b>key</b> (what do I contain?) and a <b>value</b> (what I pass on). Relevance = query · key. The scores are divided by √(key size) so they don't get so large that softmax becomes all-or-nothing.</li>\n<li>Every word looks at every other word, so cost grows with the <b>square</b> of the sequence length.</li>\n<li>Attention by itself ignores word order, so a <b>positional encoding</b> is added to each word.</li>\n</ul>\n<dl class=\"cs-terms\">\n<dt>BERT</dt><dd>Encoder-only. Trained by hiding random words and guessing them (<b>masked language modelling</b>). Good for understanding tasks like classification.</dd>\n<dt>GPT</dt><dd>Decoder-only. Trained to <b>predict the next word</b>. Good for generating text. LLMs (large language models) like GPT work this way.</dd>\n<dt>Temperature</dt><dd>Controls randomness when generating. Near 0 → always the most likely word (<b>greedy</b>). Higher → more varied.</dd>\n<dt>Fine-tuning</dt><dd>Further training a pre-trained model on your own data. <b>LoRA</b> trains a small add-on instead of all the weights.</dd>\n<dt>RAG</dt><dd><b>Retrieval-augmented generation</b>: look up relevant documents first and give them to the LLM along with the question.</dd>\n<dt>Embedding</dt><dd>A list of numbers that represents a word, user or ad, where similar things get similar lists. Similarity is often measured by <b>cosine similarity</b> (1 = same direction, 0 = unrelated).</dd>\n</dl>\n</div>",
+   "short": "Neural nets"
+  },
+  {
+   "id": "stats",
+   "title": "Probability & statistics",
+   "html": "<div class=\"cs-card\"><h3>Bayes' theorem</h3>\n<pre><code>P(A | B) = P(B | A) · P(A) / P(B)</code></pre>\n<p>It flips a conditional: from \"how likely is the evidence if A is true\" to \"how likely is A now that I've seen the evidence\". P(B) is the total chance of the evidence, added up over every way it can happen.</p>\n<div class=\"cs-callout\"><p><b>Worked example: the classic rare-disease trap</b></p>\n<p>1% of people have a disease. The test catches 99% of sick people, but also flags 5% of healthy people. You test positive. Chance you're sick?</p>\n<p>Out of 10,000 people: 100 are sick and 99 of them test positive. 9,900 are healthy and 5% of them, 495, also test positive. So P(sick | positive) = 99 / (99 + 495) ≈ <b>17%</b>. Because the disease is rare, most positives are false alarms.</p>\n</div>\n</div>\n<div class=\"cs-card\"><h3>Distributions to know</h3>\n<table class=\"cs-table\">\n<tr><th>Name</th><th>Describes</th><th>Mean</th><th>Variance</th></tr>\n<tr><td>Bernoulli(p)</td><td>one yes/no trial, like one ad view</td><td>p</td><td>p(1 − p)</td></tr>\n<tr><td>Binomial(n, p)</td><td>number of yeses in n trials</td><td>np</td><td>np(1 − p)</td></tr>\n<tr><td>Poisson(λ)</td><td>count of events in a time window</td><td>λ</td><td>λ</td></tr>\n<tr><td>Geometric(p)</td><td>trials until the first yes</td><td>1/p</td><td>(1 − p)/p²</td></tr>\n<tr><td>Uniform(a, b)</td><td>every value equally likely</td><td>(a + b)/2</td><td>(b − a)²/12</td></tr>\n<tr><td>Normal(μ, σ²)</td><td>the bell curve</td><td>μ</td><td>σ²</td></tr>\n</table>\n<p><b>Normal rule of thumb:</b> about 68% of values lie within 1 standard deviation of the mean, 95% within 2, and 99.7% within 3.</p>\n<p><b>Two rules for variance:</b> Var(aX + b) = a² Var(X), since adding a constant doesn't change spread. Covariance = E[XY] − E[X]E[Y].</p>\n</div>\n<div class=\"cs-card\"><h3>Sampling and the central limit theorem</h3>\n<p>The <b>CLT (central limit theorem)</b>: take many samples of size n and compute each sample's average. Those averages form a <b>normal (bell) curve</b>, whatever shape the original data had. Its spread, the <b>standard error</b>, is σ/√n. So to halve the standard error you need <b>4×</b> the data.</p>\n</div>\n<div class=\"cs-card\"><h3>Hypothesis testing and A/B tests</h3>\n<p>You show half the users ad A and half ad B. B gets a higher CTR. Is it really better, or just luck?</p>\n<dl class=\"cs-terms\">\n<dt>H₀</dt><dd>The <b>null hypothesis</b>: \"no real difference\".</dd>\n<dt>p-value</dt><dd>If H₀ were true, the chance of seeing a difference at least this big by luck. Small p-value (below α, usually 0.05) → reject H₀. It is <b>not</b> the probability that H₀ is true.</dd>\n<dt>Type I error</dt><dd>A <b>false positive</b>: concluding B is better when it isn't. Its probability is α.</dd>\n<dt>Type II error</dt><dd>A <b>false negative</b>: missing a real improvement. Its probability is β.</dd>\n<dt>Power</dt><dd>1 − β, the chance of catching a real effect. More data → more power.</dd>\n</dl>\n<p>Comparing two click rates uses a <b>two-proportion z-test</b> (or a chi-square test). Classic mistakes: checking results every day and stopping as soon as it looks significant (<b>peeking</b>), and testing many things at once without correcting for it.</p>\n<p><b>Simpson's paradox:</b> a trend that holds in every group can reverse when the groups are combined. <b>Correlation is not causation</b>, and zero correlation does not mean independence.</p>\n</div>\n<div class=\"cs-card\"><h3>Quick expected-value facts</h3>\n<ul>\n<li>Expected rolls of a fair die until a 6: <b>6</b> (1/p for p = 1/6).</li>\n<li>Expected coin tosses until the first head: <b>2</b>. Until two heads in a row: <b>6</b>.</li>\n<li>Two coins, at least one is heads. P(both heads) = <b>1/3</b> (HH, HT, TH are equally likely).</li>\n<li><b>MLE (maximum likelihood estimation)</b> picks the parameters that make the observed data most likely. Adding a prior belief gives <b>MAP</b>; a normal prior on the weights is the same as L2 regularisation.</li>\n</ul>\n</div>",
+   "short": "Stats"
+  },
+  {
+   "id": "adtech",
+   "title": "Applied ML: ads, recommendations & drift",
+   "html": "<div class=\"cs-card\"><h3>How an ad gets picked</h3>\n<p>When you open an app, an auction runs in about 100 milliseconds (<b>RTB, real-time bidding</b>). For each candidate ad, models predict the chance you'll click (<b>pCTR</b>) and the chance you'll then install or buy (<b>pCVR, conversion rate</b>). The bid is roughly value × pCTR × pCVR. Ads are ranked by <b>eCPM</b> (effective cost per thousand impressions) = CTR × cost per click × 1000.</p>\n<ul>\n<li>Because the predicted probability is plugged straight into the bid, it must be <b>calibrated</b>: if the model says 2%, about 2% should actually click. Accuracy and AUC can't tell you this; log loss can.</li>\n<li>Training sets often keep only some of the \"no click\" rows to save time (<b>negative downsampling</b>). That makes predictions too high, so they must be corrected afterwards.</li>\n<li>Typical CTR models: logistic regression on hashed features, <b>factorization machines</b> (learn how pairs of features interact), gradient-boosted trees, and deep models like Wide &amp; Deep.</li>\n</ul>\n</div>\n<div class=\"cs-card\"><h3>Recommendations, exploration and drift</h3>\n<dl class=\"cs-terms\">\n<dt>Collaborative filtering</dt><dd>\"Users like you also liked…\". <b>Matrix factorization</b> splits the big user × item table into a small user table and a small item table of hidden tastes.</dd>\n<dt>Cold start</dt><dd>A new user or ad has no history. Fall back on its content features or overall popularity.</dd>\n<dt>Bandits</dt><dd>Should you keep showing the ad that works best now (<b>exploit</b>) or try new ones that might be better (<b>explore</b>)? <b>Multi-armed bandit</b> methods balance this: ε-greedy, <b>UCB</b> (upper confidence bound), <b>Thompson sampling</b>.</dd>\n<dt>NDCG</dt><dd>A ranking metric that rewards putting good items near the top of the list.</dd>\n<dt>Drift</dt><dd>User behaviour changes over time, so a model quietly gets worse. Monitor it and retrain regularly.</dd>\n<dt>Isolation Forest</dt><dd>An anomaly detector, used for click fraud. Odd points get separated from the rest in very few random splits.</dd>\n<dt>Attribution</dt><dd>Deciding which ad gets credit for an install: last click, first click, or split across all touches.</dd>\n</dl>\n</div>\n<div class=\"cs-card\"><h3>Common traps to remember</h3>\n<ul>\n<li><b>Bagging → less variance. Boosting → less bias.</b></li>\n<li><b>L1 → weights become zero. L2 → weights become small.</b></li>\n<li>Trees don't need scaling; kNN, SVM, k-means, PCA and neural nets do.</li>\n<li>Logistic regression is for <b>classification</b>.</li>\n<li>99% accuracy on 99%-negative data means nothing.</li>\n<li>A p-value is not the chance that H₀ is true.</li>\n<li>Never shuffle time-series data.</li>\n\n</ul>\n</div>",
+   "short": "Applied ML"
+  }
+ ],
+ "quiz": [
+  {
+   "topic": "Basics",
+   "q": "Training accuracy is 99% but test accuracy is 70%. What's happening?",
+   "options": [
+    "Underfitting (high bias)",
+    "Overfitting (high variance)",
+    "Data is perfectly balanced",
+    "The learning rate is too low"
+   ],
+   "answer": 1,
+   "why": "The model does great on data it has seen and much worse on new data, so it memorised noise instead of learning the general pattern. That's overfitting."
+  },
+  {
+   "topic": "Basics",
+   "q": "Both training and test error are high. Best first fix?",
+   "options": [
+    "Add more regularisation",
+    "Use a more complex model or more features",
+    "Collect more of the same data",
+    "Use dropout"
+   ],
+   "answer": 1,
+   "why": "High error everywhere means the model is too simple to capture the pattern (underfitting). Regularisation and dropout would make it even simpler."
+  },
+  {
+   "topic": "Basics",
+   "q": "Which regularisation can make some weights exactly zero?",
+   "options": [
+    "L2 (Ridge)",
+    "L1 (Lasso)",
+    "Dropout",
+    "Batch normalisation"
+   ],
+   "answer": 1,
+   "why": "L1's penalty pushes weights all the way to zero, which effectively deletes those features. L2 only makes weights small."
+  },
+  {
+   "topic": "Basics",
+   "q": "Increasing the regularisation strength λ will usually:",
+   "options": [
+    "Increase variance, decrease bias",
+    "Increase bias, decrease variance",
+    "Increase both",
+    "Have no effect on either"
+   ],
+   "answer": 1,
+   "why": "A bigger penalty forces a simpler model: it's less able to fit noise (lower variance) but also less able to fit the real pattern (higher bias)."
+  },
+  {
+   "topic": "Basics",
+   "q": "Predicting tomorrow's number of ad clicks is a:",
+   "options": [
+    "Classification problem",
+    "Regression problem",
+    "Clustering problem",
+    "Dimensionality reduction problem"
+   ],
+   "answer": 1,
+   "why": "The answer is a number, not a category, so it's regression. 'Will this user click: yes/no?' would be classification."
+  },
+  {
+   "topic": "Basics",
+   "q": "Grouping users into segments without any labels is:",
+   "options": [
+    "Supervised learning",
+    "Unsupervised learning",
+    "Reinforcement learning",
+    "Regression"
+   ],
+   "answer": 1,
+   "why": "There's no 'right answer' column to learn from, so the model has to find structure by itself. That's unsupervised learning, specifically clustering."
+  },
+  {
+   "topic": "Models",
+   "q": "Logistic regression is mainly used for:",
+   "options": [
+    "Predicting continuous values",
+    "Classification",
+    "Clustering",
+    "Reducing dimensions"
+   ],
+   "answer": 1,
+   "why": "Despite the name, it outputs a probability between 0 and 1 and then applies a threshold to pick a class."
+  },
+  {
+   "topic": "Models",
+   "q": "Logistic regression is trained by minimising:",
+   "options": [
+    "Mean squared error",
+    "Log loss (binary cross-entropy)",
+    "Hinge loss",
+    "Gini impurity"
+   ],
+   "answer": 1,
+   "why": "Log loss heavily punishes confident wrong probabilities. MSE combined with the sigmoid gives a bumpy loss that's hard to minimise; hinge loss is for SVMs and Gini is for trees."
+  },
+  {
+   "topic": "Models",
+   "q": "The decision boundary of plain logistic regression is:",
+   "options": [
+    "Linear",
+    "Circular",
+    "Any shape",
+    "A step function of each feature"
+   ],
+   "answer": 0,
+   "why": "It predicts 'yes' when the weighted sum is above 0, and 'weighted sum = 0' is a straight line (or flat plane)."
+  },
+  {
+   "topic": "Models",
+   "q": "Which algorithm is a 'lazy learner' with no real training phase?",
+   "options": [
+    "Logistic regression",
+    "Decision tree",
+    "k-nearest neighbours",
+    "Naive Bayes"
+   ],
+   "answer": 2,
+   "why": "kNN just stores the training data. All the work (finding the nearest neighbours) happens when you ask it to predict."
+  },
+  {
+   "topic": "Models",
+   "q": "In kNN, using k = 1 tends to:",
+   "options": [
+    "Underfit",
+    "Overfit",
+    "Make prediction faster than training",
+    "Remove the need for scaling"
+   ],
+   "answer": 1,
+   "why": "With k = 1 each prediction copies a single neighbour, so every noisy point affects the result. Larger k smooths things out."
+  },
+  {
+   "topic": "Models",
+   "q": "Which of these is a generative model?",
+   "options": [
+    "Logistic regression",
+    "SVM",
+    "Naive Bayes",
+    "Decision tree"
+   ],
+   "answer": 2,
+   "why": "Naive Bayes models how the data of each class looks (P(features and class)). The others only learn the boundary between classes."
+  },
+  {
+   "topic": "Models",
+   "q": "What is the 'naive' assumption in Naive Bayes?",
+   "options": [
+    "Classes are equally likely",
+    "Features are independent given the class",
+    "Data is normally distributed",
+    "There are only two classes"
+   ],
+   "answer": 1,
+   "why": "It assumes that once you know the class, knowing one feature tells you nothing about another. Rarely true, but it works well in practice."
+  },
+  {
+   "topic": "Models",
+   "q": "In an SVM, which training points decide where the boundary goes?",
+   "options": [
+    "All of them equally",
+    "The support vectors",
+    "The points furthest from the boundary",
+    "The cluster centres"
+   ],
+   "answer": 1,
+   "why": "Only the points closest to the boundary (the support vectors) matter. You could delete every other point and get the same boundary."
+  },
+  {
+   "topic": "Models",
+   "q": "A very large C in an SVM leads to:",
+   "options": [
+    "A wider margin and more errors allowed",
+    "A narrower margin and a risk of overfitting",
+    "No change",
+    "Faster training only"
+   ],
+   "answer": 1,
+   "why": "C is the penalty for misclassifying training points. Large C means the SVM bends over backwards to get every point right, shrinking the margin."
+  },
+  {
+   "topic": "Models",
+   "q": "Adding a completely useless feature to linear regression makes R²:",
+   "options": [
+    "Go down",
+    "Stay the same or go up",
+    "Become negative",
+    "Become exactly 1"
+   ],
+   "answer": 1,
+   "why": "R² can never fall when you add a feature, which is why adjusted R² exists: it penalises extra features."
+  },
+  {
+   "topic": "Trees",
+   "q": "Which algorithm does NOT need feature scaling?",
+   "options": [
+    "kNN",
+    "SVM",
+    "Decision tree",
+    "k-means"
+   ],
+   "answer": 2,
+   "why": "A tree compares one feature to a threshold at a time ('age < 30?'), so the units don't matter. The others all use distances or gradients."
+  },
+  {
+   "topic": "Trees",
+   "q": "Gini impurity of a node with a 50/50 split of two classes:",
+   "options": [
+    "0",
+    "0.25",
+    "0.5",
+    "1"
+   ],
+   "answer": 2,
+   "why": "Gini = 1 − (0.5² + 0.5²) = 1 − 0.5 = 0.5, the worst possible value for two classes. A pure node would be 0."
+  },
+  {
+   "topic": "Trees",
+   "q": "Entropy of a pure node (all one class):",
+   "options": [
+    "0",
+    "0.5",
+    "1",
+    "Undefined"
+   ],
+   "answer": 0,
+   "why": "There's no uncertainty at all about the class, so entropy is 0. A 50/50 node would have entropy 1."
+  },
+  {
+   "topic": "Trees",
+   "q": "A node has 8 'click' and 2 'no click'. Gini impurity?",
+   "options": [
+    "0.16",
+    "0.32",
+    "0.5",
+    "0.8"
+   ],
+   "answer": 1,
+   "why": "Shares are 0.8 and 0.2. Gini = 1 − (0.64 + 0.04) = 0.32."
+  },
+  {
+   "topic": "Trees",
+   "q": "Bagging mainly reduces:",
+   "options": [
+    "Bias",
+    "Variance",
+    "Training time",
+    "The number of features"
+   ],
+   "answer": 1,
+   "why": "It averages many independently trained deep trees. Their individual noise points in different directions and cancels out, so variance drops."
+  },
+  {
+   "topic": "Trees",
+   "q": "Boosting mainly reduces:",
+   "options": [
+    "Bias",
+    "Variance",
+    "Memory use",
+    "The need for labels"
+   ],
+   "answer": 0,
+   "why": "Each new weak tree fixes the remaining errors of the ensemble, so together they fit patterns a single weak tree couldn't. That lowers bias."
+  },
+  {
+   "topic": "Trees",
+   "q": "What does Random Forest add on top of plain bagging?",
+   "options": [
+    "Sequential training",
+    "A random subset of features at each split",
+    "Pruning every tree to depth 1",
+    "Weighting misclassified rows"
+   ],
+   "answer": 1,
+   "why": "Restricting each split to random features makes the trees more different from each other, so averaging cancels more noise. Sequential training and reweighting are boosting ideas."
+  },
+  {
+   "topic": "Trees",
+   "q": "Which ensemble can be trained fully in parallel?",
+   "options": [
+    "AdaBoost",
+    "Gradient boosting",
+    "Random Forest",
+    "All of them equally"
+   ],
+   "answer": 2,
+   "why": "Random Forest's trees don't depend on each other. Boosting trees must be built one after another, because each needs the previous ones' errors."
+  },
+  {
+   "topic": "Trees",
+   "q": "Roughly what fraction of unique rows ends up in one bootstrap sample?",
+   "options": [
+    "50%",
+    "63%",
+    "80%",
+    "100%"
+   ],
+   "answer": 1,
+   "why": "Sampling n rows with replacement includes about 1 − 1/e ≈ 63% of the unique rows. The other ~37% are 'out-of-bag' and give a free error estimate."
+  },
+  {
+   "topic": "Trees",
+   "q": "Which ensemble is more hurt by noisy labels and outliers?",
+   "options": [
+    "Bagging",
+    "Boosting",
+    "Both equally",
+    "Neither"
+   ],
+   "answer": 1,
+   "why": "Boosting keeps focusing on the examples it gets wrong, and mislabelled points are always wrong, so it ends up chasing noise."
+  },
+  {
+   "topic": "Clustering",
+   "q": "The elbow method helps you choose:",
+   "options": [
+    "The learning rate",
+    "k in k-means",
+    "The tree depth",
+    "The test-set size"
+   ],
+   "answer": 1,
+   "why": "Plot the clustering error against k and pick the point where adding more clusters stops helping much (the 'elbow')."
+  },
+  {
+   "topic": "Clustering",
+   "q": "Which clustering method doesn't need k and labels outliers as noise?",
+   "options": [
+    "k-means",
+    "DBSCAN",
+    "GMM",
+    "k-medoids"
+   ],
+   "answer": 1,
+   "why": "DBSCAN grows clusters through dense regions and leaves isolated points unassigned as noise. It also finds clusters of any shape."
+  },
+  {
+   "topic": "Clustering",
+   "q": "Which is most sensitive to outliers?",
+   "options": [
+    "k-means",
+    "DBSCAN",
+    "Random Forest",
+    "Median"
+   ],
+   "answer": 0,
+   "why": "k-means moves each centre to the average of its points, and a single far-away point drags an average a long way."
+  },
+  {
+   "topic": "Clustering",
+   "q": "PCA is:",
+   "options": [
+    "Supervised feature selection",
+    "Unsupervised; finds directions of maximum spread",
+    "A clustering method",
+    "A type of regularisation"
+   ],
+   "answer": 1,
+   "why": "It ignores labels and builds new axes along which the data spreads out the most, then keeps the top few."
+  },
+  {
+   "topic": "Clustering",
+   "q": "PCA eigenvalues are 4, 3, 2, 1. Variance kept by the first two components?",
+   "options": [
+    "40%",
+    "50%",
+    "70%",
+    "90%"
+   ],
+   "answer": 2,
+   "why": "Each eigenvalue is the spread captured by its component. (4 + 3) / (4 + 3 + 2 + 1) = 7/10 = 70%."
+  },
+  {
+   "topic": "Clustering",
+   "q": "Why scale features before PCA?",
+   "options": [
+    "PCA only works on 0/1 data",
+    "Otherwise features in large units dominate the components",
+    "It makes PCA supervised",
+    "It's not needed"
+   ],
+   "answer": 1,
+   "why": "PCA looks for the largest spread. Salary in rupees has a far bigger numeric spread than age in years, so it would take over without scaling."
+  },
+  {
+   "topic": "Clustering",
+   "q": "The silhouette score ranges from:",
+   "options": [
+    "0 to 1",
+    "−1 to 1",
+    "0 to ∞",
+    "−∞ to ∞"
+   ],
+   "answer": 1,
+   "why": "Near 1 = the point sits well inside its own cluster; near 0 = on a border; negative = probably in the wrong cluster."
+  },
+  {
+   "topic": "Metrics",
+   "q": "99% of rows are negative and the model always predicts negative. Accuracy?",
+   "options": [
+    "1%",
+    "50%",
+    "99%",
+    "Undefined"
+   ],
+   "answer": 2,
+   "why": "It gets every negative right, which is 99% of rows, while catching zero positives. This is why accuracy is useless on imbalanced data."
+  },
+  {
+   "topic": "Metrics",
+   "q": "TP = 40, FP = 10, FN = 20, TN = 30. Precision?",
+   "options": [
+    "0.67",
+    "0.70",
+    "0.75",
+    "0.80"
+   ],
+   "answer": 3,
+   "why": "Precision = TP / (TP + FP) = 40 / 50 = 0.80. Of everything flagged positive, 80% really was."
+  },
+  {
+   "topic": "Metrics",
+   "q": "Same matrix (TP 40, FP 10, FN 20, TN 30). Recall?",
+   "options": [
+    "0.67",
+    "0.70",
+    "0.75",
+    "0.80"
+   ],
+   "answer": 0,
+   "why": "Recall = TP / (TP + FN) = 40 / 60 ≈ 0.67. Of all real positives, the model caught two-thirds."
+  },
+  {
+   "topic": "Metrics",
+   "q": "For cancer screening, the most important metric is usually:",
+   "options": [
+    "Precision",
+    "Recall",
+    "Accuracy",
+    "Specificity"
+   ],
+   "answer": 1,
+   "why": "Missing a sick patient (a false negative) is far worse than a false alarm, so you want to catch as many real cases as possible: recall."
+  },
+  {
+   "topic": "Metrics",
+   "q": "For a spam filter where losing a real email is very bad, focus on:",
+   "options": [
+    "Precision",
+    "Recall",
+    "MAE",
+    "R²"
+   ],
+   "answer": 0,
+   "why": "Here the costly mistake is a false positive (a real email marked spam). Precision measures how trustworthy the 'spam' label is."
+  },
+  {
+   "topic": "Metrics",
+   "q": "The ROC curve plots:",
+   "options": [
+    "Precision vs recall",
+    "TPR (recall) vs FPR",
+    "Accuracy vs threshold",
+    "Loss vs epochs"
+   ],
+   "answer": 1,
+   "why": "For every threshold, the ROC curve plots the true positive rate (recall) against the false positive rate."
+  },
+  {
+   "topic": "Metrics",
+   "q": "An AUC of 0.5 means:",
+   "options": [
+    "A perfect model",
+    "No better than random guessing",
+    "Always wrong",
+    "50% accuracy, which is good"
+   ],
+   "answer": 1,
+   "why": "AUC is the chance the model ranks a random positive above a random negative. 0.5 is a coin flip."
+  },
+  {
+   "topic": "Metrics",
+   "q": "Raising the classification threshold usually:",
+   "options": [
+    "Raises recall, lowers precision",
+    "Raises precision, lowers recall",
+    "Raises both",
+    "Lowers both"
+   ],
+   "answer": 1,
+   "why": "You say 'yes' only when very sure, so fewer false alarms (precision up) but more real positives slip through (recall down)."
+  },
+  {
+   "topic": "Metrics",
+   "q": "Why is F1 the harmonic mean instead of the simple average?",
+   "options": [
+    "It's easier to compute",
+    "It stays low unless both precision and recall are high",
+    "It's always higher",
+    "It ignores recall"
+   ],
+   "answer": 1,
+   "why": "With precision 1.0 and recall 0.0, the simple average is 0.5 but F1 is 0. The harmonic mean punishes one of them being bad."
+  },
+  {
+   "topic": "Metrics",
+   "q": "Which regression metric is most robust to outliers?",
+   "options": [
+    "MSE",
+    "RMSE",
+    "MAE",
+    "R²"
+   ],
+   "answer": 2,
+   "why": "MAE uses the plain absolute error. MSE and RMSE square errors, so one huge miss dominates them."
+  },
+  {
+   "topic": "Metrics",
+   "q": "For CTR prediction (about 1% positives), which pair of metrics is most useful?",
+   "options": [
+    "Accuracy and R²",
+    "PR-AUC and log loss",
+    "MAE and RMSE",
+    "Accuracy and specificity"
+   ],
+   "answer": 1,
+   "why": "PR-AUC handles heavy imbalance well, and log loss checks the quality of the probabilities themselves, which matter because they set the bid."
+  },
+  {
+   "topic": "Data",
+   "q": "Which of these is data leakage?",
+   "options": [
+    "Using k-fold cross-validation",
+    "Fitting a scaler on the full dataset before splitting",
+    "Using a validation set",
+    "Shuffling non-time-series data"
+   ],
+   "answer": 1,
+   "why": "The scaler's average and spread then include test rows, so test information sneaks into training. Fit on the training split only."
+  },
+  {
+   "topic": "Data",
+   "q": "Best way to validate a time-series model?",
+   "options": [
+    "Random k-fold",
+    "Train on the past, test on the future",
+    "Leave-one-out with shuffling",
+    "Test on the training data"
+   ],
+   "answer": 1,
+   "why": "Shuffling would let the model train on the future and test on the past, which can never happen in real life."
+  },
+  {
+   "topic": "Data",
+   "q": "Stratified k-fold keeps:",
+   "options": [
+    "The same number of features in each fold",
+    "The same class proportions in each fold",
+    "The time order",
+    "Only the hardest examples"
+   ],
+   "answer": 1,
+   "why": "Each fold gets roughly the same mix of classes as the full data, which matters when one class is rare."
+  },
+  {
+   "topic": "Data",
+   "q": "Leave-one-out CV on 1,000 rows trains how many models?",
+   "options": [
+    "1",
+    "10",
+    "999",
+    "1,000"
+   ],
+   "answer": 3,
+   "why": "Each row is the test set once, so you train 1,000 models, each on the other 999 rows."
+  },
+  {
+   "topic": "Data",
+   "q": "Best way to encode millions of distinct app IDs with limited memory?",
+   "options": [
+    "One-hot encoding",
+    "Feature hashing",
+    "Drop the column",
+    "Label encoding sorted alphabetically"
+   ],
+   "answer": 1,
+   "why": "Hashing maps any number of IDs into a fixed number of columns. One-hot would create millions of columns."
+  },
+  {
+   "topic": "Data",
+   "q": "Which is NOT a way to handle class imbalance?",
+   "options": [
+    "Class weights",
+    "SMOTE oversampling",
+    "Moving the threshold",
+    "Judging the model only by accuracy"
+   ],
+   "answer": 3,
+   "why": "Accuracy hides the problem (see the 99% example). The other three are all standard fixes."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "Which activation is most associated with vanishing gradients?",
+   "options": [
+    "ReLU",
+    "Sigmoid",
+    "Leaky ReLU",
+    "Linear"
+   ],
+   "answer": 1,
+   "why": "Sigmoid goes flat for large inputs, so its gradient is tiny (at most 0.25). Many tiny numbers multiplied through layers shrink to almost zero."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "Training loss jumps around wildly and then blows up. Likely cause?",
+   "options": [
+    "Learning rate too high",
+    "Learning rate too low",
+    "Too much data",
+    "Too few epochs"
+   ],
+   "answer": 0,
+   "why": "Each step is so big that it overshoots the minimum and lands higher each time. Lower the learning rate."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "A deep network with no activation functions is equivalent to:",
+   "options": [
+    "A decision tree",
+    "A single linear model",
+    "A CNN",
+    "An RNN"
+   ],
+   "answer": 1,
+   "why": "Stacking linear layers just gives another linear function. Activation functions are what let the network learn curves."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "32×32×3 input, six 5×5 filters, stride 1, no padding. Output size?",
+   "options": [
+    "32×32×6",
+    "28×28×6",
+    "28×28×3",
+    "27×27×6"
+   ],
+   "answer": 1,
+   "why": "(32 − 5 + 0)/1 + 1 = 28, and there's one output channel per filter: 28×28×6."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "A dense layer from 100 inputs to 50 outputs has how many parameters?",
+   "options": [
+    "150",
+    "5,000",
+    "5,050",
+    "5,100"
+   ],
+   "answer": 2,
+   "why": "100 × 50 weights + 50 biases (one per output) = 5,050."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "How many parameters does a max-pooling layer have?",
+   "options": [
+    "0",
+    "1 per channel",
+    "Kernel size squared",
+    "Same as the previous layer"
+   ],
+   "answer": 0,
+   "why": "Pooling just takes the maximum in each window. There's nothing to learn."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "Output layer and loss for picking one of 10 classes?",
+   "options": [
+    "Sigmoid + MSE",
+    "Softmax + cross-entropy",
+    "ReLU + MAE",
+    "Tanh + hinge"
+   ],
+   "answer": 1,
+   "why": "Softmax turns 10 scores into probabilities that sum to 1, and cross-entropy rewards giving high probability to the correct class."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "Dropout is applied:",
+   "options": [
+    "Only during training",
+    "Only at test time",
+    "Both equally",
+    "Only to the input layer"
+   ],
+   "answer": 0,
+   "why": "Neurons are switched off randomly while training so the network doesn't rely on any one of them. At test time all neurons are used."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "Why do transformers divide attention scores by √(key size)?",
+   "options": [
+    "To save memory",
+    "To stop scores getting so large that softmax becomes all-or-nothing",
+    "To add word order",
+    "To make attention linear"
+   ],
+   "answer": 1,
+   "why": "Large dot products push softmax towards one 1 and all 0s, where gradients vanish. Scaling keeps the scores moderate."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "Why do transformers need positional encodings?",
+   "options": [
+    "To speed up training",
+    "Attention alone has no sense of word order",
+    "To reduce overfitting",
+    "To handle images"
+   ],
+   "answer": 1,
+   "why": "Attention compares every word with every other word without caring about position, so 'dog bites man' would look like 'man bites dog' without them."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "GPT-style models are trained to:",
+   "options": [
+    "Fill in hidden words anywhere",
+    "Predict the next word",
+    "Classify sentences",
+    "Cluster documents"
+   ],
+   "answer": 1,
+   "why": "GPT is decoder-only and predicts the next token from the ones before. Filling in hidden words is how BERT is trained."
+  },
+  {
+   "topic": "Neural nets",
+   "q": "Setting the sampling temperature close to 0 makes an LLM:",
+   "options": [
+    "More random",
+    "Almost always pick the most likely word",
+    "Refuse to answer",
+    "Faster"
+   ],
+   "answer": 1,
+   "why": "Low temperature sharpens the probabilities so the top word nearly always wins. That's close to greedy decoding."
+  },
+  {
+   "topic": "Stats",
+   "q": "1% have a disease. The test catches 99% of sick people and flags 5% of healthy ones. P(sick | positive)?",
+   "options": [
+    "About 99%",
+    "About 50%",
+    "About 17%",
+    "About 1%"
+   ],
+   "answer": 2,
+   "why": "Per 10,000 people: 99 true positives and 495 false positives. 99 / 594 ≈ 17%. When the disease is rare, most positives are false alarms."
+  },
+  {
+   "topic": "Stats",
+   "q": "Mean and variance of a Poisson distribution with rate λ?",
+   "options": [
+    "λ and λ²",
+    "λ and λ",
+    "λ and √λ",
+    "1/λ and 1/λ²"
+   ],
+   "answer": 1,
+   "why": "For a Poisson distribution the mean and the variance are both λ. (1/λ and 1/λ² belong to the exponential distribution.)"
+  },
+  {
+   "topic": "Stats",
+   "q": "An ad with CTR 0.3 is shown 10 times. Mean and variance of clicks?",
+   "options": [
+    "3 and 2.1",
+    "3 and 0.9",
+    "7 and 2.1",
+    "3 and 3"
+   ],
+   "answer": 0,
+   "why": "Binomial: mean = np = 3, variance = np(1 − p) = 3 × 0.7 = 2.1."
+  },
+  {
+   "topic": "Stats",
+   "q": "A p-value of 0.03 with α = 0.05 means:",
+   "options": [
+    "H₀ is true with 3% probability",
+    "Reject H₀",
+    "Accept H₀",
+    "The effect is 3% large"
+   ],
+   "answer": 1,
+   "why": "0.03 is below the 0.05 cut-off, so the result would be unlikely if there were no real difference. It does NOT mean H₀ has a 3% chance of being true."
+  },
+  {
+   "topic": "Stats",
+   "q": "A Type I error is:",
+   "options": [
+    "A false positive",
+    "A false negative",
+    "A rounding error",
+    "Using the wrong test"
+   ],
+   "answer": 0,
+   "why": "Rejecting H₀ when it's actually true: you declare a winner that isn't really better."
+  },
+  {
+   "topic": "Stats",
+   "q": "To halve the standard error of a sample mean, you need:",
+   "options": [
+    "2× the data",
+    "4× the data",
+    "Half the data",
+    "√2× the data"
+   ],
+   "answer": 1,
+   "why": "Standard error = σ/√n. Halving it means doubling √n, which means 4× n."
+  },
+  {
+   "topic": "Stats",
+   "q": "Var(2X + 3) equals:",
+   "options": [
+    "2 Var(X)",
+    "4 Var(X)",
+    "4 Var(X) + 3",
+    "2 Var(X) + 3"
+   ],
+   "answer": 1,
+   "why": "Adding a constant doesn't change spread, and multiplying by 2 multiplies variance by 2² = 4."
+  },
+  {
+   "topic": "Stats",
+   "q": "Expected number of rolls of a fair die to get the first 6?",
+   "options": [
+    "3",
+    "3.5",
+    "6",
+    "12"
+   ],
+   "answer": 2,
+   "why": "Waiting for a success with probability p takes 1/p tries on average. 1 / (1/6) = 6."
+  },
+  {
+   "topic": "Stats",
+   "q": "Two fair coins are tossed and at least one is heads. P(both heads)?",
+   "options": [
+    "1/2",
+    "1/3",
+    "1/4",
+    "2/3"
+   ],
+   "answer": 1,
+   "why": "The possible outcomes are HH, HT and TH, all equally likely. Only one of the three is HH."
+  },
+  {
+   "topic": "Stats",
+   "q": "Best test to compare the click rates of two ad creatives?",
+   "options": [
+    "Two-proportion z-test",
+    "Pearson correlation",
+    "Linear regression R²",
+    "Silhouette score"
+   ],
+   "answer": 0,
+   "why": "Each creative has a share of clicks (a proportion), and this test checks whether two proportions really differ."
+  },
+  {
+   "topic": "Stats",
+   "q": "Zero correlation between X and Y means:",
+   "options": [
+    "They are independent",
+    "There is no linear relationship, but they may still be related",
+    "Y is constant",
+    "X causes Y"
+   ],
+   "answer": 1,
+   "why": "Y = X² over a symmetric range has zero correlation but depends completely on X. Correlation only measures straight-line relationships."
+  },
+  {
+   "topic": "Applied ML",
+   "q": "The classic baseline model for CTR prediction is:",
+   "options": [
+    "k-means",
+    "Logistic regression",
+    "PCA",
+    "DBSCAN"
+   ],
+   "answer": 1,
+   "why": "It outputs a probability, trains fast on huge sparse data, and is easy to calibrate. It's been the industry baseline for years."
+  },
+  {
+   "topic": "Applied ML",
+   "q": "Why must CTR predictions be well calibrated?",
+   "options": [
+    "To raise accuracy",
+    "The predicted probability directly sets the bid",
+    "To reduce training time",
+    "Calibration isn't important"
+   ],
+   "answer": 1,
+   "why": "If the model says 4% when the true rate is 2%, the system bids double what the ad is worth."
+  },
+  {
+   "topic": "Applied ML",
+   "q": "You keep only 10% of 'no click' rows when training. The predicted CTRs will be:",
+   "options": [
+    "Too low",
+    "Too high, so they must be corrected",
+    "Unchanged",
+    "Random"
+   ],
+   "answer": 1,
+   "why": "Clicks now make up a much bigger share of the training data than in reality, so the model overestimates. You rescale the outputs afterwards."
+  },
+  {
+   "topic": "Applied ML",
+   "q": "A new ad with no history is an example of:",
+   "options": [
+    "Overfitting",
+    "The cold-start problem",
+    "Data leakage",
+    "Multicollinearity"
+   ],
+   "answer": 1,
+   "why": "Collaborative methods need past interactions. Without any, you rely on the ad's content features, popularity, or exploration."
+  },
+  {
+   "topic": "Applied ML",
+   "q": "Thompson sampling and UCB address:",
+   "options": [
+    "Missing values",
+    "The explore-vs-exploit trade-off",
+    "Vanishing gradients",
+    "Feature scaling"
+   ],
+   "answer": 1,
+   "why": "They're multi-armed bandit methods: they decide when to keep showing the best-known ad and when to try others that might be better."
+  },
+  {
+   "topic": "Applied ML",
+   "q": "A model works well at launch and gets worse over the following weeks. Most likely:",
+   "options": [
+    "Overfitting",
+    "Data or concept drift",
+    "Too high a learning rate",
+    "Too many trees"
+   ],
+   "answer": 1,
+   "why": "User behaviour and the ad mix change over time, so the patterns the model learned slowly go stale. Monitor and retrain."
+  },
+  {
+   "topic": "Applied ML",
+   "q": "Isolation Forest is used for:",
+   "options": [
+    "Ranking ads",
+    "Anomaly detection, e.g. click fraud",
+    "Reducing dimensions",
+    "Text generation"
+   ],
+   "answer": 1,
+   "why": "It splits the data randomly. Unusual points get isolated in very few splits, which flags them as anomalies."
+  }
+ ]
+}
