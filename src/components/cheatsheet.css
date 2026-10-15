@@ -90,3 +90,163 @@
   border-bottom: 1px solid var(--line);
   vertical-align: top;
 }
+
+/* --- Interactive cheatsheets (notes + quiz, see InteractiveCheatsheet.js).
+   Tabs and chips reuse .push/.pushed and .filter-chip from layout.css. --- */
+
+.cs-tabs {
+  position: sticky;
+  top: var(--nav-h, 62px);
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  margin-top: 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.cs-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.cs-jump a {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 2px 6px;
+}
+
+.cs-jump a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.cs-topic {
+  margin-top: 32px;
+  scroll-margin-top: 130px;
+}
+
+.cs-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.cs-stack > .cs-card {
+  border-top: 1px solid var(--line);
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.cs-stack .cs-card > * + * {
+  margin-top: 10px;
+}
+
+.cs-terms {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin-bottom: 0;
+}
+
+.cs-terms dt {
+  font: 600 0.82em var(--mono);
+  color: var(--accent);
+  padding-top: 3px;
+}
+
+.cs-terms dd {
+  margin: 0;
+  min-width: 0;
+}
+
+@media (max-width: 520px) {
+  .cs-terms { grid-template-columns: 1fr; gap: 2px; }
+  .cs-terms dd { margin-bottom: 8px; }
+}
+
+.cs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cs-score {
+  margin-right: auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-score b {
+  color: var(--ink);
+}
+
+.cs-qmeta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.cs-qnum {
+  font: 600 13px var(--mono);
+  color: var(--muted);
+}
+
+.cs-q {
+  margin: 6px 0 0;
+  font-weight: 600;
+}
+
+.cs-opts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 8px;
+}
+
+.cs-opt {
+  text-align: left;
+  font: 15px/1.35 var(--body);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  padding: 9px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cs-opt:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.cs-opt:disabled {
+  cursor: default;
+}
+
+.cs-opt-right {
+  border-color: var(--difficulty-easy);
+  background: color-mix(in srgb, var(--difficulty-easy) 18%, var(--surface));
+  font-weight: 600;
+}
+
+.cs-opt-wrong {
+  border-color: var(--difficulty-hard);
+  background: color-mix(in srgb, var(--difficulty-hard) 16%, var(--surface));
+  text-decoration: line-through;
+}
+
+.cs-why {
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.cs-why b {
+  color: var(--ink);
+}

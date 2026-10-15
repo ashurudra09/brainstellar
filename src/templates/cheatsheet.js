@@ -2,6 +2,8 @@ import React from 'react'
 import { graphql, Link } from 'gatsby'
 import Layout from '../components/layout'
 import Seo from '../components/seo'
+import InteractiveCheatsheet from '../components/InteractiveCheatsheet'
+import interactive from '../cheatsheets'
 
 export const query = graphql`
   query($id: String!) {
@@ -9,6 +11,8 @@ export const query = graphql`
       html
       frontmatter {
         title
+        slug
+        kind
         summary
         icon
         tags
@@ -37,7 +41,9 @@ export default function Cheatsheet({ data }) {
           </div>
         )}
 
-        <div className="content-text" dangerouslySetInnerHTML={{ __html: html }} />
+        {frontmatter.kind === 'interactive' && interactive[frontmatter.slug]
+          ? <InteractiveCheatsheet slug={frontmatter.slug} data={interactive[frontmatter.slug]} />
+          : <div className="content-text" dangerouslySetInnerHTML={{ __html: html }} />}
 
         </div></div></div></div>
     </Layout>
