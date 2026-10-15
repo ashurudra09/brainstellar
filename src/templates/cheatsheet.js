@@ -26,20 +26,20 @@ export default function Cheatsheet({ data }) {
       <div className="stylishpage"><div className="bord1"><div className="bord2"><div className="container">
         <Link to="/cheatsheets" className="btn btn-sm link-white smooth">&larr; Cheatsheets</Link>
 
-        <h2 style={{ textAlign: `center`, marginTop: `0.5em`, marginBottom: `0.2em` }}>
-          {frontmatter.icon} {frontmatter.title}
-        </h2>
+        <div className="page-head" style={{ marginTop: `0.8em` }}>
+          <h1>{frontmatter.icon} {frontmatter.title}</h1>
+          {frontmatter.summary && <p className="lede">{frontmatter.summary}</p>}
+        </div>
 
         {frontmatter.tags && frontmatter.tags.length > 0 && (
-          <div style={{ textAlign: `center`, marginBottom: `1em` }}>
-            {frontmatter.tags.map(tag => <span key={tag} className="cs-pill" style={{ margin: '0 4px' }}>{tag}</span>)}
+          <div style={{ marginBottom: `1em` }}>
+            {frontmatter.tags.map(tag => <span key={tag} className="cs-pill" style={{ marginRight: 6 }}>{tag}</span>)}
           </div>
         )}
 
         <div className="content-text" dangerouslySetInnerHTML={{ __html: html }} />
 
-        <br /><br />
-      </div></div></div></div>
+        </div></div></div></div>
     </Layout>
   )
 }

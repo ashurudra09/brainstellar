@@ -50,30 +50,16 @@ export default function Question({ data, pageContext }) {
   return (
     <Layout>
       <div className="stylishpage"><div className="bord1"><div className="bord2"><div className="container">
-        <br /><br />
-
-        <table style={{ border: '0px solid black', width: '100%', padding: '0px', margin: '0px' }}>
-          <tbody>
-            <tr style={{ padding: '0px', margin: '0px' }}>
-              <td style={{ padding: '0px', margin: '0px', border: '0px solid black', width: '20%', text: '' }}>
-                {puzzle.difficulty &&
-                  <Link className={`btn  btn-sm btn-${puzzle.difficulty} smooth`} to={`/puzzles/${puzzle.difficulty}`} title={`More ${puzzle.difficulty} puzzles`}>{puzzle.difficulty}</Link>
-                }
-              </td>
-              <td style={{ padding: '0px', margin: '0px' }}>
-                <div className="content-text" style={{ padding: '0px', margin: '0px', textAlign: 'center', fontSize: '1.3em' }}>
-                  <a href={canonicalRoute} title="Permanent link to this post">
-                    {puzzle.title}
-                  </a>
-                </div>
-              </td>
-              <td style={{ padding: '0px', margin: '0px', border: '0px solid black', width: '20%', maxWidth: '80px', textAlign: 'right' }}>
-                <Link className={`btn  btn-sm link-white smooth`} to={`/puzzles/${puzzle.category}`} title={`More ${puzzle.category} puzzles`}>{puzzle.category}</Link>
-
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div className="q-head">
+          <div className="tag">{domain ? domain.label : domainSlug}</div>
+          <h1><a href={canonicalRoute} title="Permanent link to this post">{puzzle.title}</a></h1>
+        </div>
+        <div className="q-head">
+          {puzzle.difficulty &&
+            <Link className={`btn btn-sm btn-${puzzle.difficulty} smooth`} to={`/puzzles/${puzzle.difficulty}`} title={`More ${puzzle.difficulty} puzzles`}>{puzzle.difficulty}</Link>
+          }
+          <Link className="btn btn-sm link-white smooth" to={`/puzzles/${puzzle.category}`} title={`More ${puzzle.category} puzzles`}>{puzzle.category}</Link>
+        </div>
 
         <PuzzleStatusToggles puzzleId={progressKey} />
 
@@ -105,30 +91,10 @@ export default function Question({ data, pageContext }) {
 
         <PuzzleNotes puzzleId={progressKey} />
 
-        <br />
-        <div style={{ marginBottom: `50px` }}>
-          <table style={{ width: `100%`, tableLayout: `fixed` }}>
-            <tbody>
-              <tr>
-                <td>
-
-                  {previousPuzzleRoute && (
-                    <Link style={{ float: `left` }} to={previousPuzzleRoute} className={"btn  btn-sm link-white smooth"}>Previous</Link>
-                  )}
-                </td>
-
-                <td>
-
-                  {nextPuzzleRoute && (
-                    <Link style={{ float: `right` }} to={nextPuzzleRoute} className={"btn  btn-sm link-white smooth"}>Next Puzzle</Link>
-                  )}
-                </td>
-
-              </tr>
-            </tbody>
-          </table>
+        <div className="q-nav">
+          {previousPuzzleRoute ? <Link to={previousPuzzleRoute} className="btn btn-sm link-white smooth">&larr; Previous</Link> : <span />}
+          {nextPuzzleRoute && <Link to={nextPuzzleRoute} className="btn btn-sm link-white smooth">Next Puzzle &rarr;</Link>}
         </div>
-        <br /><br />
       </div></div></div></div>
     </Layout>
   )

@@ -72,6 +72,7 @@ own. Then map what remains:
 | coloured badge, chip, tag | `<span class="cs-pill">` |
 | note / warning / tip box | `<div class="cs-callout">` |
 | `<kbd>`, shortcut key | `<span class="cs-kbd">` |
+| term / definition list (`<dl>`) | markdown table or bold-term list |
 
 Prefer plain markdown wherever it carries the same meaning -- reach for a
 `.cs-*` class only when the layout itself is load-bearing (a side-by-side

@@ -1,40 +1,51 @@
+/* Visual language borrowed from the ML kit: warm off-white page, white
+   hairline cards, crimson accent. The legacy --color-* tokens are aliases so
+   the rest of this file themes itself. */
 :root {
   color-scheme: light;
-  --color-text: black;
-  --color-background: white;
-  --color-background-off: #f2f2f2;
+  --bg: #faf8f7; --surface: #ffffff; --ink: #1f1a1a; --muted: #6b6060; --line: #e7e0de;
+  --accent: #b3262f; --accent-soft: #fbe9ea;
+  --code-bg: #f3efee; --ex-bg: #f6f3f2;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, "Courier New", monospace;
+  --size-content: 900px;
+  --size-gutter: 0 16px;
+  --size-gap: 12px;
+  --color-text: var(--ink);
+  --color-background: var(--surface);
+  --color-background-off: var(--code-bg);
+  --qf-border: var(--line);
 }
 
 [data-theme="dark"] {
   color-scheme: dark;
-  --color-text: white;
-  --color-background: #1d1d1d;
-  --color-background-off: #2d2d2d;
+  --bg: #161314; --surface: #1f1b1c; --ink: #efe9e8; --muted: #a79d9c; --line: #352f30;
+  --accent: #f0646c; --accent-soft: #3a2224;
+  --code-bg: #2a2526; --ex-bg: #241f20;
 }
 
 @media (prefers-color-scheme: dark) {
   [data-theme="auto"] {
     color-scheme: dark;
-    --color-text: white;
-    --color-background: #1d1d1d;
-    --color-background-off: #2d2d2d;
+    --bg: #161314; --surface: #1f1b1c; --ink: #efe9e8; --muted: #a79d9c; --line: #352f30;
+    --accent: #f0646c; --accent-soft: #3a2224;
+    --code-bg: #2a2526; --ex-bg: #241f20;
   }
 }
 
 body {
-  background-color: var(--color-background);
-  color: var(--color-text);
+  background-color: var(--bg);
+  color: var(--ink);
 }
 
 body,
 textarea,
 input {
-  font: 13px/18px "Lucida Grande", "Lucida Sans Unicode", Helvetica, Arial, Verdana, sans-serif;
+  font: 17px/1.6 var(--body);
   margin: 0;
   border-radius: 0;
   background: 0;
-  text-align: justify;
-  text-justify: inter-word;
 }
 
 textarea,
@@ -62,8 +73,9 @@ a:active {
   text-decoration: none
 }
 
-* {
-  outline: 0
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 html {
@@ -86,27 +98,19 @@ body {
   position: relative;
 }
 
-.container {
-  margin: 0 15px;
-  width: auto;
 
-  /* the bottom margin is the negative value of the footer's height */
-
-}
 
 .container-nav {
-  margin: 0 15px;
+  margin: 0;
   width: auto;
   display: flex;
+  gap: 8px;
   align-items: center;
   flex-wrap: nowrap;
 }
 
 .stylishpage {
-  background: var(--color-background);
-  margin: 2px;
-  margin-top: 15px;
-  margin-bottom: 2px;
+  margin: 16px 0;
 }
 
 .content-text {
@@ -123,52 +127,32 @@ body {
   height: auto;
 }
 
-.bord1 {
-  border-bottom: 1px solid rgb(128, 128, 128, 0.31)
+body {
+  background: var(--bg)
 }
 
-body {
-  background: var(--color-background)
+/* Card shell (.stylishpage > .bord1 > .bord2 > .container) -- one hairline
+   card, the kit's .blk. */
+.bord1 {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.bord2 {
+  border: 0;
+}
+
+.container {
+  margin: 0;
+  padding: 18px 20px;
 }
 
 @media(min-width:600px) {
 
-  /*this is satisfied for 600 to 1024*/
-  body {
-    background: var(--color-background-off)
-  }
-
-  .bord1 {
-    border: 1px solid rgb(128, 128, 128, 0.16);
-    border-radius: 8px;
-  }
-
-  .bord2 {
-    border: 1px solid rgb(128, 128, 128, 0.31);
-    border-radius: 7px;
-  }
-
-  .container {
-    width: 90%;
-    margin: auto;
-  }
-
   .container-outer {
-    width: 95%;
+    width: 100%;
     margin: auto;
-  }
-
-  .container-nav {
-    margin: 0 15px;
-    width: auto;
-  }
-
-  .stylishpage {
-    background: var(--color-background);
-    border-radius: 9px;
-    margin: 4px;
-    margin-top: 6px;
-    margin-bottom: 6px;
   }
 
   .content-text {
@@ -180,29 +164,6 @@ body {
 @media(min-width:1024px) {
 
   /*this is beyond 1024*/
-  .container {
-    width: 80%;
-    margin: auto;
-  }
-
-  .container-outer {
-    width: 80%;
-    margin: auto;
-  }
-
-  .container-nav {
-    width: 80%;
-    margin: auto;
-  }
-
-  .stylishpage {
-    background: var(--color-background);
-    border-radius: 9px;
-    margin: 6px;
-    margin-top: 8px;
-    margin-bottom: 10px;
-  }
-
   .content-text {
     margin: 10px;
     padding: 10px;
@@ -222,35 +183,69 @@ form>* {
   margin-bottom: 10px
 }
 
-h1 {
-  font-size: 4em
-}
-
+h1,
 h2,
-.btn {
-  font-size: 2em
+h3 {
+  font-family: var(--display);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: clamp(1.7rem, 4vw, 2.3rem);
+  font-weight: 700;
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 12px;
+}
+
+h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.tag {
+  font: 600 12px var(--body);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.lede {
+  color: var(--muted);
+  max-width: 70ch;
+  margin: 8px 0 0;
 }
 
 .btn {
-  background: #808080;
+  font-size: 1em;
+}
+
+.btn {
+  font: 600 14px var(--body);
+  background: transparent;
   border-radius: 6px;
-  border: 0;
-  color: var(--color-background);
+  border: 1px solid var(--line);
+  color: var(--muted);
   cursor: pointer;
   display: inline-block;
   margin: .2em .3em .2em 0;
-  padding: 12px 30px 14px
+  padding: 5px 12px;
 }
 
 .btn:hover {
-  background: #666;
-  color: var(--color-background);
+  border-color: var(--accent);
+  color: var(--accent);
   text-decoration: none
 }
 
 .btn:active,
 .btn:focus {
-  background: #666;
   text-decoration: none
 }
 
@@ -395,13 +390,13 @@ input,
 
 textarea,
 input {
-  border: 1px solid #ccc;
+  border: 1px solid var(--line);
   padding: 8px
 }
 
 textarea:focus,
 input:focus {
-  border-color: #5ab
+  border-color: var(--accent)
 }
 
 textarea,
@@ -415,70 +410,79 @@ input[type='text'] {
   box-shadow: 0 0 0 1px #ccc
 }
 
-.nav,
-.nav .current {
-  background: black;
-  color: var(--color-background);
-  background-image: url('/images/background_black.png');
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
 }
-
 
 .nav a:hover,
 .nav a:active,
 .nav a:focus {
-  color: white;
+  text-decoration: none;
+}
+
+/* The kit's .tab pill; the current page gets the accent fill. */
+.nav-links {
+  font: 600 15px var(--body);
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 .nav-links:hover,
-.nav-links:active,
 .nav-links:focus {
-  background: #c00;
-  background-image: url('/images/background_red.png');
-  background-size: 4px 4px;
+  border-color: var(--accent);
 }
 
-.nav img {
-  margin: -10px;
-  height: 20px;
-  top: -20px;
+.nav a.nav-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface);
 }
 
 .nav {
   min-height: 20px;
-  padding: 14px 0 15px
+  padding: 12px 0;
 }
 
-.nav a {
-  color: #aaa;
-  top: -1px;
-  position: relative;
+.nav .pagename,
+.nav a.pagename:hover {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  margin-right: auto;
 }
 
-.nav .pagename {
-  font-size: 1.6em;
-  top: 1px;
-  height: 20px;
-  position: relative;
-}
-
-.nav-links {
-  padding: 20px 25px 20px 25px;
+.nav-logo {
+  height: 32px;
+  width: 32px;
+  border-radius: 7px;
 }
 
 .nav-wordmark {
-  position: relative;
-  top: -7px;
-  height: 20px;
-  max-width: min(211px, 45vw);
-  width: auto;
+  font: 700 1.35rem var(--display);
+  letter-spacing: -.01em;
+}
+
+.nav-links {
+  padding: 6px 16px;
 }
 
 .nav-toggle {
   display: none;
   margin-left: auto;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
   border-radius: 6px;
   padding: 5px 12px;
   font-size: 1.1em;
@@ -487,7 +491,7 @@ input[type='text'] {
 }
 
 .nav-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.18);
+  border-color: var(--accent);
 }
 
 /* ponytail: no focus trap / Escape / scroll-lock on .nav-menu -- it's an
@@ -517,7 +521,9 @@ input[type='text'] {
 
   .nav-menu .nav-links {
     display: block;
-    padding: 12px 15px;
+    padding: 8px 16px;
+    margin: 3px 0;
+    border-radius: 8px;
   }
 
   .nav-menu .nav-select {
@@ -548,7 +554,7 @@ input[type='text'] {
 }
 
 .table tbody>*:nth-child(2n-1) {
-  background: #ddd
+  background: var(--ex-bg)
 }
 
 .row {
@@ -631,30 +637,25 @@ input[type='text'] {
   /*prevent paragraphs in markdown*/
 }
 
+/* Revealed Hint/Solution content: the kit's .ex callout. */
 .around {
-  color: var(--color-text);
-  background: var(--color-background);
-  margin: .2em .3em .2em 0;
-  padding: 8px 20px 9px;
-  border: 2px solid #808080;
-  border-radius: 20px;
-}
-
-.around:hover,
-.around:active,
-.around:focus {
-  color: var(--color-text);
-  background: var(--color-background);
+  color: var(--ink);
+  background: var(--ex-bg);
+  margin: .5em 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
 }
 
 .push {
-  background-color: var(--color-background);
-  color: var(--color-text);
+  font: 600 15px var(--body);
+  background-color: var(--surface);
+  color: var(--ink);
   text-decoration: none;
   margin: .2em .3em .2em 0;
-  padding: 8px 20px 9px;
-  border: 2px solid #808080;
-  border-radius: 20px;
+  padding: 7px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
   cursor: pointer;
   display: inline-block;
 }
@@ -662,27 +663,17 @@ input[type='text'] {
 .push:hover,
 .push:active,
 .push:focus {
-  border: 2px solid #444;
+  border-color: var(--accent);
   text-decoration: none
 }
 
-.pushed {
-  color: var(--color-background);
-  background: #808080;
-  text-decoration: none;
-  margin: .2em .3em .2em 0;
-  padding: 10px 22px 11px;
-  border: 2px solid #808080;
-  border-radius: 20px;
-  cursor: pointer;
-  display: inline-block;
-}
-
+.pushed,
 .pushed:hover,
 .pushed:active,
 .pushed:focus {
-  background: #777;
-  text-decoration: none
+  color: var(--surface);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 /*.fb_edge_comment_widget.fb_iframe_widget { display: none !important }*/
@@ -935,13 +926,6 @@ input[type='text'] {
   opacity: 0 !important;
 }
 
-.stylishpage {
-  font: 15px/18px sans-serif;
-  font-size: 15px;
-  line-height: 24px;
-  font-weight: 400;
-}
-
 .solution a {
   text-decoration: underline;
   /* change this to your preferred color */
@@ -950,7 +934,8 @@ input[type='text'] {
 /* --- Code blocks (DSA/SQL content) --- */
 
 pre {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: var(--mono);
+  font-size: .84em;
   text-align: left;
   overflow-x: auto;
   background: var(--color-background-off);
@@ -960,7 +945,8 @@ pre {
 }
 
 code {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-family: var(--mono);
+  font-size: .84em;
 }
 
 :not(pre) > code {
@@ -1171,15 +1157,15 @@ code {
   white-space: nowrap;
   background: var(--color-background-off);
   color: var(--color-text);
-  border: 1px solid rgb(128, 128, 128, 0.31);
-  border-radius: 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
   padding: 0 12px;
   font-size: 0.9em;
   cursor: pointer;
 }
 
 .filter-chip:hover {
-  border-color: #808080;
+  border-color: var(--accent);
 }
 
 .filter-chip-active {
@@ -1203,7 +1189,7 @@ code {
   margin-bottom: 14px;
   /* body{text-align:justify} and index.module.css .textCenter both leak in */
   text-align: left;
-  --qf-border: rgb(128, 128, 128, 0.31);
+  --qf-border: var(--line);
   --qf-chip-h: 28px;
   --qf-chip-gap: 6px;
 }
@@ -1236,14 +1222,14 @@ code {
   box-sizing: border-box;
   padding: 7px 12px 7px 33px;
   border: 1px solid var(--qf-border);
-  border-radius: 18px;
-  background: var(--color-background-off);
+  border-radius: 999px;
+  background: var(--surface);
   color: var(--color-text);
   text-align: left;
 }
 
 .qf-search input[type='text']:focus {
-  border-color: #808080;
+  border-color: var(--accent);
 }
 
 .qf-iconbtn {
@@ -1268,7 +1254,7 @@ code {
 }
 
 .qf-iconbtn:hover {
-  border-color: #808080;
+  border-color: var(--accent);
 }
 
 .qf-badge {
@@ -1389,19 +1375,21 @@ code {
   font-size: 0.95em;
 }
 
+.puzzle-table {
+  font-variant-numeric: tabular-nums;
+}
+
 .puzzle-table th {
   text-align: left;
   padding: 6px 8px;
-  border-bottom: 2px solid rgb(128, 128, 128, 0.31);
-  font-size: 0.8em;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  opacity: 0.65;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .puzzle-table td {
   padding: 8px;
-  border-bottom: 1px solid rgb(128, 128, 128, 0.16);
+  border-bottom: 1px solid var(--line);
   vertical-align: middle;
 }
 
@@ -1452,7 +1440,7 @@ code {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 1px solid rgb(128, 128, 128, 0.31);
+  border: 1px solid var(--line);
   cursor: pointer;
   font-size: 0.9em;
 }
@@ -1523,7 +1511,7 @@ code {
 .puzzle-notes-toolbar button {
   width: 28px;
   height: 28px;
-  border: 1px solid #808080;
+  border: 1px solid var(--line);
   border-radius: 4px;
   background: var(--color-background);
   color: var(--color-text);
@@ -1537,7 +1525,7 @@ code {
   resize: both;
   overflow: auto;
   font-family: inherit;
-  border: 1px solid #808080;
+  border: 1px solid var(--line);
   border-radius: 4px;
   padding: 8px;
 }
@@ -1587,7 +1575,7 @@ code {
   flex-direction: column;
   gap: 4px;
   background: var(--color-background);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  border: 1px solid var(--line);
   border-radius: 6px;
   padding: 6px;
   z-index: 10;
@@ -1633,7 +1621,7 @@ code {
   justify-content: space-between;
   gap: 10px;
   padding: 8px 4px;
-  border-bottom: 1px solid rgb(128, 128, 128, 0.16);
+  border-bottom: 1px solid var(--line);
 }
 
 .review-queue-mark-reviewed {
@@ -1646,36 +1634,133 @@ code {
   text-align: center;
 }
 
-/* The nav bar is always dark in both themes (see .nav below), so the closed
-   control is hardcoded light-on-dark; the popup is drawn on a normal OS
-   surface, so it follows the theme tokens instead. */
+/* Closed control follows the theme tokens; the chevron is a data-URI so it
+   has one variant per theme. */
 .nav-select {
   appearance: none;
-  background-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 6px;
-  padding: 5px 26px 5px 10px;
+  background-color: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 28px 6px 14px;
   margin: 0 6px;
-  font: inherit;
-  font-size: 0.95em;
+  font: 600 15px var(--body);
   cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b6060' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 10px center;
   background-size: 14px;
 }
 
-.nav-select:hover {
-  background-color: rgba(255, 255, 255, 0.18);
+[data-theme="dark"] .nav-select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a79d9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
 }
 
+@media (prefers-color-scheme: dark) {
+  [data-theme="auto"] .nav-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a79d9c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  }
+}
+
+.nav-select:hover,
 .nav-select:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
-  outline-offset: 1px;
+  border-color: var(--accent);
 }
 
 .nav-select option {
   background: var(--color-background);
   color: var(--color-text);
+}
+
+/* --- Restyle overrides: keep the legacy button families but in the kit's
+   compact chip/ghost proportions. Coloured .btn-* variants (difficulty) keep
+   their fills with white text. --- */
+.btn-sm,
+.link-white {
+  font: 600 14px var(--body);
+  padding: 5px 12px;
+  margin: 2px;
+  border-radius: 6px;
+}
+
+.btn-easy,
+.btn-medium,
+.btn-hard,
+.btn-deadly {
+  color: #fff;
+  border-color: transparent;
+}
+
+.btn-easy:hover,
+.btn-medium:hover,
+.btn-hard:hover,
+.btn-deadly:hover {
+  color: #fff;
+}
+
+.link-white {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+.link-white:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Question page header: tag line, title, then meta row. */
+.q-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.q-head .tag {
+  flex: 1 1 100%;
+}
+
+.q-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 24px 0 8px;
+}
+
+.page-head {
+  margin-bottom: 14px;
+}
+
+.page-head h1,
+.page-head h2 {
+  margin: 0;
+}
+
+.puzzle-table-wrap {
+  overflow-x: auto;
+}
+
+.nav-logo {
+  width: auto;
+}
+
+@media (min-width: 1024px) {
+  .nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-menu .nav-links {
+    padding: 5px 13px;
+    font-size: 14.5px;
+  }
+
+  .nav-menu .nav-select {
+    margin: 0;
+    padding: 5px 26px 5px 12px;
+    font-size: 14.5px;
+  }
 }
