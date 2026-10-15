@@ -234,6 +234,7 @@ h3 {
   color: var(--muted);
   cursor: pointer;
   display: inline-block;
+  white-space: nowrap;
   margin: .2em .3em .2em 0;
   padding: 5px 12px;
 }
@@ -410,10 +411,14 @@ input[type='text'] {
   box-shadow: 0 0 0 1px #ccc
 }
 
-.nav {
+/* sticky on <header>: the nav's own parent is only as tall as the nav. */
+header {
   position: sticky;
   top: 0;
   z-index: 5;
+}
+
+.nav {
   background: var(--bg);
   border-bottom: 1px solid var(--line);
 }
@@ -559,7 +564,9 @@ input[type='text'] {
 
 .row {
   margin: 1% 0;
-  overflow: auto
+  /* clears floats without becoming a scroll container (which would break
+     position: sticky on the nav and cheatsheet tab bar) */
+  display: flow-root;
 }
 
 .col {
