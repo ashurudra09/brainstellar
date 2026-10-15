@@ -6,7 +6,6 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import QuestionTable from "../components/QuestionTable"
 import RandomQuestionButton from "../components/RandomQuestionButton"
-import * as styles from "../components/index.module.css"
 
 const AllQuestionsPage = ({ data }) => {
   const questions = useMemo(
@@ -19,12 +18,12 @@ const AllQuestionsPage = ({ data }) => {
   return (
     <Layout id="wrapper">
       <Seo title="All Questions" />
-      <div className={styles.textCenter}>
+      <div>
         <div className="stylishpage">
           <div className="bord1">
             <div className="bord2">
               <div className="container">
-                <h2>All Questions</h2>
+                <div className="page-head"><h1>All Questions</h1></div>
                 <RandomQuestionButton questions={visible} />
                 <QuestionTable questions={questions} onVisibleChange={handleVisibleChange} />
               </div>

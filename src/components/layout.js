@@ -11,6 +11,14 @@ import { Helmet } from "react-helmet";
 
 import Header from "./header"
 import Footer from "./footer"
+import "@fontsource/bricolage-grotesque/latin-600.css"
+import "@fontsource/bricolage-grotesque/latin-700.css"
+import "@fontsource/source-sans-3/latin-400.css"
+import "@fontsource/source-sans-3/latin-400-italic.css"
+import "@fontsource/source-sans-3/latin-600.css"
+import "@fontsource/source-sans-3/latin-700.css"
+import "@fontsource/jetbrains-mono/latin-400.css"
+import "@fontsource/jetbrains-mono/latin-600.css"
 import "./layout.css"
 import "./cheatsheet.css"
 
@@ -48,7 +56,6 @@ const Layout = ({ children }) => {
             {children}
           </div>
         </main>
-        <br />
         <Footer />
       </div>
     </>

@@ -2,41 +2,15 @@
 import React from 'react'
 
 const Footer = () => (
-  <footer
-    style={{
-      textAlign: `center`,
-      fontSize: `var(--font-sm)`,
-      width: "100%", position: "absolute", bottom: "0px"
-    }}
-  >
-
-    <div className="container-outer">
-      <div className="stylishpage" style={{ margin: "0px", padding: "0px" }}>
-        <div className="bord1" style={{ margin: "0px", padding: "0px" }}>
-          <div className="bord2" style={{ margin: "0px", padding: "0px" }}>
-            <table
-              style={{ width: "100%", textAlign: "center", margin: "0px", padding: "0px" }}
-            >
-              <tbody>
-                <tr>
-                  <td style={{ opacity: `0.5` }}>
-                    <div>
-                      Puzzle content is not owned by this site -- see the original at{' '}
-                      <a href="https://brainstellar.com" style={{ color: 'inherit' }}>brainstellar.com</a>.
-                    </div>
-                    <div>
-                      Created by{' '}
-                      <a href="https://github.com/ashurudra09" style={{ color: 'inherit' }}>ashurudra09</a>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+  <footer style={{ textAlign: `center`, color: `var(--muted)`, fontSize: `14px`, padding: `8px 0 32px` }}>
+    <div>
+      Puzzle content is not owned by this site -- see the original at{' '}
+      <a href="https://brainstellar.com" style={{ color: 'inherit', textDecoration: 'underline' }}>brainstellar.com</a>.
     </div>
-
+    <div>
+      Created by{' '}
+      <a href="https://github.com/ashurudra09" style={{ color: 'inherit', textDecoration: 'underline' }}>ashurudra09</a>
+    </div>
   </footer>
 )
 
