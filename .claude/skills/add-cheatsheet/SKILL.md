@@ -111,6 +111,16 @@ which the cheatsheet template switches to when the stub's frontmatter has
    scripts, no colours. Drop the artifact's frequency tags and branding.
 4. Register it in `src/cheatsheets/index.js` (`slug: importedJson`).
 
+Optional fields the component supports, for richer kits (see
+`src/cheatsheets/ethical-hacking-kit.json`): topic `tag` and `intro` (HTML);
+top-level `preface` (HTML shown above the tabs), `quizIntros` (`{ topic:
+html }` shown when that topic's chip is selected) and `localNumbering: true`
+(number questions per topic, `W1 · Q3`, instead of globally); on a question,
+`answer` as an array for select-all, `numeric: { lo, hi, text }` for a typed
+number instead of `options`, and `note` for a small badge. All quiz text (`q`,
+`options`, `why`) is HTML, so escape any literal `<` or `&`. A "Missed" chip
+is added automatically.
+
 Quiz progress is stored per browser under `brainstellar-cs:{slug}:v1`.
 Anything interactive that is *not* this notes + quiz shape still gets
 flattened, below.

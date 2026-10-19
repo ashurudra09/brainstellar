@@ -142,7 +142,14 @@
   min-width: 0;
 }
 
-.cs-stack .cs-card > * + * {
+.cs-stack > .cs-callout {
+  overflow-x: auto;
+  min-width: 0;
+  margin: 0;
+}
+
+.cs-stack > div > * + *,
+.cs-stack > article > * + * {
   margin-top: 10px;
 }
 
@@ -249,4 +256,106 @@
 
 .cs-why b {
   color: var(--ink);
+}
+
+/* Quiz extras: select-all, numeric answers, intros, kit preface. */
+.cs-preface {
+  color: var(--muted);
+  max-width: 72ch;
+}
+
+.cs-preface ol {
+  padding-left: 20px;
+}
+
+.cs-preface li::marker {
+  color: var(--accent);
+}
+
+.cs-preface b {
+  color: var(--ink);
+}
+
+.cs-intro,
+.cs-qintro {
+  color: var(--muted);
+  max-width: 72ch;
+}
+
+.cs-qintro {
+  font-size: 15px;
+  margin-top: 12px;
+}
+
+.cs-kind {
+  font: 600 11px var(--body);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.cs-opt-sel {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.cs-opt-miss {
+  border: 1px dashed var(--difficulty-easy);
+}
+
+.cs-act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.cs-act input {
+  font: 16px var(--mono);
+  width: 12ch;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.cs-go {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.cs-go:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.cs-your {
+  font: 15px var(--mono);
+}
+
+.cs-your-right {
+  color: var(--difficulty-easy);
+}
+
+.cs-your-wrong {
+  color: var(--difficulty-hard);
+  text-decoration: line-through;
+}
+
+.cs-why > * + * {
+  margin-top: 8px;
+}
+
+.cs-why ul,
+.cs-why ol {
+  padding-left: 20px;
+}
+
+.cs-why table {
+  font-size: 14px;
+}
+
+.cs-stack .cs-card h4 {
+  margin-top: 16px;
 }

@@ -258,7 +258,7 @@
     "k-means"
    ],
    "answer": 2,
-   "why": "A tree compares one feature to a threshold at a time ('age < 30?'), so the units don't matter. The others all use distances or gradients."
+   "why": "A tree compares one feature to a threshold at a time ('age &lt; 30?'), so the units don't matter. The others all use distances or gradients."
   },
   {
    "topic": "Trees",
