@@ -1771,3 +1771,17 @@ code {
     font-size: 14.5px;
   }
 }
+
+/* MCQ options (question.js McqOptions): always visible; a pick reveals right/wrong. */
+.mcq-options { list-style: upper-alpha; padding-left: 1.6em; margin: 0; }
+.mcq-options li { margin: 6px 0; }
+.mcq-option {
+  display: block; width: 100%; text-align: left; font: inherit; color: var(--ink);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 8px 12px; cursor: pointer;
+}
+.mcq-option:hover:not(:disabled) { border-color: var(--accent); }
+.mcq-option:disabled { cursor: default; }
+.mcq-option p { margin: 0; }
+.mcq-correct { border: 2px solid var(--difficulty-easy); }
+.mcq-wrong { border: 2px solid var(--difficulty-hard); }

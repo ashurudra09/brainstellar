@@ -4,6 +4,8 @@ import { doc, getDoc, setDoc, onSnapshot, serverTimestamp } from 'firebase/fires
 import { getDb } from '../firebase';
 import { AuthContext } from './AuthContext';
 import mergeProgress from '../utils/mergeProgress';
+import renameKeys from '../utils/renameKeys';
+import MOVED from '../data/movedQuestions.json';
 
 export const ProgressContext = createContext();
 
@@ -29,7 +31,7 @@ const migrate = data => {
   if (data.version === 2 && data.questions) {
     return {
       version: 2,
-      questions: data.questions,
+      questions: renameKeys(data.questions, MOVED),
       settings: { reviewIntervals: DEFAULT_REVIEW_INTERVALS, ...(data.settings || {}) },
     };
   }

@@ -71,3 +71,10 @@ test('idempotent: merging a result with itself is unchanged', () => {
   const twice = mergeProgress(once, once);
   assert.deepEqual(twice, once);
 });
+
+test('moved question keys are renamed', () => {
+  const renameKeys = require('./renameKeys');
+  const out = renameKeys({ 'quant:13': { solved: true }, 'quant:14': { solved: true } }, { 'quant:13': 'prob-stats:13' });
+  assert.deepEqual(Object.keys(out).sort(), ['prob-stats:13', 'quant:14']);
+  assert.equal(out['prob-stats:13'].solved, true);
+});
