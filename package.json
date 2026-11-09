@@ -5,6 +5,9 @@
   "version": "0.1.0",
   "author": "Varun Seth <8343593+varun-seth@users.noreply.github.com>",
   "dependencies": {
+    "@fontsource/bricolage-grotesque": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/source-sans-3": "^5.3.1",
     "dompurify": "^3.4.15",
     "firebase": "^12.18.0",
     "gatsby": "^5.9.1",

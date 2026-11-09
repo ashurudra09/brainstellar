@@ -14,23 +14,8 @@ const Header = ({ siteTitle }) => {
       <div className="nav">
         <div className="container-nav">
           <Link to="/" className="nav-links pagename">
-            <img
-              src="/favicon.gif"
-              style={{
-                border: '0px solid white',
-                padding: '0px',
-                marginRight: '10px',
-                borderRadius: '7px',
-                height: '35px',
-                width: '35px'
-              }}
-              alt="BRAINSTELLAR"
-            />{' '}
-            <img
-              src="/images/cover_transparent.png"
-              alt="BRAINSTELLAR"
-              className="nav-wordmark"
-            />
+            <img src="/favicon.gif" className="nav-logo" alt="" />
+            <span className="nav-wordmark">Brainstellar</span>
           </Link>
 
           <button
@@ -44,9 +29,9 @@ const Header = ({ siteTitle }) => {
           </button>
 
           <div className={`nav-menu${open ? ' nav-menu-open' : ''}`} onClick={() => setOpen(false)}>
-            <Link to="/" className="nav-links">Dashboard</Link>
-            <Link to="/all" className="nav-links">All Questions</Link>
-            <Link to="/cheatsheets" className="nav-links">Cheatsheets</Link>
+            <Link to="/" className="nav-links" activeClassName="nav-active">Dashboard</Link>
+            <Link to="/all" className="nav-links" activeClassName="nav-active">All Questions</Link>
+            <Link to="/cheatsheets" className="nav-links" partiallyActive activeClassName="nav-active">Cheatsheets</Link>
             <select
               className="nav-select"
               defaultValue=""

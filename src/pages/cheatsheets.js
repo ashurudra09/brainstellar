@@ -3,7 +3,6 @@ import { graphql, Link } from "gatsby"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
-import * as styles from "../components/index.module.css"
 
 const CheatsheetsPage = ({ data }) => {
   const cheatsheets = data.allMarkdownRemark.nodes.map(node => ({ ...node.frontmatter, slug: node.frontmatter.slug }));
@@ -11,12 +10,12 @@ const CheatsheetsPage = ({ data }) => {
   return (
     <Layout id="wrapper">
       <Seo title="Cheatsheets" />
-      <div className={styles.textCenter}>
+      <div>
         <div className="stylishpage">
           <div className="bord1">
             <div className="bord2">
               <div className="container">
-                <h2>Cheatsheets</h2>
+                <div className="page-head"><h1>Cheatsheets</h1></div>
 
                 {cheatsheets.length === 0 ? (
                   <p>No cheatsheets yet.</p>

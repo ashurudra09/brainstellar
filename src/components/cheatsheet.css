@@ -16,10 +16,11 @@
 
 .cs-card {
   flex: 1 1 220px;
-  background: var(--color-background-off);
+  background: var(--surface);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 12px 16px;
-  border-top: 4px solid var(--accent, var(--color-text));
+  padding: 14px 18px;
+  border-top: 3px solid var(--accent);
 }
 
 .cs-card h4 {
@@ -30,11 +31,11 @@
 .cs-pill {
   display: inline-block;
   padding: 2px 10px;
-  border-radius: 14px;
-  font-size: 0.85em;
-  background: var(--color-background-off);
-  border: 1px solid var(--qf-border, rgb(128, 128, 128, 0.31));
-  color: var(--accent, var(--color-text));
+  border-radius: 999px;
+  font: 600 13px var(--body);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--accent);
 }
 
 .cs-cols {
@@ -50,9 +51,9 @@
 }
 
 .cs-callout {
-  border-left: 4px solid var(--accent, var(--color-text));
-  background: var(--color-background-off);
-  border-radius: 0 8px 8px 0;
+  border-left: 3px solid var(--accent);
+  background: var(--ex-bg);
+  border-radius: 0 6px 6px 0;
   padding: 10px 14px;
   margin: 1em 0;
 }
@@ -61,10 +62,10 @@
   display: inline-block;
   padding: 1px 7px;
   border-radius: 4px;
-  border: 1px solid var(--qf-border, rgb(128, 128, 128, 0.31));
+  border: 1px solid var(--qf-border, var(--line));
   border-bottom-width: 2px;
   background: var(--color-background-off);
-  font-family: monospace;
+  font-family: var(--mono);
   font-size: 0.9em;
 }
 
@@ -73,20 +74,288 @@
   border-collapse: collapse;
   font-size: 0.95em;
   margin: 1em 0;
+  font-variant-numeric: tabular-nums;
 }
 
 .cs-table th {
   text-align: left;
   padding: 6px 8px;
-  border-bottom: 2px solid var(--qf-border, rgb(128, 128, 128, 0.31));
-  font-size: 0.8em;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  opacity: 0.65;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .cs-table td {
   padding: 8px;
-  border-bottom: 1px solid rgb(128, 128, 128, 0.16);
+  border-bottom: 1px solid var(--line);
   vertical-align: top;
+}
+
+/* --- Interactive cheatsheets (notes + quiz, see InteractiveCheatsheet.js).
+   Tabs and chips reuse .push/.pushed and .filter-chip from layout.css. --- */
+
+.cs-tabs {
+  position: sticky;
+  top: var(--nav-h, 62px);
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  margin-top: 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.cs-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.cs-jump a {
+  color: var(--muted);
+  font-size: 14px;
+  padding: 2px 6px;
+}
+
+.cs-jump a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.cs-topic {
+  margin-top: 32px;
+  scroll-margin-top: 130px;
+}
+
+.cs-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.cs-stack > .cs-card {
+  border-top: 1px solid var(--line);
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.cs-stack > .cs-callout {
+  overflow-x: auto;
+  min-width: 0;
+  margin: 0;
+}
+
+.cs-stack > div > * + *,
+.cs-stack > article > * + * {
+  margin-top: 10px;
+}
+
+.cs-terms {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 14px;
+  margin-bottom: 0;
+}
+
+.cs-terms dt {
+  font: 600 0.82em var(--mono);
+  color: var(--accent);
+  padding-top: 3px;
+}
+
+.cs-terms dd {
+  margin: 0;
+  min-width: 0;
+}
+
+@media (max-width: 520px) {
+  .cs-terms { grid-template-columns: 1fr; gap: 2px; }
+  .cs-terms dd { margin-bottom: 8px; }
+}
+
+.cs-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.cs-score {
+  margin-right: auto;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-score b {
+  color: var(--ink);
+}
+
+.cs-qmeta {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.cs-qnum {
+  font: 600 13px var(--mono);
+  color: var(--muted);
+}
+
+.cs-q {
+  margin: 6px 0 0;
+  font-weight: 600;
+}
+
+.cs-opts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 8px;
+}
+
+.cs-opt {
+  text-align: left;
+  font: 15px/1.35 var(--body);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--ink);
+  padding: 9px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.cs-opt:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.cs-opt:disabled {
+  cursor: default;
+}
+
+.cs-opt-right {
+  border-color: var(--difficulty-easy);
+  background: color-mix(in srgb, var(--difficulty-easy) 18%, var(--surface));
+  font-weight: 600;
+}
+
+.cs-opt-wrong {
+  border-color: var(--difficulty-hard);
+  background: color-mix(in srgb, var(--difficulty-hard) 16%, var(--surface));
+  text-decoration: line-through;
+}
+
+.cs-why {
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.cs-why b {
+  color: var(--ink);
+}
+
+/* Quiz extras: select-all, numeric answers, intros, kit preface. */
+.cs-preface {
+  color: var(--muted);
+  max-width: 72ch;
+}
+
+.cs-preface ol {
+  padding-left: 20px;
+}
+
+.cs-preface li::marker {
+  color: var(--accent);
+}
+
+.cs-preface b {
+  color: var(--ink);
+}
+
+.cs-intro,
+.cs-qintro {
+  color: var(--muted);
+  max-width: 72ch;
+}
+
+.cs-qintro {
+  font-size: 15px;
+  margin-top: 12px;
+}
+
+.cs-kind {
+  font: 600 11px var(--body);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.cs-opt-sel {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.cs-opt-miss {
+  border: 1px dashed var(--difficulty-easy);
+}
+
+.cs-act {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.cs-act input {
+  font: 16px var(--mono);
+  width: 12ch;
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+.cs-go {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.cs-go:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.cs-your {
+  font: 15px var(--mono);
+}
+
+.cs-your-right {
+  color: var(--difficulty-easy);
+}
+
+.cs-your-wrong {
+  color: var(--difficulty-hard);
+  text-decoration: line-through;
+}
+
+.cs-why > * + * {
+  margin-top: 8px;
+}
+
+.cs-why ul,
+.cs-why ol {
+  padding-left: 20px;
+}
+
+.cs-why table {
+  font-size: 14px;
+}
+
+.cs-stack .cs-card h4 {
+  margin-top: 16px;
 }

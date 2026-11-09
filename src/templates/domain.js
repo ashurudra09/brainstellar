@@ -40,10 +40,10 @@ export default function DomainPage({ data, pageContext }) {
     <Layout>
       <Seo title={label} />
       <div className="stylishpage"><div className="bord1"><div className="bord2"><div className="container">
-        <h2 style={{ textAlign: `center`, marginTop: `1.5em`, marginBottom: `1em` }}>{domain ? `${domain.icon} ${label}` : label}</h2>
+        <div className="page-head"><h1>{domain ? `${domain.icon} ${label}` : label}</h1></div>
 
         {questions.length === 0 ? (
-          <p style={{ textAlign: `center` }}>No questions yet.</p>
+          <p>No questions yet.</p>
         ) : (
           <>
             <ProgressStats questions={questions} domain={domain} />
@@ -51,8 +51,6 @@ export default function DomainPage({ data, pageContext }) {
             <QuestionTable questions={questions} domain={domain} onVisibleChange={handleVisibleChange} />
           </>
         )}
-
-        <br /><br />
       </div></div></div></div>
     </Layout>
   )

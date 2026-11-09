@@ -1,12 +1,11 @@
 import * as React from "react"
 import { useMemo } from "react"
-import { graphql, Link } from "gatsby"
+import { graphql } from "gatsby"
 
 import Layout from "../components/layout"
 import Seo from "../components/seo"
 import ProgressStats from "../components/ProgressStats"
 import ReviewQueue from "../components/ReviewQueue"
-import * as styles from "../components/index.module.css"
 
 const IndexPage = ({ data }) => {
   const questions = useMemo(
@@ -17,16 +16,13 @@ const IndexPage = ({ data }) => {
   return (
     <Layout id="wrapper">
       <Seo title="Practice Dashboard" />
-      <div className={styles.textCenter}>
+      <div>
 
         <div className="stylishpage">
           <div className="bord1">
             <div className="bord2">
               <div className="container">
-                <h2 style={{ textAlign: 'center' }}>Your Progress</h2>
-                <div style={{ textAlign: 'center' }}>
-                  <Link to="/all" className="btn btn-sm link-white smooth">All Questions</Link>
-                </div>
+                <div className="page-head"><h1>Your Progress</h1></div>
                 <ProgressStats questions={questions} />
               </div>
             </div>

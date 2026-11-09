@@ -39,7 +39,10 @@ In priority order:
 1. An artifact published earlier in this conversation.
 2. An artifact URL the user pasted -- read it back with the Artifact tool's
    `read` action.
-3. Content pasted directly into the invocation.
+3. A local `.html` or `.md` file the user attached or gave a path to (e.g. an
+   upload) -- read it from disk and treat it exactly like an artifact of that
+   format.
+4. Content pasted directly into the invocation.
 
 Stop and ask rather than inventing one. Read the **whole** artifact before
 converting it -- a cheatsheet's value is in its long tail of rows, and a
@@ -76,6 +79,7 @@ own. Then map what remains:
 | coloured badge, chip, tag | `<span class="cs-pill">` |
 | note / warning / tip box | `<div class="cs-callout">` |
 | `<kbd>`, shortcut key | `<span class="cs-kbd">` |
+| term / definition list (`<dl>`) | markdown table or bold-term list |
 
 Prefer plain markdown wherever it carries the same meaning -- reach for a
 `.cs-*` class only when the layout itself is load-bearing (a side-by-side
@@ -87,7 +91,45 @@ a ninth class or an inline `style=`. Never emit a hardcoded colour, an
 inline `style=` attribute, or a `<style>` block of your own; anything that
 seems to need one is a note to the user in step 6, not an inline exception.
 
-**If the HTML artifact is interactive** -- tabs, filters, collapsibles, a
+### Interactive notes + quiz artifacts -- keep them interactive
+
+If the artifact has the shape of a study kit -- a Notes view with topic
+sections and a Quiz view (questions with options, right/wrong marking, topic
+filter chips, a score, reset) behind tabs -- do **not** flatten it. The site
+renders this shape natively with `src/components/InteractiveCheatsheet.js`,
+which the cheatsheet template switches to when the stub's frontmatter has
+`kind: "interactive"`. Steps:
+
+1. Write the stub `src/data/cheatsheets/{slug}.md`: the normal frontmatter
+   from step 5 plus `kind: "interactive"`, and **no body**.
+2. Write `src/cheatsheets/{slug}.json` -- `{ "topics": [{ "id", "title",
+   "short", "html" }], "quiz": [{ "topic", "q", "options", "answer",
+   "why" }] }`. `short` is the jump-link label, `answer` the index of the
+   correct option. Generate it with a throwaway script (BeautifulSoup for the
+   notes; `node` to evaluate the artifact's JS question array) rather than
+   retyping, keep the script outside the repo, and proofread the output.
+3. In each topic's `html`, remap the artifact's classes to the site
+   vocabulary: block -> `<div class="cs-card">` (with an `<h3>`), worked
+   example -> `cs-callout`, `<dl>` -> `<dl class="cs-terms">`, `<table>` ->
+   `<table class="cs-table">`, formula -> `<pre><code>`. No inline styles, no
+   scripts, no colours. Drop the artifact's frequency tags and branding.
+4. Register it in `src/cheatsheets/index.js` (`slug: importedJson`).
+
+Optional fields the component supports, for richer kits (see
+`src/cheatsheets/ethical-hacking-kit.json`): topic `tag` and `intro` (HTML);
+top-level `preface` (HTML shown above the tabs), `quizIntros` (`{ topic:
+html }` shown when that topic's chip is selected) and `localNumbering: true`
+(number questions per topic, `W1 · Q3`, instead of globally); on a question,
+`answer` as an array for select-all, `numeric: { lo, hi, text }` for a typed
+number instead of `options`, and `note` for a small badge. All quiz text (`q`,
+`options`, `why`) is HTML, so escape any literal `<` or `&`. A "Missed" chip
+is added automatically.
+
+Quiz progress is stored per browser under `brainstellar-cs:{slug}:v1`.
+Anything interactive that is *not* this notes + quiz shape still gets
+flattened, below.
+
+**If the HTML artifact is interactive (other shapes)** -- tabs, filters, collapsibles, a
 live search box -- that behaviour cannot survive the conversion, and
 pretending otherwise produces a cheatsheet with dead buttons on it. Flatten
 it instead:
@@ -140,14 +182,16 @@ Tell the user:
 - Anything interactive that got flattened (per step 3), and anything the
   `.cs-*` vocabulary genuinely couldn't express.
 
-Do not commit anything to git -- the user reviews first, same as
+Do not commit anything to git unless the user's invocation explicitly asks
+for it (e.g. "push to main") -- by default the user reviews first, same as
 `add-question`.
 
 ## 7. Keep the two copies of this skill in sync
 
-This skill exists twice: once in the site repo's own `.claude/skills/`, and
-once in the parent workspace's `.claude/skills/`. Whichever copy you loaded,
-mirror any edit to the other:
+This skill may exist twice: once in the site repo's own `.claude/skills/`,
+and once in a parent workspace's `.claude/skills/`. If the parent copy exists,
+whichever one you loaded, mirror any edit to the other (skip this when
+`../.claude/skills/add-cheatsheet` doesn't exist):
 
 ```bash
 diff -r .claude/skills/add-cheatsheet ../.claude/skills/add-cheatsheet

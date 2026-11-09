@@ -1,0 +1,1908 @@
+{
+ "preface": "<p class=\"tag\">NPTEL noc26_cs157 · IIT Kharagpur · Prof. Indranil Sengupta</p>\n<p>Everything for the final exam in one page: plain-language notes for all 12 weeks (lectures 1–60) plus every assignment question (134, Weeks 0–12) as an interactive quiz with explanations. NPTEL finals are written in the same style as the weekly assignments, so the quiz is the closest thing to past papers. Your score is usually 25% assignments + 75% proctored exam, and you typically need at least 10/25 and 30/75. Check your course page for the exact rule.</p>\n<ol><li><b>Cheat sheet first (30 min).</b> Memorise it; reread it on exam morning.</li>\n<li><b>Quiz week by week.</b> Answer before reading. When you miss one, open that week's notes section.</li>\n<li><b>Go deep on</b> NMAP (W4, W12), crypto numericals (W6–7), packet and subnet maths (W1–3). Skim definitions in W5, W8–11.</li>\n<li><b>Redo the \"Missed\" filter</b> until it's empty.</li></ol>",
+ "localNumbering": true,
+ "topics": [
+  {
+   "id": "cheat",
+   "title": "Big picture & cheat sheet",
+   "short": "Cheat sheet",
+   "tag": "start here · reread before the exam",
+   "intro": "",
+   "html": "<div class=\"cs-card\"><h3>Words you will see everywhere</h3>\n<table class=\"cs-table\"><thead><tr><th>Term</th><th>What it means in plain English</th></tr></thead><tbody><tr><td>Ethical hacking</td><td>Breaking into systems <i>with permission</i> to find weak spots before criminals do</td></tr><tr><td>Network</td><td>Computers connected so they can send data to each other</td></tr><tr><td>IP address</td><td>A computer's postal address on a network (e.g. 192.168.1.10)</td></tr><tr><td>Port</td><td>A numbered \"door\" on a computer; each service (web, email) listens behind its own door</td></tr><tr><td>Packet</td><td>A small chunk of data sent across a network, like one envelope in a big mailing</td></tr><tr><td>Protocol</td><td>An agreed set of rules for how computers talk (TCP, UDP, HTTP)</td></tr><tr><td>Vulnerability</td><td>A weakness that an attacker could use</td></tr><tr><td>Exploit</td><td>The actual trick or code that uses a vulnerability</td></tr><tr><td>Encryption</td><td>Scrambling data so only someone with the key can read it</td></tr><tr><td>Hash</td><td>A fixed-size \"fingerprint\" of data; you can't turn it back into the original</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>How the weeks fit together</h3>\n<p>The course builds in six stages, and each one needs the one before it. If a week feels hard, the gap is often in an earlier stage.</p>\n<ol><li><b>Weeks 1–3 — Networking foundations.</b> Packets, TCP/IP, addresses and routing: how data actually moves. You can't attack what you don't understand, so everything rests on this.</li><li><b>Weeks 4–5 — Finding targets.</b> Reconnaissance and scanning with NMAP, then spotting weaknesses, cracking passwords and recognising malware.</li><li><b>Weeks 6–7 — Cryptography.</b> The defensive core: keeping data secret (encryption) and trustworthy (hashes, signatures, TLS).</li><li><b>Weeks 8–9 — More attacks.</b> Steganography, biometrics, denial of service, sniffing and social engineering.</li><li><b>Week 10 — Hardware security.</b> Attacks on the chip itself, where even perfect maths can leak a secret.</li><li><b>Weeks 11–12 — Web attacks and tools.</b> Metasploit, SQL injection and XSS, then a final deep dive on NMAP and Wireshark.</li></ol>\n<p><b>The single idea behind it all:</b> ethical hacking is understanding how systems work well enough to find their weak points, so they can be fixed, always with permission and within the law.</p></div>\n<div class=\"cs-card\"><p>The assignments lean heavily on a handful of fixed numbers and names. These come up again and again.</p></div>\n<div class=\"cs-card\"><h3>Cheat sheet · Sizes (bits and bytes)</h3>\n<table class=\"cs-table\"><thead><tr><th>Thing</th><th>Size</th></tr></thead><tbody><tr><td>IPv4 address</td><td>32 bits</td></tr><tr><td>IPv6 address</td><td>128 bits</td></tr><tr><td>MAC address</td><td>48 bits</td></tr><tr><td>Port number</td><td>16 bits</td></tr><tr><td>IP header</td><td>20 bytes (min), 60 bytes (max)</td></tr><tr><td>TCP header</td><td>20 bytes (min), 60 bytes (max)</td></tr><tr><td>UDP header</td><td>8 bytes</td></tr><tr><td>IPv6 base header</td><td>40 bytes (fixed)</td></tr><tr><td>TTL / Hop Limit</td><td>8 bits</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Cheat sheet · Crypto sizes</h3>\n<table class=\"cs-table\"><thead><tr><th>Algorithm</th><th>Key points</th></tr></thead><tbody><tr><td>DES</td><td>64-bit block, 56-bit key</td></tr><tr><td>Triple DES</td><td>up to 168-bit key</td></tr><tr><td>AES</td><td>128-bit block; 128/192/256-bit key</td></tr><tr><td>MD5</td><td>128-bit hash</td></tr><tr><td>SHA-1</td><td>160-bit hash</td></tr><tr><td>SHA-256 / 512</td><td>256 / 512-bit hash; SHA-512 uses 1024-bit blocks</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Cheat sheet · Common ports</h3>\n<table class=\"cs-table\"><thead><tr><th>Port</th><th>Service</th></tr></thead><tbody><tr><td>21</td><td>FTP</td></tr><tr><td>22</td><td>SSH</td></tr><tr><td>23</td><td>Telnet</td></tr><tr><td>25</td><td>SMTP (email sending)</td></tr><tr><td>53</td><td>DNS</td></tr><tr><td>80</td><td>HTTP</td></tr><tr><td>110</td><td>POP3</td></tr><tr><td>179</td><td>BGP</td></tr><tr><td>443</td><td>HTTPS</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Cheat sheet · NMAP options</h3>\n<table class=\"cs-table\"><thead><tr><th>Option</th><th>Meaning</th></tr></thead><tbody><tr><td>-sn / -sP</td><td>Only find live hosts (no port scan)</td></tr><tr><td>-Pn</td><td>Skip discovery; assume all hosts up</td></tr><tr><td>-sL</td><td>List targets only</td></tr><tr><td>-PE / -PP / -PM</td><td>ICMP echo / timestamp / netmask sweep</td></tr><tr><td>-PS / -PA / -PU</td><td>TCP SYN / TCP ACK / UDP sweep</td></tr><tr><td>-sS / -sT</td><td>SYN (half-open) / Connect (full handshake) scan</td></tr><tr><td>-sU</td><td>UDP scan</td></tr><tr><td>-sF / -sN / -sX</td><td>FIN / NULL / Xmas stealth scans</td></tr><tr><td>-F</td><td>Fast: top 100 ports</td></tr><tr><td>--top-ports N</td><td>N most common ports</td></tr><tr><td>-O / -sV / -A</td><td>OS / version / everything</td></tr><tr><td>-sC</td><td>Run default scripts</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Cheat sheet · Key formulas</h3>\n<table class=\"cs-table\"><thead><tr><th>For</th><th>Formula</th></tr></thead><tbody><tr><td>Usable hosts in a subnet</td><td>2<sup>32 − prefix</sup> − 2</td></tr><tr><td>Total transmission time</td><td>transmission time + propagation delay</td></tr><tr><td>Data bytes in an IP packet</td><td>total length − (HLEN × 4)</td></tr><tr><td>Symmetric keys for N people</td><td>N(N−1)/2</td></tr><tr><td>Public keys for N people</td><td>2N</td></tr><tr><td>Brute-force combinations</td><td>(choices per position)<sup>length</sup></td></tr><tr><td>Square-and-multiply</td><td>squarings = bits − 1; multiplications = (number of 1s) − 1</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Cheat sheet · Name pairs people mix up</h3>\n<table class=\"cs-table\"><tbody><tr><td><b>Virus</b> copies itself via files · <b>Worm</b> copies itself across networks · <b>Trojan</b> doesn't copy itself</td><td></td></tr><tr><td><b>FIN</b> = polite close · <b>RST</b> = abrupt reset/reject</td><td></td></tr><tr><td><b>-sn</b> = host discovery only · <b>-Pn</b> = skip discovery (opposites)</td><td></td></tr><tr><td><b>Private key</b> signs/decrypts · <b>Public key</b> verifies/encrypts</td><td></td></tr><tr><td><b>Behavioural</b> biometrics (gait, signature, keystrokes) · <b>Physical</b> (fingerprint, iris, retina, face)</td><td></td></tr><tr><td><b>Interior</b> routing: RIP, OSPF · <b>Exterior</b>: BGP</td><td></td></tr><tr><td><b>SPA</b> reads one power trace · <b>DPA</b> uses many traces + statistics</td><td></td></tr></tbody></table></div>"
+  },
+  {
+   "id": "w1",
+   "title": "Ethical hacking and networking basics",
+   "short": "W1",
+   "tag": "Week 1 · Lectures 1–5",
+   "intro": "<p>Lectures 1–5. The big idea: an ethical hacker attacks systems <b>with permission</b> to find weak spots first, and you can't attack a network until you understand how data moves through one.</p>",
+   "html": "<div class=\"cs-card\"><h3>What ethical hacking is</h3>\n<p>Ethical hacking means finding the weaknesses in computers and networks by thinking and acting like a criminal hacker, but with the owner's permission. Other names for it: <b>penetration testing</b> (\"pen testing\"), intrusion testing, red teaming.</p>\n<table class=\"cs-table\"><thead><tr><th>Term</th><th>Plain meaning</th></tr></thead><tbody><tr><td>Penetration test</td><td>A <i>legal</i> attempt to break in. The tester only <b>reports</b> what they found</td></tr><tr><td>Security test</td><td>Goes further: also reviews the company's security policies and <b>suggests fixes</b></td></tr><tr><td>Hacking</td><td>Originally just \"showing computer skill\"</td></tr><tr><td>Cracking</td><td>Actually breaking security on software or systems</td></tr><tr><td>Spoofing</td><td>Faking where a packet came from (a fake sender IP address)</td></tr><tr><td>Denial of Service (DoS)</td><td>Flooding a computer with traffic until it can't answer real users</td></tr><tr><td>Port scanning</td><td>Checking which \"doors\" (ports) on a computer are open</td></tr></tbody></table>\n<p><b>The CIA Triad</b> is the three things security protects:</p>\n<ul><li><b>Confidentiality</b>: only the right people can read it.</li><li><b>Integrity</b>: nobody can change it without being noticed.</li><li><b>Availability</b>: it works when you need it.</li></ul>\n<h4>How attackers get in, and what they do once inside</h4>\n<ul><li><b>Front door:</b> guessing or stealing passwords.</li><li><b>Back door:</b> a hidden entrance, often left behind by developers for testing.</li><li><b>Trojan horse:</b> a harmful program hidden inside something you download. Many quietly install a back door.</li><li><b>Software vulnerabilities:</b> known bugs. Companies publish fixes (patches), and attackers target anyone who hasn't installed them.</li></ul>\n<p>Once inside, an attacker may edit the logs to hide their tracks, steal or change files, install a back door to return later, or use the machine to attack others.</p>\n<h4>Types of tester</h4>\n<ul><li><b>Script kiddies</b> (\"packet monkeys\"): beginners who copy other people's tools without understanding them.</li><li><b>Professional testers:</b> write their own scripts (Python, C, Perl, JavaScript, SQL and more).</li></ul>\n<h4>The three testing models</h4>\n<table class=\"cs-table\"><thead><tr><th>Model</th><th>What the tester is told</th><th>Like...</th></tr></thead><tbody><tr><td><b>White box</b></td><td>Everything: network layout, technology, can interview staff</td><td>Getting the building's blueprints</td></tr><tr><td><b>Black box</b></td><td>Nothing; finds it all out themselves</td><td>A real outside attacker</td></tr><tr><td><b>Gray box</b></td><td>Some information</td><td>Somewhere in between</td></tr></tbody></table>\n<p>A <b>tiger box</b> is a laptop loaded with operating systems and hacking tools for testing.</p>\n<h4>Staying legal</h4>\n<ul><li>Accessing a computer <b>without permission is illegal</b>, as is spreading viruses or worms and running DoS attacks.</li><li>Laws differ by country and change fast. Even owning some tools can be illegal in some places.</li><li>A good tester needs network knowledge, people skills, an understanding of the law, and skill with the tools.</li></ul></div>\n<div class=\"cs-card\"><h3>Networks: LAN vs WAN</h3>\n<p>A computer network is just computers connected so they can talk and share resources.</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>LAN (Local Area Network)</th><th>WAN (Wide Area Network)</th></tr></thead><tbody><tr><td>Covers</td><td>A room, building or campus</td><td>Cities, countries, continents</td></tr><tr><td>Speed</td><td>Faster</td><td>Slower</td></tr><tr><td>Cost</td><td>Cheaper</td><td>More expensive</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>How data travels: circuit vs packet switching</h3>\n<p><b>Circuit switching</b> works like an old phone call. A dedicated path is reserved before talking starts, and nobody else can use it.</p>\n<ol><li>Set up the connection.</li><li>Send the data at full speed.</li><li>Tear the connection down.</li></ol>\n<p>The downsides: there's a delay to set up, and the line sits wasted during quiet moments. That's fine for voice, but bad for computer data, which comes in bursts.</p>\n<p><b>Packet switching</b> works like the postal system and is what the internet uses.</p>\n<ul><li>A message is chopped into small <b>packets</b>, each with a <b>header</b> (a label holding the addresses).</li><li>Links are <b>shared</b> by everyone, so they're used efficiently.</li><li>Each router uses <b>store-and-forward</b>: it receives the whole packet, checks its routing table, and passes it on.</li></ul>\n<p>Packet switching comes in two styles:</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>Virtual circuit</th><th>Datagram</th></tr></thead><tbody><tr><td>Route chosen</td><td>Once, before sending</td><td>Separately for every packet</td></tr><tr><td>Packets take</td><td>The same path</td><td>Possibly different paths</td></tr><tr><td>Analogy</td><td>Telephone system</td><td>Postal system</td></tr><tr><td>Problems</td><td>Setup delay</td><td>Packets can arrive out of order, get lost or duplicated</td></tr><tr><td>Strength</td><td>Orderly</td><td>No setup delay; can route around broken links</td></tr></tbody></table>\n<p><b>Three kinds of delay:</b></p>\n<ul><li><b>Propagation delay:</b> time for the signal to travel along the wire.</li><li><b>Transmission time:</b> time to push all the packet's bits onto the wire (packet size ÷ link speed).</li><li><b>Processing delay:</b> time a router spends handling the packet.</li></ul></div>\n<div class=\"cs-card\"><h3>The layer models: OSI and TCP/IP</h3>\n<p>Networking is split into layers so each one can be designed and changed separately. Each layer only talks to the ones directly above and below it.</p>\n<table class=\"cs-table\"><thead><tr><th>OSI layer (7)</th><th>Job</th><th>TCP/IP layer (4)</th></tr></thead><tbody><tr><td>7 Application</td><td>Programs you use (web, email)</td><td>Application</td></tr><tr><td>6 Presentation</td><td>Data format and translation</td><td>Application</td></tr><tr><td>5 Session</td><td>Manages conversations</td><td>Application</td></tr><tr><td>4 Transport</td><td>Reliable end-to-end delivery (TCP, UDP)</td><td>Transport</td></tr><tr><td>3 Network</td><td>Addressing and routing (IP)</td><td>Network</td></tr><tr><td>2 Data link</td><td>Frames between neighbours; MAC addresses</td><td>Data link</td></tr><tr><td>1 Physical</td><td>Raw bits on the wire</td><td>Data link</td></tr></tbody></table>\n<p>Memory trick, from layer 1 up: \"<b>P</b>lease <b>D</b>o <b>N</b>ot <b>T</b>hrow <b>S</b>ausage <b>P</b>izza <b>A</b>way\".</p>\n<p><b>Devices and their layers:</b></p>\n<ul><li><b>Hub:</b> extends a LAN; just repeats everything everywhere.</li><li><b>Bridge / layer-2 switch:</b> connects LANs, using MAC addresses (data link layer).</li><li><b>Router / layer-3 switch:</b> connects different networks, using IP addresses (network layer).</li></ul></div>\n<div class=\"cs-card\"><h3>The TCP/IP family</h3>\n<p>TCP/IP is the set of protocols the whole internet runs on. It started in the 1970s, funded by the US military's ARPA. It uses datagrams, so each packet travels independently.</p>\n<table class=\"cs-table\"><thead><tr><th>Protocol</th><th>Job</th></tr></thead><tbody><tr><td><b>IP</b></td><td>Moves packets from source to destination. Unreliable: packets can be lost, duplicated or arrive out of order</td></tr><tr><td><b>TCP</b></td><td>Reliable and connection-based. Splits messages into packets, reassembles them, and resends lost ones</td></tr><tr><td><b>UDP</b></td><td>Simple, fast, no guarantees. Good for small messages like DNS lookups</td></tr><tr><td><b>ARP</b></td><td>Finds the MAC (hardware) address for an IP address</td></tr><tr><td><b>RARP</b></td><td>The reverse: finds the IP address for a MAC address</td></tr><tr><td><b>ICMP</b></td><td>Error and status messages (this is what <code>ping</code> uses)</td></tr><tr><td><b>IGMP</b></td><td>Tells routers which multicast groups a device has joined</td></tr></tbody></table>\n<p><b>Three kinds of address:</b></p>\n<ul><li><b>Port number:</b> 16 bits; picks the program on the computer.</li><li><b>IP address:</b> 32 bits; picks the computer on the internet.</li><li><b>MAC address:</b> 48 bits; the hardware ID of the network card.</li></ul>\n<h4>Encapsulation: envelopes inside envelopes</h4>\n<p>As data goes <b>down</b> the layers, each one wraps it in its own header. As it comes <b>up</b> at the other end, each header is removed.</p>\n<p>Example: a file transfer sends 200 bytes of data.</p>\n<ol><li>The application adds its header (TFTP).</li><li>The transport layer adds a UDP header.</li><li>The network layer adds an IP header.</li><li>The data link layer adds an Ethernet header and trailer, making an Ethernet frame.</li></ol></div>\n<div class=\"cs-card\"><h3>Inside an IP packet header</h3>\n<p>The IP header is the \"label\" on every packet: at least <b>20 bytes</b>, at most 60.</p>\n<table class=\"cs-table\"><thead><tr><th>Field</th><th>Size</th><th>What it does</th></tr></thead><tbody><tr><td>VER</td><td>4 bits</td><td>IP version (usually 4)</td></tr><tr><td>HLEN</td><td>4 bits</td><td>Header length, counted in <b>4-byte chunks</b> (5 = 20 bytes, 15 = 60 bytes)</td></tr><tr><td>Service type</td><td>8 bits</td><td>Priority</td></tr><tr><td>Total length</td><td>16 bits</td><td>Whole packet size in bytes (max 65,535)</td></tr><tr><td>Identification, Flags, Fragment offset</td><td></td><td>Used when a packet is split into fragments (Week 2)</td></tr><tr><td>Time to Live (TTL)</td><td>8 bits</td><td>Countdown; minus 1 at each router; at 0 the packet is dropped. Stops endless loops</td></tr><tr><td>Protocol</td><td>8 bits</td><td>What's inside: TCP, UDP, ...</td></tr><tr><td>Header checksum</td><td>16 bits</td><td>Error check on the header only</td></tr><tr><td>Source / Destination IP</td><td>32 bits each</td><td>Sender and receiver addresses</td></tr><tr><td>Options</td><td>variable</td><td>Extras, e.g. source routing</td></tr></tbody></table>\n<p><b>HLEN maths:</b> header bytes = HLEN × 4. For example, HLEN 5 = 20 bytes, and 224 bits = 28 bytes = HLEN 7.</p>\n<p><b>Seeing packets yourself:</b> packet sniffers such as <b>Wireshark</b>, tcpdump, Windump and Tshark let you watch real packets and their headers.</p></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 1 tests</h3>\n<ul><li>The CIA triad, and the white / black / gray box models.</li><li>Packet switching vs circuit switching.</li><li>Which OSI layer does what (especially the data link layer).</li><li>Delay maths: total time = transmission time + propagation delay.</li><li>Minimum TCP header (20 bytes), TTL, the HLEN calculation, MAC address size (48 bits).</li></ul></div>"
+  },
+  {
+   "id": "w2",
+   "title": "IP addressing, TCP/UDP and subnetting",
+   "short": "W2",
+   "tag": "Week 2 · Lectures 6–10",
+   "intro": "<p>Lectures 6–10. This week is about addresses, ports, and how to read packet headers. It has more maths than any other week, but every calculation follows one of a few patterns, and they're all worked through below.</p>",
+   "html": "<div class=\"cs-card\"><h3>Fragmentation: cutting big packets into pieces</h3>\n<p>Every link has a maximum packet size, the <b>MTU</b> (Maximum Transfer Unit). When a packet is bigger than the next link's MTU, a router cuts it into <b>fragments</b>. Each fragment travels as its own IP packet with its own header.</p>\n<p>There are two ways to put the pieces back together:</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>Transparent</th><th>Non-transparent (what IP uses)</th></tr></thead><tbody><tr><td>Reassembled where</td><td>At the exit router of that network</td><td>Only at the <b>final destination</b></td></tr><tr><td>Downside</td><td>All pieces must leave through the same router; may be cut and rejoined many times</td><td>More overhead: every piece carries a 20+ byte header</td></tr><tr><td>Upside</td><td>Later networks never know it happened</td><td>Pieces can take different routes, so throughput is higher</td></tr></tbody></table>\n<p><b>The three header fields for fragments:</b></p>\n<ul><li><b>Identification (16 bits):</b> an ID number shared by all pieces of the same original packet.</li><li><b>Fragment offset (13 bits):</b> where this piece starts in the original, counted in <b>units of 8 bytes</b>.</li><li><b>Flags:</b><ul><li><b>D (Don't fragment):</b> if 1, routers may not cut this packet. If it's too big, it's dropped and an error is sent back.</li><li><b>M (More fragments):</b> 1 = more pieces follow; 0 = this is the last piece.</li></ul></li></ul>\n<p><b>Reading a fragment:</b></p>\n<table class=\"cs-table\"><thead><tr><th>M</th><th>Offset</th><th>Means</th></tr></thead><tbody><tr><td>0</td><td>0</td><td>Not fragmented at all</td></tr><tr><td>1</td><td>0</td><td>First piece</td></tr><tr><td>1</td><td>&gt; 0</td><td>A middle piece</td></tr><tr><td>0</td><td>&gt; 0</td><td>Last piece</td></tr></tbody></table>\n<p><b>Worked example (from the slides):</b> 1000 bytes of data, MTU 620 bytes.</p>\n<ol><li>Room for data per piece = 620 − 20 (header) = 600 bytes. 600 is a multiple of 8, so it can be used as is.</li><li>Piece 1: 600 bytes, offset 0, M = 1.</li><li>Piece 2: the remaining 400 bytes, offset 600 ÷ 8 = <b>75</b>, M = 0.</li></ol>\n<p>If a later link has an even smaller MTU, those pieces are cut again. The offsets still count from the start of the <i>original</i> packet.</p></div>\n<div class=\"cs-card\"><h3>IP addresses</h3>\n<p>An IPv4 address is <b>32 bits</b>, written as four numbers (0–255) separated by dots. This is called dotted-decimal.</p>\n<p>Example: <code>01000010 10001000 00110000 01111110</code> = <b>66.134.48.126</b></p>\n<p>Every address has two parts:</p>\n<ul><li><b>Network number:</b> which network. Assigned by a central authority. Routers only look at this part.</li><li><b>Host number:</b> which device on that network. Assigned by the local admin.</li></ul>\n<h4>The old class system (\"classful\" addressing)</h4>\n<p>The first few bits decide the class:</p>\n<table class=\"cs-table\"><thead><tr><th>Class</th><th>First number</th><th>Default mask</th><th>Networks</th><th>Hosts per network</th><th>Use</th></tr></thead><tbody><tr><td>A</td><td>0–127</td><td>255.0.0.0 (/8)</td><td>127</td><td>16,777,214</td><td>Huge organisations</td></tr><tr><td>B</td><td>128–191</td><td>255.255.0.0 (/16)</td><td>16,383</td><td>65,534</td><td>Medium</td></tr><tr><td>C</td><td>192–223</td><td>255.255.255.0 (/24)</td><td>2,097,151</td><td>254</td><td>Small</td></tr><tr><td>D</td><td>224–239</td><td>—</td><td>—</td><td>—</td><td>Multicast (one-to-many)</td></tr><tr><td>E</td><td>240–255</td><td>—</td><td>—</td><td>—</td><td>Reserved</td></tr></tbody></table>\n<p>Hosts are always 2<sup>host bits</sup> − 2, because two addresses are taken (see below).</p>\n<h4>Special addresses to memorise</h4>\n<table class=\"cs-table\"><thead><tr><th>Address</th><th>Meaning</th></tr></thead><tbody><tr><td>10.x.x.x, 172.16–172.31.x.x, 192.168.x.x</td><td><b>Private</b>: inside homes and offices, never on the public internet</td></tr><tr><td>127.x.x.x</td><td><b>Loopback</b>: \"this computer itself\" (127.0.0.1)</td></tr><tr><td>0.0.0.0</td><td>Default network / default route</td></tr><tr><td>255.255.255.255</td><td>Limited broadcast: everyone on my local network</td></tr><tr><td>First address of a network (e.g. 118.0.0.0)</td><td>The <b>network address</b>: the network's name</td></tr><tr><td>Last address of a network (e.g. 118.255.255.255)</td><td>The <b>broadcast address</b>: everyone on that network</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>TCP and UDP: the transport layer</h3>\n<p>Both sit on top of IP, and programs use them to send data.</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>TCP</th><th>UDP</th></tr></thead><tbody><tr><td>Connection</td><td>Set up first (handshake)</td><td>None, just send</td></tr><tr><td>Reliable?</td><td>Yes: numbers every byte, acknowledges, resends lost data, reorders</td><td>No</td></tr><tr><td>Extras</td><td>Flow control, full-duplex (both directions at once)</td><td>Only a checksum and port numbers</td></tr><tr><td>Header</td><td><b>20–60 bytes</b></td><td><b>8 bytes</b></td></tr><tr><td>Good for</td><td>Web, email, file transfer</td><td>DNS lookups, video, games</td></tr></tbody></table>\n<h4>Ports: which program gets the data</h4>\n<p>One computer runs many programs at once. A <b>port number</b> (16 bits, so 0–65,535) says which program a packet is for, like a flat number in a building whose street address is the IP.</p>\n<ul><li><b>Well-known ports (1–1023):</b> fixed for standard services, e.g. FTP 21, SMTP 25. Listed in <code>/etc/services</code> on Linux.</li><li><b>Ephemeral ports:</b> temporary numbers a client picks for itself, so the server knows where to reply.</li></ul>\n<p>A unique connection is identified by 5 values, called an <b>association</b>: {protocol, local IP, local port, remote IP, remote port}. For example, {TCP, 144.16.192.5, 1785, 144.16.202.57, 21}.</p>\n<h4>The TCP header</h4>\n<table class=\"cs-table\"><thead><tr><th>Field</th><th>Size</th><th>Job</th></tr></thead><tbody><tr><td>Source port / Destination port</td><td>16 bits each</td><td>Which programs at each end</td></tr><tr><td>Sequence number</td><td>32 bits</td><td>Number of the first byte in this segment, used to put data back in order</td></tr><tr><td>Acknowledgement number</td><td>32 bits</td><td>\"Next byte I expect from you\"</td></tr><tr><td>HLEN</td><td>4 bits</td><td>Header length in 4-byte chunks</td></tr><tr><td>Flags</td><td>6 bits</td><td>See below</td></tr><tr><td>Window</td><td>16 bits</td><td>How much more data the sender may send before waiting (0 = stop)</td></tr><tr><td>Checksum</td><td>16 bits</td><td>Error check over the whole segment</td></tr><tr><td>Urgent pointer</td><td>16 bits</td><td>Where urgent data ends</td></tr></tbody></table>\n<p><b>The six flags:</b></p>\n<ul><li><b>SYN</b> = 1, ACK = 0: \"I want to connect\" (request).</li><li><b>SYN</b> = 1, <b>ACK</b> = 1: \"OK, connection accepted\" (confirmation).</li><li><b>FIN:</b> \"I'm done sending\" (polite close).</li><li><b>RST:</b> reset or reject a connection (abrupt).</li><li><b>URG:</b> urgent data inside.</li><li><b>PSH:</b> push this data to the program now.</li></ul>\n<h4>The three-way handshake</h4>\n<ol><li>Client → Server: <b>SYN</b> (\"can we talk?\")</li><li>Server → Client: <b>SYN + ACK</b> (\"yes, can you hear me?\")</li><li>Client → Server: <b>ACK</b> (\"yes, let's go\")</li></ol>\n<p><b>Why hackers care:</b> if an attacker sends lots of SYNs and never sends step 3, the server holds many <b>half-open</b> connections. Its connection table fills up and real users get refused. This is the <b>SYN flood</b> DoS attack (Weeks 8–9).</p>\n<h4>The UDP header (8 bytes)</h4>\n<p>Source port, destination port, length, checksum: four fields of 2 bytes each. The checksum is optional (0 = not used).</p></div>\n<div class=\"cs-card\"><h3>Subnetting: splitting a network into smaller ones</h3>\n<p>A <b>subnet mask</b> says which bits of an address are the network part: <b>1s for network, 0s for host</b>.</p>\n<p>To find the network an address belongs to, AND the address with the mask, bit by bit (1 AND 1 = 1, anything else = 0).</p>\n<p><b>Example:</b> 144.16.72.57 with mask 255.255.192.0</p>\n<ol><li>The first two numbers keep their value: 144.16</li><li>Third number: 72 = <code>01001000</code>, 192 = <code>11000000</code> → AND = <code>01000000</code> = 64</li><li>Fourth number: anything AND 0 = 0</li><li>Network address = <b>144.16.64.0</b></li></ol>\n<p>Moving the mask further right \"borrows\" host bits to make more, smaller subnets. For example, putting 255.255.0.0 on the class A network 10.0.0.0 gives 256 subnets of 65,534 hosts each.</p>\n<h4>CIDR: the modern way</h4>\n<p>CIDR (Classless Inter-Domain Routing) drops the A/B/C classes. You write the address, then a slash and the number of network bits, e.g. <code>144.16.192.57/18</code>.</p>\n<table class=\"cs-table\"><thead><tr><th>Prefix</th><th>Mask</th><th>Addresses</th><th>Usable hosts</th></tr></thead><tbody><tr><td>/8</td><td>255.0.0.0</td><td>16,777,216</td><td>16,777,214</td></tr><tr><td>/16</td><td>255.255.0.0</td><td>65,536</td><td>65,534</td></tr><tr><td>/20</td><td>255.255.240.0</td><td>4,096</td><td>4,094</td></tr><tr><td>/24</td><td>255.255.255.0</td><td>256</td><td>254</td></tr><tr><td>/25</td><td>255.255.255.128</td><td>128</td><td>126</td></tr><tr><td>/26</td><td>255.255.255.192</td><td>64</td><td>62</td></tr><tr><td>/27</td><td>255.255.255.224</td><td>32</td><td>30</td></tr><tr><td>/28</td><td>255.255.255.240</td><td>16</td><td>14</td></tr><tr><td>/29</td><td>255.255.255.248</td><td>8</td><td>6</td></tr></tbody></table>\n<p><b>The formula:</b> addresses = 2<sup>32 − prefix</sup>; usable hosts = that − 2.</p>\n<p><b>CIDR rules:</b></p>\n<ul><li>A block's size is always a power of 2.</li><li>A block's first address must be divisible by its size.</li></ul>\n<p><b>Example:</b> 144.16.192.24/29 means 32 − 29 = 3 host bits = 8 addresses, so the block runs 144.16.192.24 to .31.</p>\n<h4>VLSM: subnets of different sizes</h4>\n<p>VLSM (Variable Length Subnet Masks) lets one network be split into subnets of different sizes. This wastes fewer addresses.</p>\n<p><b>Example:</b> the network 192.203.17.0/24 must serve departments of 110, 45 and 50 hosts. Equal-sized subnets can't do it. With VLSM:</p>\n<ol><li>Split with /25 into two halves of 128: .0–.127 (for the 110 hosts) and .128–.255.</li><li>Split the second half with /26 into two of 64: .128–.191 (45 hosts) and .192–.255 (50 hosts).</li></ol></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 2 tests</h3>\n<ul><li>Reading the first byte of an IP header: version + HLEN → header size → options size.</li><li>TCP flags (SYN, ACK, FIN vs RST, URG).</li><li>Broadcast vs network addresses, and the private ranges.</li><li>Fragment flags (M, offset, DF).</li><li>Well-known ports; CIDR /26 → mask 192.</li><li>Data bytes = total length − HLEN × 4; UDP header = 8 bytes.</li></ul></div>"
+  },
+  {
+   "id": "w3",
+   "title": "Routing and IPv6",
+   "short": "W3",
+   "tag": "Week 3 · Lectures 11–15",
+   "intro": "<p>Lectures 11–15. This week answers one question: how does a router decide where to send a packet? It covers routing tables, the protocols routers use to share routes (RIP, OSPF, BGP), and IPv6, the newer version of IP.</p>",
+   "html": "<div class=\"cs-card\"><h3>Delivering packets</h3>\n<p>IP is <b>connectionless</b>: there's no route set up in advance, and every packet is routed on its own.</p>\n<ul><li><b>Direct delivery:</b> sender and receiver are on the same network, so no router is needed. This also covers the final hop, from the last router to the host.</li><li><b>Indirect delivery:</b> the destination is on another network, so the packet hops from router to router until it reaches that network.</li></ul></div>\n<div class=\"cs-card\"><h3>Routing tables</h3>\n<p>Every router has a <b>routing table</b>: a list of \"to reach X, send it out of door Y\".</p>\n<table class=\"cs-table\"><thead><tr><th>Method</th><th>The table stores</th><th>Like...</th></tr></thead><tbody><tr><td>Next-hop</td><td>Only the <i>next</i> router, not the whole path</td><td>Asking for directions one junction at a time</td></tr><tr><td>Network-specific</td><td>One entry per destination <i>network</i>, not per host</td><td>\"All of Mumbai: go via this road\"</td></tr><tr><td>Host-specific</td><td>An entry for one particular computer</td><td>A special rule for one house</td></tr><tr><td>Default</td><td>\"If nothing else matches, send it here\" (0.0.0.0)</td><td>\"Not sure? Ask the main post office\"</td></tr></tbody></table>\n<p>Tables can be <b>static</b> (typed in by hand, never changes) or <b>dynamic</b> (updated automatically by protocols like RIP, OSPF, BGP).</p>\n<p><b>Columns in a routing table:</b> mask, destination, next hop, interface (which port to send from), and flags:</p>\n<table class=\"cs-table\"><thead><tr><th>Flag</th><th>Meaning</th></tr></thead><tbody><tr><td>U</td><td>Route is <b>U</b>p</td></tr><tr><td>G</td><td>Goes via a <b>G</b>ateway (the destination is on another network)</td></tr><tr><td>H</td><td><b>H</b>ost-specific route (a single computer)</td></tr><tr><td>D</td><td>Added by a re<b>D</b>irect message</td></tr><tr><td>M</td><td><b>M</b>odified by a redirect</td></tr></tbody></table>\n<p><b>See your own routing table:</b> <code>netstat -r</code> (Linux) or <code>route print</code> (Windows).</p>\n<h4>How a router picks a row: longest match wins</h4>\n<p>For each row, the router ANDs the destination address with the row's mask. If the result equals that row's destination, the row matches. When several rows match, it picks the <b>most specific</b> one (longest mask). If nothing matches, it uses the default route.</p>\n<p><b>Worked example</b> (from Lecture 15):</p>\n<table class=\"cs-table\"><thead><tr><th>Destination</th><th>Mask</th><th>Interface</th></tr></thead><tbody><tr><td>128.35.57.0</td><td>255.255.255.0</td><td>eth0</td></tr><tr><td>128.35.57.0</td><td>255.255.255.128</td><td>eth1</td></tr><tr><td>192.112.17.25</td><td>255.255.255.255</td><td>eth2</td></tr><tr><td>default</td><td>0.0.0.0</td><td>eth3</td></tr></tbody></table>\n<ul><li><b>128.35.57.16:</b> matches both of the first two rows. The /25 row (covering .0–.127) is more specific, so it goes out <b>eth1</b>.</li><li><b>192.112.17.10:</b> row 3 is only for the single host .25, and nothing else matches, so it goes out the default, <b>eth3</b>.</li></ul></div>\n<div class=\"cs-card\"><h3>Routing protocols</h3>\n<p>An <b>autonomous system (AS)</b> is a group of networks and routers run by one organisation, such as an ISP. Each has its own AS number.</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>Interior (inside one AS)</th><th>Exterior (between ASes)</th></tr></thead><tbody><tr><td>Protocols</td><td><b>RIP</b>, <b>OSPF</b></td><td><b>BGP</b></td></tr></tbody></table>\n<h4>RIP (Routing Information Protocol)</h4>\n<ul><li><b>Distance vector:</b> the \"distance\" is just the number of hops (routers) to the destination.</li><li>Each router learns routes from its neighbours' tables.</li><li><b>Problems:</b><ul><li>Slow to notice changes in big networks.</li><li>Routing loops, including the <b>count-to-infinity</b> problem, where routers keep raising each other's distance to a dead route.</li><li>Updates use a lot of bandwidth.</li></ul></li></ul>\n<h4>OSPF (Open Shortest Path First)</h4>\n<ul><li><b>Link state:</b> every router builds a full map of the AS and works out the cheapest path itself, using <b>Dijkstra's algorithm</b>.</li><li>\"Cost\" is configurable: delay, speed, money, and so on.</li><li>Routers send <b>Hello</b> packets every 10 seconds. No Hello for 40 seconds means the neighbour is treated as down.</li><li>Its five packet types:<ol><li><b>Hello</b>: is my neighbour alive?</li><li><b>Database Description</b>: sync maps at the start.</li><li><b>Link State Request</b>: \"send me this piece of the map\".</li><li><b>Link State Update</b>: the map info itself (link state advertisements, LSAs).</li><li><b>Link State Acknowledgement</b>: \"got it\".</li></ol></li><li>Messages can be authenticated (cleartext or MD5).</li></ul>\n<h4>BGP (Border Gateway Protocol)</h4>\n<ul><li>The <b>exterior</b> protocol that connects the whole internet together.</li><li>Runs over <b>TCP port 179</b>. Two routers talking BGP are called <b>peers</b>.</li><li>Like a distance vector protocol, but it shares <b>complete routes</b>, not just hop counts.</li><li>At first peers swap whole tables; after that, only changes.</li><li>Its four message types:<ol><li><b>Open</b>: start a neighbour connection.</li><li><b>Update</b>: announce or withdraw a route.</li><li><b>Keepalive</b>: \"still here\".</li><li><b>Notification</b>: report an error.</li></ol></li><li>ISPs run BGP. Most companies don't; they just set a default route to their ISP.</li></ul></div>\n<div class=\"cs-card\"><h3>IPv6</h3>\n<p>IPv4's 32-bit addresses have run out, and it handles real-time traffic like video poorly. IPv6 fixes this.</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>IPv4</th><th>IPv6</th></tr></thead><tbody><tr><td>Address size</td><td>32 bits</td><td><b>128 bits</b></td></tr><tr><td>Written as</td><td>Dotted decimal: 192.168.1.1</td><td>Colon hexadecimal: 7BD6:3DC:FFFF:0:0:2D:F321:FFFF</td></tr><tr><td>Base header</td><td>20–60 bytes (variable)</td><td><b>40 bytes, fixed</b>, plus optional extension headers</td></tr><tr><td>Address classes</td><td>A, B, C, D, E</td><td><b>None</b>; uses prefix lengths</td></tr><tr><td>Loop protection</td><td>TTL</td><td><b>Hop Limit</b> (8 bits)</td></tr><tr><td>Fragmentation</td><td>Routers may fragment</td><td><b>Only the sender</b> fragments (fragment extension header)</td></tr></tbody></table>\n<p><b>Shortening IPv6 addresses:</b> one run of zero groups can be replaced by <code>::</code>. For example, 7BD6:0:0:0:0:0:0:B6 → <b>7BD6::B6</b>.</p>\n<p><b>The base header fields:</b></p>\n<ul><li><b>Version</b> (= 6)</li><li><b>Priority</b> (8 bits)</li><li><b>Flow label</b> (20 bits): for traffic that needs guaranteed performance.</li><li><b>Payload length</b></li><li><b>Next header:</b> what comes next (an extension header, TCP or UDP).</li><li><b>Hop limit</b></li><li><b>Source and destination addresses:</b> 128 bits each.</li></ul>\n<p><b>Extension headers</b> are chained together through \"next header\": routing, hop-by-hop options, fragment, and authentication.</p>\n<p><b>Three address types:</b></p>\n<ul><li><b>Unicast:</b> one computer.</li><li><b>Multicast:</b> every member of a group.</li><li><b>Anycast:</b> the <i>nearest one</i> of a group. This is new in IPv6.</li></ul>\n<p><b>Moving from IPv4 to IPv6:</b></p>\n<ul><li><b>Dual stack:</b> devices run both versions.</li><li><b>Tunnelling:</b> IPv6 packets are wrapped inside IPv4 packets to cross IPv4-only networks.</li><li><b>Header translation:</b> convert between the two formats.</li></ul></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 3 tests</h3>\n<ul><li>Connectionless routing (each packet independent, paths may differ).</li><li>Direct vs indirect delivery.</li><li>The H flag; OSPF Hello packets; broadcast addresses.</li><li>Interior (RIP, OSPF) vs exterior (BGP); the default route 0.0.0.0.</li><li>IPv6 facts: no classes, fixed 40-byte header, 8-bit hop limit.</li><li>Usable hosts in a /20 = 2¹² − 2 = 4094.</li></ul></div>"
+  },
+  {
+   "id": "w4",
+   "title": "Lab setup, information gathering and NMAP",
+   "short": "W4",
+   "tag": "Week 4 · Lectures 16–20",
+   "intro": "<p>Lectures 16–20. This is where the course turns hands-on: you build a safe practice lab, learn to gather information about a target, and meet <b>NMAP</b>, the tool used more than any other in this course.</p>",
+   "html": "<div class=\"cs-card\"><h3>The practice lab</h3>\n<p><b>Golden rule:</b> hacking any machine you don't own or have permission to test is <b>illegal</b>. All practice happens on your own virtual machines, with your firewall kept on.</p>\n<table class=\"cs-table\"><thead><tr><th>Part</th><th>What it is</th><th>Examples</th></tr></thead><tbody><tr><td><b>Hypervisor</b></td><td>Software that runs \"pretend computers\" (virtual machines) inside your real one, sharing its CPU, memory, disk and network</td><td>VirtualBox (used in the course), VMware</td></tr><tr><td><b>Attacker machine</b></td><td>A Linux packed with hacking tools</td><td><b>Kali Linux</b> (recommended), Parrot Security, BackBox</td></tr><tr><td><b>Victim machine</b></td><td>Deliberately insecure systems for target practice</td><td><b>Metasploitable 2</b> (Linux), <b>Metasploitable 3</b> (Windows), old Windows XP/7</td></tr></tbody></table>\n<p>You need about 4 GB RAM and 30–40 GB of disk. A low-power alternative is \"Live\" Kali running from a USB stick.</p>\n<p><b>VirtualBox network modes:</b></p>\n<ul><li><b>NAT (the default):</b> VMs sit hidden behind your computer. They all get the same private IP and can reach the internet, but outsiders can't reach them.</li><li><b>Bridged adapter:</b> VMs join your real network like separate computers. Use this when the attacker VM needs to reach the victim VM or your host.</li></ul></div>\n<div class=\"cs-card\"><h3>Reconnaissance: information gathering</h3>\n<p>Reconnaissance (\"recon\") is collecting as much information as possible about a target <b>before</b> attacking. It's always the first step.</p>\n<p>What you're looking for:</p>\n<ul><li><b>Network info:</b> domain names, IP addresses, running services.</li><li><b>System info:</b> usernames, system names, architecture.</li><li><b>Organisation info:</b> employees, locations, contacts, security policies.</li></ul>\n<table class=\"cs-table\"><thead><tr><th></th><th>Passive recon</th><th>Active recon</th></tr></thead><tbody><tr><td>How</td><td>Indirectly, from public sources. You never touch the target</td><td>Directly talking to the target's systems</td></tr><tr><td>Detail</td><td>Less</td><td>More</td></tr><tr><td>Risk of being noticed</td><td>None</td><td>Yes</td></tr><tr><td>Tools</td><td>archive.org, Whois, Netcraft, theHarvester, search engines</td><td>NMAP, Nessus, Metasploit, DNS/email enumeration</td></tr></tbody></table>\n<h4>Passive tools</h4>\n<ul><li><b>archive.org (Wayback Machine):</b> old snapshots of a website, and when it changed. You can even download (mirror) a whole site to study its folders.</li><li><b>Whois:</b> the public register for domain names. It shows the owner, contact details, IP address, name servers and registration/expiry dates.</li><li><b>Netcraft:</b> finds a site's subdomains and what operating system its server runs.</li><li><b>Search operators</b> (Google hacking):</li></ul>\n<table class=\"cs-table\"><thead><tr><th>Operator</th><th>Finds</th></tr></thead><tbody><tr><td><code>site:example.com</code></td><td>Results only from that site</td></tr><tr><td><code>inurl:login</code></td><td>Pages with that word in the address</td></tr><tr><td><code>intitle:admin</code></td><td>Pages with that word in the title</td></tr><tr><td><code>filetype:pdf</code></td><td>Only that file type</td></tr><tr><td><code>cache:</code></td><td>The search engine's stored copy of a page</td></tr><tr><td><code>\"exact phrase\"</code></td><td>That exact wording</td></tr><tr><td><code>@word</code></td><td>Social media results</td></tr></tbody></table>\n<p>Other passive sources: social media, forums, blogs, news alerts, and simply browsing the company website.</p>\n<h4>Active tools</h4>\n<ul><li><b>DNS and mail server enumeration:</b> query the target's DNS servers to list their records. This can reveal computer names, IP addresses and usernames, and hint at how big the organisation is. Tools: <code>nslookup</code>, <code>host</code>, <code>dig</code>.</li><li><b>Scanning:</b> find live hosts, open ports, running services and versions, the operating system, and vulnerabilities. Tools: <b>NMAP</b> (and Zenmap, its GUI), Nessus, Nexpose.</li></ul></div>\n<div class=\"cs-card\"><h3>NMAP basics</h3>\n<p>NMAP (Network Mapper) is a free, open-source scanner. The general form is:</p>\n<pre>nmap [scan type] [options] &lt;target&gt;</pre>\n<p>Its four main jobs:</p>\n<ol><li><b>Host discovery:</b> which computers are alive?</li><li><b>Port scanning:</b> which ports are open?</li><li><b>Version detection:</b> what service, and which version, is behind each port?</li><li><b>OS detection:</b> which operating system is it?</li></ol></div>\n<div class=\"cs-card\"><h3>Host discovery (\"ping sweeps\")</h3>\n<table class=\"cs-table\"><thead><tr><th>Technique</th><th>NMAP option</th><th>How it works</th><th>Notes</th></tr></thead><tbody><tr><td><b>ICMP echo sweep</b></td><td><code>-PE</code></td><td>Send ICMP type 8 (Echo Request). A type 0 (Echo Reply) means alive; silence means down or filtered</td><td>Simple, slow, easily blocked</td></tr><tr><td><b>Broadcast ICMP</b></td><td></td><td>One echo request to the broadcast address; every host replies</td><td>Faster, but most routers block it and Windows ignores it</td></tr><tr><td><b>Non-echo ICMP</b></td><td><code>-PP</code> (timestamp, type 13), <code>-PM</code> (address mask, type 17)</td><td>Uses other ICMP questions that hosts still answer</td><td>Gets past filters that only block echo</td></tr><tr><td><b>TCP sweep</b></td><td><code>-PS</code> (SYN), <code>-PA</code> (ACK)</td><td>Send a TCP packet to a common port (21, 22, 23, 25, 80)</td><td>Also finds open ports; pick ports the firewall allows</td></tr><tr><td><b>UDP sweep</b></td><td><code>-PU</code></td><td>Send UDP. A \"port unreachable\" reply means that port is closed (but the host is up); silence is unclear</td><td>Not very reliable; firewalls often drop UDP</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Port scanning</h3>\n<table class=\"cs-table\"><thead><tr><th>Scan</th><th>Option</th><th>What it sends</th><th>Open port</th><th>Closed port</th><th>Notes</th></tr></thead><tbody><tr><td><b>TCP Connect</b></td><td><code>-sT</code></td><td>The full handshake: SYN → SYN/ACK → ACK</td><td>Handshake completes</td><td>RST/ACK</td><td>Reliable but noisy; shows up in the target's logs</td></tr><tr><td><b>TCP SYN</b> (\"half-open\")</td><td><code>-sS</code></td><td>SYN only, then RST once it gets a SYN/ACK</td><td>SYN/ACK</td><td>RST/ACK</td><td>Never completes the connection, so it's quieter</td></tr><tr><td><b>Stealth / inverse</b></td><td><code>-sF</code> (FIN), <code>-sN</code> (NULL), <code>-sX</code> (Xmas)</td><td>Odd packets: FIN only, no flags, or FIN+URG+PSH all set</td><td><b>No reply</b></td><td>RST</td><td>By the TCP rules, closed ports must answer with RST and open ports ignore the packet. Slow, hard to detect</td></tr><tr><td><b>FTP bounce</b></td><td><code>-b</code></td><td>Asks an FTP server to connect to the target for you</td><td></td><td></td><td>Hides where you are; very slow</td></tr></tbody></table>\n<p><b>The key trick to remember:</b> a SYN/ACK means open, and RST means closed. In stealth scans it's reversed: <i>silence</i> means open.</p></div>\n<div class=\"cs-card\"><h3>Version and OS detection</h3>\n<p>Different operating systems answer odd packets in slightly different ways. These differences are a <b>TCP/IP fingerprint</b>. For example:</p>\n<ul><li>Windows acknowledges certain packets with sequence number + 1; most others use the same number.</li><li>Linux sets a different Type-of-Service value in some error replies.</li></ul>\n<p>Options:</p>\n<ul><li><code>-O</code>: OS detection (<code>--osscan-guess</code> to guess harder).</li><li><code>-sV</code>: service version detection (<code>--version-intensity 0</code>–<code>9</code>).</li><li><code>-A</code>: OS detection, versions, scripts and traceroute all together.</li></ul></div>\n<div class=\"cs-card\"><h3>NMAP options cheat sheet</h3>\n<table class=\"cs-table\"><thead><tr><th>Option</th><th>Meaning</th></tr></thead><tbody><tr><td><code>-sL</code></td><td>Just list the targets; send nothing</td></tr><tr><td><code>-sP</code> / <code>-sn</code></td><td>Ping scan: only check which hosts are up</td></tr><tr><td><code>-Pn</code></td><td>Skip discovery; treat every host as up</td></tr><tr><td><code>-p 22,80</code> / <code>-p 1-65535</code></td><td>Scan only these ports</td></tr><tr><td><code>-F</code></td><td>Fast: fewer ports (the top 100)</td></tr><tr><td><code>--top-ports N</code></td><td>The N most common ports</td></tr><tr><td><code>-r</code></td><td>Scan ports in order, not randomly</td></tr><tr><td><code>-sU</code></td><td>UDP port scan</td></tr><tr><td><code>-sA</code> / <code>-sW</code> / <code>-sM</code></td><td>ACK / Window / Maimon scans</td></tr><tr><td><code>-n</code> / <code>-R</code></td><td>Never / always do DNS name lookups</td></tr><tr><td><code>--reason</code></td><td>Explain why each port got its state</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Defending against recon</h3>\n<ul><li>Don't publish sensitive information; search for it yourself and remove what you find.</li><li>Use split DNS and block DNS zone transfers.</li><li>Turn off directory listing on web servers.</li><li>Train staff about social engineering.</li><li>Encrypt passwords and keep systems patched.</li><li>Hide server details (\"server masking\", disguised file extensions).</li><li>Watch logs for odd packets and half-finished connections.</li></ul></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 4 tests</h3>\n<ul><li>What a hypervisor does; what Whois can and can't tell you.</li><li>ICMP type 8 vs type 0; which <code>-P</code> options use TCP (-PS, -PA).</li><li>The handshake order; SYN-scan replies (SYN-ACK = open, RST = closed).</li><li>VirtualBox NAT behaviour.</li><li>-O / -sV / -A; ports 80 and 443 mean a website; the <code>--reason</code> output.</li></ul></div>"
+  },
+  {
+   "id": "w5",
+   "title": "Vulnerability scanning, system hacking and malware",
+   "short": "W5",
+   "tag": "Week 5 · Lectures 21–25",
+   "intro": "<p>Lectures 21–25. Week 4 found what's running on a system. This week is about finding its <b>weaknesses</b>, the kinds of attack that follow, and how each one is defended against. These notes cover the ideas and terms the exam asks about.</p>",
+   "html": "<div class=\"cs-card\"><h3>Vulnerability scanning</h3>\n<p>A <b>vulnerability scan</b> automatically checks a system for known weaknesses, such as out-of-date software or bad settings. Organisations run these on their own systems so they can fix problems before attackers find them.</p>\n<table class=\"cs-table\"><thead><tr><th>Tool</th><th>What to know</th></tr></thead><tbody><tr><td><b>NMAP scripts (NSE)</b></td><td>NMAP's add-on scripts. <code>-sC</code> (the same as <code>--script=default</code>) runs the default set, and <code>-A</code> includes them too</td></tr><tr><td><b>Nessus</b></td><td>The best-known professional scanner. Easy to use, detailed reports, paid (7-day trial)</td></tr><tr><td><b>Nexpose, OpenVAS, MBSA</b></td><td>Other vulnerability scanners</td></tr></tbody></table>\n<p>Script names describe their job: <i>os-discovery</i> identifies the operating system, <i>enum-users</i> lists accounts, and <i>brute</i> tries passwords.</p></div>\n<div class=\"cs-card\"><h3>Proxies</h3>\n<p>A <b>proxy server</b> sits in the middle and passes traffic on, so the other side sees the proxy's address instead of the real sender's. The course mentions this because attackers use proxies (and IP spoofing) to hide where an attack comes from. That's also why investigators can't always trust the source address in their logs.</p></div>\n<div class=\"cs-card\"><h3>System hacking</h3>\n<p><b>System hacking</b> means breaking into a computer to steal or misuse what's on it. The course splits it into three stages.</p>\n<h4>a) Password attacks</h4>\n<p>Most of these succeed only because people choose weak or common passwords.</p>\n<table class=\"cs-table\"><thead><tr><th>Method</th><th>Idea</th></tr></thead><tbody><tr><td>Shoulder surfing</td><td>Watching someone type</td></tr><tr><td>Social engineering</td><td>Tricking a person into revealing it</td></tr><tr><td>Dictionary attack</td><td>Trying a list of common words</td></tr><tr><td>Brute force</td><td>Trying every possible combination</td></tr><tr><td>Rule-based</td><td>Trying variations when part of the password is known</td></tr><tr><td>Default passwords</td><td>Devices still using the factory password</td></tr><tr><td>Keyloggers / spyware</td><td>Hidden software recording what you type</td></tr><tr><td>Wire sniffing</td><td>Capturing passwords sent unencrypted over the network</td></tr><tr><td>Rainbow tables</td><td>Pre-computed lists of passwords and their hashes</td></tr></tbody></table>\n<p>Tools named in the course: John the Ripper, Hydra, Hashcat, Crunch (Crunch only <i>makes</i> wordlists).</p>\n<p><b>Why length matters:</b> each extra character multiplies the number of guesses. Four lowercase letters give 26⁴ = 456,976 combinations; eight give about 209 billion.</p>\n<p><b>Defences:</b> long passphrases, no reused or default passwords, locking accounts after failed attempts, and two-factor login.</p>\n<h4>b) Privilege escalation</h4>\n<p>After getting in with an ordinary account, the attacker tries to gain more power, using bugs or misconfigurations.</p>\n<ul><li><b>Vertical:</b> going up a level, e.g. normal user → administrator.</li><li><b>Horizontal:</b> staying at the same level but taking over <i>another</i> user's account.</li></ul>\n<p><b>Defences:</b> give every program and user the <i>least privilege</i> they need, limit who can log in interactively, encrypt sensitive data, and keep software patched.</p>\n<h4>c) Running programs and hiding files</h4>\n<p>With access, attackers may run programs remotely, take screenshots, or install a <b>backdoor</b> so they can return. Legitimate remote-admin tools (the course names PDQ Deploy and DameWare) can be misused for this.</p></div>\n<div class=\"cs-card\"><h3>Malware</h3>\n<p><b>Malware</b> (malicious software) damages systems or gives control to its creator.</p>\n<table class=\"cs-table\"><thead><tr><th>Type</th><th>What it does</th></tr></thead><tbody><tr><td><b>Virus</b></td><td>Copies itself by attaching to other files or programs; spreads when they're shared</td></tr><tr><td><b>Worm</b></td><td>Copies itself across networks <i>on its own</i>, no host file needed</td></tr><tr><td><b>Trojan</b></td><td>Pretends to be useful software; does <b>not</b> copy itself. Often opens a backdoor</td></tr><tr><td><b>Ransomware</b></td><td>Locks your files and demands payment</td></tr><tr><td><b>Spyware / adware</b></td><td>Spies on you / shows unwanted ads</td></tr><tr><td><b>Rootkit</b></td><td>Hides deep in the system to stay invisible</td></tr><tr><td><b>Botnet</b></td><td>Many infected machines controlled together, often used for DDoS</td></tr></tbody></table>\n<p>A virus has an <b>infection phase</b> (copying itself) and an <b>attack phase</b> (doing damage when a trigger condition is met). Virus types named in the course: hoax, stealth, polymorphic (changes its own code to avoid detection).</p>\n<p><b>How malware gets in:</b> email attachments, USB drives, fake or pirated software, untrusted downloads, chat apps, and software bugs.</p>\n<p><b>Signs of a Trojan:</b> antivirus mysteriously switched off, browser redirects, strange network activity.</p>\n<p><b>Defences:</b> genuine antivirus, firewalls, timely updates, no unknown attachments or sites, strong passwords.</p>\n<p>Antivirus is tested safely with the <b>EICAR test file</b>: a harmless string that all antivirus products agree to flag.</p></div>\n<div class=\"cs-card\"><h3>Attacks on the local network</h3>\n<p><b>Packet sniffing</b> means capturing the traffic on a network, like tapping a phone line. A network card in <b>promiscuous mode</b> keeps every packet it sees, not just its own.</p>\n<ul><li><b>Passive sniffing:</b> on old networks with <b>hubs</b>, everyone sees all traffic, so just listening is enough.</li><li><b>Active sniffing:</b> modern <b>switches</b> only send traffic where it belongs, so attackers try to trick the switch (below).</li></ul>\n<p><b>Protocols that send passwords in plain text</b> (readable by a sniffer): HTTP, Telnet, rlogin, FTP, POP, IMAP, SMTP. Their encrypted versions (HTTPS, SSH, etc.) protect against this.</p>\n<table class=\"cs-table\"><thead><tr><th>Attack</th><th>Idea</th><th>Result</th></tr></thead><tbody><tr><td><b>MAC flooding</b></td><td>Fill the switch's CAM table (its list of which device is on which port) with fake entries</td><td>The switch falls back to sending traffic to every port, like a hub</td></tr><tr><td><b>DHCP starvation</b></td><td>Request every available IP address with fake requests</td><td>Real devices can't get an address (a DoS)</td></tr><tr><td><b>ARP spoofing / poisoning</b></td><td>Send fake ARP replies so devices link the attacker's MAC to someone else's IP</td><td>Traffic flows through the attacker: <b>man-in-the-middle</b></td></tr></tbody></table>\n<p><b>Defences:</b> switch port security (limiting MAC addresses per port), DHCP snooping, static or inspected ARP entries, and encrypting traffic so captured data is unreadable.</p></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 5 tests</h3>\n<ul><li>Which NMAP options run scripts (-A, -sC, --script=default).</li><li>Which tools are <i>not</i> scanners (Hydra, Crunch).</li><li>Packet sniffing is not a password-cracking method.</li><li>UDP is connectionless; Crunch makes wordlists.</li><li>Not all malware self-replicates (Trojans don't).</li><li>MAC flooding makes a switch act like a hub.</li><li>smb-os-discovery.</li><li>Counting maths: usernames × passwords = 4 × 5000 = 20,000; 26⁴ = 456,976.</li></ul></div>"
+  },
+  {
+   "id": "w6",
+   "title": "Cryptography: private and public key",
+   "short": "W6",
+   "tag": "Week 6 · Lectures 26–30",
+   "intro": "<p>Lectures 26–30. This is the start of the cryptography weeks: how to keep data secret and prove who sent it. You don't need to do hard maths, only understand the ideas and remember a few numbers.</p>",
+   "html": "<div class=\"cs-card\"><h3>Types of security attack</h3>\n<p>Picture a message going from a Source (S) to a Destination (D), with an Intruder (I) nearby.</p>\n<table class=\"cs-table\"><thead><tr><th>Attack</th><th>What the intruder does</th><th>Security goal it breaks</th></tr></thead><tbody><tr><td><b>Interruption</b></td><td>Blocks or destroys the message</td><td><b>Availability</b></td></tr><tr><td><b>Interception</b></td><td>Secretly reads it</td><td><b>Confidentiality</b></td></tr><tr><td><b>Modification</b></td><td>Changes it on the way</td><td><b>Integrity</b></td></tr><tr><td><b>Fabrication</b></td><td>Creates a fake message</td><td><b>Authenticity</b></td></tr></tbody></table>\n<h4>Passive vs active attacks</h4>\n<ul><li><b>Passive:</b> only listening, never changing anything. Examples: reading message contents, or <b>traffic analysis</b> (studying who talks to whom and how often). These are very hard to detect.</li><li><b>Active:</b> changing data or creating false data. Four types:<ul><li><b>Masquerade:</b> pretending to be someone else.</li><li><b>Replay:</b> recording a real message and resending it later.</li><li><b>Modification:</b> altering part of a message.</li><li><b>Denial of service:</b> blocking access.</li></ul></li></ul>\n<h4>Security services (what we want to provide)</h4>\n<table class=\"cs-table\"><thead><tr><th>Service</th><th>Plain meaning</th></tr></thead><tbody><tr><td>Confidentiality</td><td>Privacy: only the intended people can read it</td></tr><tr><td>Authentication</td><td>Proof of who created or sent it</td></tr><tr><td>Integrity</td><td>Proof it wasn't changed</td></tr><tr><td>Non-repudiation</td><td>The sender can't later deny sending it</td></tr><tr><td>Access control</td><td>Only allowed people can use a resource</td></tr><tr><td>Availability</td><td>It works when needed</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Encryption basics</h3>\n<ul><li><b>Plaintext (P):</b> the readable message.</li><li><b>Ciphertext (C):</b> the scrambled version.</li><li><b>Key (K):</b> the secret value that controls the scrambling.</li></ul>\n<p><b>A golden rule:</b> a cipher's security should depend <b>only on keeping the key secret</b>, never on hiding how the algorithm works. Assume everyone knows the algorithm.</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>Private-key (symmetric)</th><th>Public-key (asymmetric)</th></tr></thead><tbody><tr><td>Keys</td><td>One shared secret key</td><td>A pair per person: public + private</td></tr><tr><td>Speed</td><td>Fast (DES is about 100× faster than RSA)</td><td>Slow</td></tr><tr><td>Big problem</td><td>Sharing the key safely; needs <b>n(n−1)/2</b> keys for n people</td><td>Slow; needs a way to trust public keys</td></tr><tr><td>Examples</td><td>Caesar, DES, 3DES, IDEA, AES</td><td>RSA, Diffie-Hellman</td></tr></tbody></table></div>\n<div class=\"cs-card\"><h3>Classical ciphers (pen-and-paper)</h3>\n<h4>Substitution: swap letters for other letters</h4>\n<ul><li><b>Caesar cipher:</b> shift every letter 3 places forward, wrapping Z → A. HAPPY NEW YEAR → KDSSB QHZ BHDU.<ul><li>The general version shifts by k places, and k is the key.</li><li>Weakness: only 25 possible keys, so just try them all (brute force).</li></ul></li><li><b>Mono-alphabetic cipher:</b> any letter can map to any other letter, following a fixed table (the key).<ul><li>There are 26! (about 4 × 10²⁶) possible keys.</li><li>Still weak: some letters are much more common than others (like E in English), so <b>letter-frequency analysis</b> breaks it.</li></ul></li></ul>\n<h4>Transposition: keep the letters, change their order</h4>\n<p>One simple method: write the message in rows under numbered columns, then read the columns out in key order.</p>\n<p>Weakness: the ciphertext has exactly the same letter counts as the original.</p>\n<h4>Stream vs block ciphers</h4>\n<ul><li><b>Stream:</b> encrypts bit by bit.</li><li><b>Block:</b> encrypts fixed-size chunks (e.g. 64 or 128 bits), padding the last chunk if it's short.</li></ul></div>\n<div class=\"cs-card\"><h3>Modern private-key ciphers</h3>\n<table class=\"cs-table\"><thead><tr><th>Cipher</th><th>Block size</th><th>Key size</th><th>Notes</th></tr></thead><tbody><tr><td><b>DES</b></td><td><b>64 bits</b></td><td><b>56 bits</b></td><td>Old US standard. 16 rounds (a \"Feistel\" structure). The key is now too short</td></tr><tr><td><b>Triple DES</b></td><td>64 bits</td><td>Up to <b>168 bits</b></td><td>Runs DES three times: Encrypt-Decrypt-Encrypt with 3 keys. Secure but slow</td></tr><tr><td><b>IDEA</b></td><td>64 bits</td><td>128 bits</td><td></td></tr><tr><td><b>AES</b> (Rijndael)</td><td><b>128 bits</b></td><td><b>128, 192 or 256 bits</b></td><td>Today's standard (chosen in 2000). 10, 12 or 14 rounds</td></tr></tbody></table>\n<p>Each AES round has four steps: SubBytes (substitute), ShiftRows (shuffle), MixColumns (mix), AddRoundKey (add the key).</p></div>\n<div class=\"cs-card\"><h3>Public-key cryptography</h3>\n<p>Each person has two keys:</p>\n<ul><li>A <b>public key</b>, shared with everyone, like an open padlock.</li><li>A <b>private key</b>, kept secret, the only key that opens that padlock.</li></ul>\n<p>What is locked with one key can only be opened with the other.</p>\n<table class=\"cs-table\"><thead><tr><th>Goal</th><th>Sender A uses</th><th>Receiver B uses</th><th>Why</th></tr></thead><tbody><tr><td><b>Confidentiality</b> (secret message to B)</td><td><b>B's public</b> key</td><td>B's private key</td><td>Only B can open it</td></tr><tr><td><b>Authentication</b> (proving it came from A)</td><td><b>A's private</b> key</td><td>A's public key</td><td>Only A could have made it</td></tr></tbody></table>\n<p>Three uses: encryption, digital signatures, and key exchange.</p>\n<h4>RSA</h4>\n<p>Invented by Rivest, Shamir and Adleman in 1977. It's safe because <b>splitting a huge number into its two prime factors is extremely hard</b>. Safe key sizes are around 1024–2048 bits.</p>\n<p><b>Key generation:</b></p>\n<ol><li>Pick two primes p and q, and compute n = p × q.</li><li>Compute φ(n) = (p − 1)(q − 1).</li><li>Pick e that shares no factor with φ(n).</li><li>Find d so that (d × e) leaves remainder 1 when divided by φ(n).</li><li>The public key is {e, n}; the private key is {d, n}.</li></ol>\n<p><b>Encrypt:</b> C = M^e mod n. <b>Decrypt:</b> M = C^d mod n.</p>\n<p><b>Worked example (from the slides):</b></p>\n<ul><li>p = 7, q = 17 → n = 119, φ(n) = 96.</li><li>Choose e = 5. Then d = 77, because 77 × 5 = 385 = 4 × 96 + 1.</li><li>Public key {5, 119}, private key {77, 119}.</li><li>Encrypt M = 19: 19⁵ mod 119 = <b>66</b>. Decrypt: 66⁷⁷ mod 119 = <b>19</b>.</li></ul>\n<p><b>In practice:</b> RSA is slow, so it's used only to send a random AES key safely, and AES then encrypts the actual data. Quantum computers could break RSA in future, which is why \"post-quantum\" algorithms are being researched.</p>\n<h4>Diffie-Hellman key exchange (1976)</h4>\n<p>Lets two people agree on a shared secret key over a public channel, without ever sending the key itself. It <b>can't encrypt messages</b> on its own; it only creates a key.</p>\n<ol><li>A and B publicly agree on two numbers, n and g.</li><li>A picks a secret x and sends X = g^x mod n.</li><li>B picks a secret y and sends Y = g^y mod n.</li><li>Both work out the same key, g<sup>xy</sup> mod n. A computes Y^x; B computes X^y.</li></ol>\n<p>It's safe because working backwards from X to x (the \"discrete logarithm\") is very hard. <b>Weakness:</b> a <b>man-in-the-middle</b> can sit between them, do the exchange separately with each, and read everything.</p></div>\n<div class=\"cs-card\"><h3>Message authentication</h3>\n<p>How do you prove a message wasn't changed and came from the right person?</p>\n<ul><li><b>Encrypt it</b> with a key only the two of you share.</li><li><b>Attach a MAC</b> (Message Authentication Code), computed from the message and a secret key: MAC = F(K, M).<ul><li>The receiver recomputes it. If it matches, the message is genuine and unchanged.</li></ul></li><li><b>Hash functions</b> (covered in Week 7):</li></ul>\n<table class=\"cs-table\"><thead><tr><th>Family</th><th>Output size</th></tr></thead><tbody><tr><td>MD5 (also MD2, MD4)</td><td>128 bits</td></tr><tr><td>SHA-1</td><td>160 bits</td></tr><tr><td>SHA-256 / 384 / 512</td><td>256 / 384 / 512 bits</td></tr><tr><td>RIPEMD-128 / 160</td><td>128 / 160 bits</td></tr></tbody></table></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 6 tests</h3>\n<ul><li>Masquerade vs replay vs modification.</li><li>Caesar shift encrypt and decrypt (SECURE → VHFXUH, KHOOR → HELLO).</li><li>Using a substitution table (CODE → EGRT).</li><li>Hashes can't be reversed; DoS = interruption.</li><li>Encrypt with the <b>receiver's public key</b>; DES block = 64 bits.</li><li>Key counting: public-key = 2N keys (150 people → 300); symmetric = N(N−1)/2 (40 people → 780).</li></ul></div>"
+  },
+  {
+   "id": "w7",
+   "title": "Hashes, digital signatures and secure protocols",
+   "short": "W7",
+   "tag": "Week 7 · Lectures 31–35",
+   "intro": "<p>Lectures 31–35. Week 6 showed how to keep data secret. This week covers how to prove data wasn't changed (hashes), prove who sent it (signatures and certificates), and the real protocols that use all of this (SSL/TLS, SSH, IPSec).</p>",
+   "html": "<div class=\"cs-card\"><h3>Hash functions</h3>\n<p>A <b>hash function</b> turns a message of any size into a short, fixed-size \"fingerprint\" called the <b>digest</b>.</p>\n<ul><li><b>One-way:</b> you can't get the message back from the hash.</li><li><b>Many-to-one:</b> infinitely many messages map onto a limited number of hashes, so matching pairs (\"collisions\") must exist. They should just be impossible to <i>find</i>.</li></ul>\n<p><b>What a good cryptographic hash must do:</b></p>\n<ol><li>Work on input of any size.</li><li>Always give the same, fixed-length output.</li><li>Be quick to compute.</li><li><b>First preimage resistance:</b> given a hash, you can't find a message that produces it.</li><li><b>Second preimage resistance:</b> given one message, you can't find a <i>different</i> message with the same hash.</li><li><b>Collision resistance:</b> you can't find <i>any</i> two messages with the same hash. This is the strongest requirement.</li></ol>\n<p><b>Avalanche effect:</b> change one letter of the message and the whole hash changes completely.</p>\n<h4>Keyed vs unkeyed hashes</h4>\n<table class=\"cs-table\"><thead><tr><th></th><th>Unkeyed hash (MDC)</th><th>Keyed hash (MAC)</th></tr></thead><tbody><tr><td>Input</td><td>Message only</td><td>Message + secret key</td></tr><tr><td>Proves</td><td><b>Integrity</b> (not changed), if you got the hash from a trusted source</td><td>Integrity <b>and</b> who sent it (authenticity)</td></tr><tr><td>Weakness</td><td>Anyone can recompute it after changing the message</td><td>The key must be shared</td></tr><tr><td>Examples</td><td>MD5, SHA-256</td><td>HMAC</td></tr></tbody></table>\n<h4>Hash families and sizes</h4>\n<table class=\"cs-table\"><thead><tr><th>Hash</th><th>Output (digest)</th><th>Block size</th><th>Rounds</th></tr></thead><tbody><tr><td>MD5</td><td>128 bits</td><td>512 bits</td><td></td></tr><tr><td>SHA-1</td><td>160 bits</td><td>512 bits</td><td>80</td></tr><tr><td>SHA-224 / SHA-256</td><td>224 / 256 bits</td><td>512 bits</td><td>64</td></tr><tr><td>SHA-384 / <b>SHA-512</b></td><td>384 / 512 bits</td><td><b>1024 bits</b></td><td>80</td></tr><tr><td>RIPEMD-128 / 160</td><td>128 / 160 bits</td><td></td><td></td></tr></tbody></table>\n<h4>HMAC: a keyed hash built from an ordinary hash</h4>\n<p>HMAC hashes twice, mixing in the key each time:</p>\n<pre><code>HMAC(M) = H(K ‖ P ‖ H(K ‖ Q ‖ M))</code></pre>\n<p>Here K is the key, P and Q are fixed padding values, and ‖ means \"join together\". Hashing is faster than encryption, and hash code is available everywhere, which is why HMAC is popular.</p>\n<h4>The birthday attack</h4>\n<p>It's like the birthday puzzle: in a room of only 23 people, two probably share a birthday. For an n-bit hash, trying about 2<sup>n/2</sup> random messages will probably turn up a collision. So hashes need at least 128 bits, and <b>160 or more</b> is recommended.</p></div>\n<div class=\"cs-card\"><h3>Digital signatures</h3>\n<p>A <b>digital signature</b> is the electronic version of a handwritten signature, built on public-key cryptography.</p>\n<ul><li><b>Sign</b> with your <b>private</b> key. Only you have it, so nobody else can forge your signature.</li><li><b>Verify</b> with your <b>public</b> key. Anyone can check it, and you don't need to be online.</li></ul>\n<p>This gives <b>authentication</b> (who signed), <b>integrity</b> (nothing changed) and <b>non-repudiation</b> (the signer can't deny it).</p>\n<p><b>Usual method (signature with appendix):</b> hash the message, sign the <i>hash</i>, and send the message plus the signature. The receiver hashes the message themselves and checks it matches the signature.</p>\n<p><b>Other kinds of signature:</b></p>\n<ul><li><b>With message recovery:</b> the message itself comes back out of the signature.</li><li><b>Deterministic:</b> same message, same signature every time.</li><li><b>Probabilistic:</b> a different signature each time; harder to forge.</li><li><b>Blind:</b> the signer signs without seeing the message (used for e.g. anonymous voting).</li><li><b>Undeniable:</b> the signer must take part in verifying it.</li></ul>\n<p>Examples: RSA, DSA, ECDSA, ElGamal, Schnorr.</p>\n<p><b>Attacks on signatures</b>, from worst to least bad:</p>\n<ul><li><b>Total break:</b> the attacker has the signing key.</li><li><b>Selective forgery:</b> the attacker can sign messages of their choice.</li><li><b>Existential forgery:</b> the attacker can sign <i>some</i> messages, but can't control which.</li></ul></div>\n<div class=\"cs-card\"><h3>Digital certificates</h3>\n<p><b>The problem:</b> how do you know a public key really belongs to, say, your bank? <b>The answer:</b> a certificate.</p>\n<p>A <b>digital certificate</b> links a public key to an identity (a name and details). It is signed by a trusted <b>Certification Authority (CA)</b>.</p>\n<ul><li>The common format is <b>X.509 v3</b>. It holds a version, serial number, signature algorithm, issuer, validity dates, subject name, subject's public key, and optional fields.</li><li>A certificate can be <b>revoked</b> if it expires or its private key is compromised. The CA publishes a <b>Certificate Revocation List (CRL)</b>.</li></ul></div>\n<div class=\"cs-card\"><h3>SSL/TLS: securing web traffic</h3>\n<p><b>SSL</b> (Secure Socket Layer) was created by Netscape. <b>TLS</b> (Transport Layer Security) is its successor. Both sit between the application (HTTP, email) and TCP.</p>\n<p><b>Goals:</b> authenticate the server (and optionally the client), keep data private, and keep it unchanged.</p>\n<p>SSL has two layers:</p>\n<ul><li><b>Record protocol:</b> splits data into chunks of 16 KB or less, compresses them, adds a MAC, encrypts, and hands the result to TCP.</li><li><b>Three protocols on top of it:</b><ul><li><b>Handshake:</b> agree on algorithms and keys, and authenticate.</li><li><b>ChangeCipherSpec:</b> \"switch to the agreed settings now\".</li><li><b>Alert:</b> warnings or fatal errors (a fatal alert ends the session).</li></ul></li></ul>\n<p><b>The handshake in four phases:</b></p>\n<ol><li><b>Hello:</b> client and server exchange version, a random number, session ID and the list of ciphers they support.</li><li><b>Server:</b> sends its certificate and key exchange information, and may request the client's certificate.</li><li><b>Client:</b> sends its certificate (if asked) and key exchange information.</li><li><b>Finish:</b> both send ChangeCipherSpec and Finished. From here on, data is encrypted.</li></ol>\n<p><b>Secure versions of services:</b></p>\n<table class=\"cs-table\"><thead><tr><th>Service</th><th>Port</th></tr></thead><tbody><tr><td>HTTPS</td><td>443</td></tr><tr><td>SMTP over SSL</td><td>465</td></tr><tr><td>POP3 over SSL</td><td>995</td></tr><tr><td>LDAP over SSL</td><td>636 (the slide says 646)</td></tr></tbody></table>\n<p>Note that SSL/TLS adds work, so it is not faster than plain HTTP, and it does not provide non-repudiation.</p></div>\n<div class=\"cs-card\"><h3>SSH (Secure Shell)</h3>\n<p>Created in 1995 as a secure replacement for Telnet, rlogin and rcp. It encrypts everything, including passwords, and supports tunnelling (port forwarding).</p>\n<p>In SSH version 1, the server has two keys:</p>\n<ul><li>A long-term identity key (1024-bit RSA).</li><li>A short-term encryption key (768-bit RSA), replaced every hour so old sessions can't be decrypted later.</li></ul>\n<p>Login can use a password, RSA keys, or plug-ins (smart cards, biometrics).</p></div>\n<div class=\"cs-card\"><h3>IPSec: security at the IP layer</h3>\n<p>IPSec adds encryption and authentication to IP itself. It is <b>required in IPv6</b> and optional in IPv4.</p>\n<p>It provides authentication and integrity, confidentiality, and <b>replay protection</b> (re-sent copies of packets are dropped).</p>\n<table class=\"cs-table\"><thead><tr><th>Mode</th><th>Protects</th><th>Used between</th></tr></thead><tbody><tr><td><b>Transport</b></td><td>Only the payload; the original IP header stays visible</td><td>Two hosts</td></tr><tr><td><b>Tunnel</b></td><td>The <b>entire</b> original packet, wrapped inside a new one</td><td>Firewalls or hosts; this is how VPNs work</td></tr></tbody></table>\n<p>Its downsides: it's complex, doesn't work well with NAT, and routers must support it.</p></div>\n<div class=\"cs-card\"><h3>S-HTTP vs HTTPS</h3>\n<ul><li><b>HTTPS</b> = HTTP running over SSL/TLS. It secures the whole <i>connection</i>.</li><li><b>S-HTTP</b> = an extension of HTTP that secures individual <i>messages</i>. It can work with symmetric keys only.</li></ul>\n<p>They are <b>not</b> the same thing, and HTTPS is the one used today.</p></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 7 tests</h3>\n<ul><li>Hash output is fixed-length and smaller than the message.</li><li>DES block 64 bits; MD5 = 128 bits; SHA-256 = 256-bit output; SHA-512 block = 1024 bits.</li><li>HTTPS relies on SSL/TLS; collision resistance (no two messages with the same hash).</li><li>Verify a signature with the signer's <b>public</b> key; non-repudiation.</li><li>Unkeyed hashes don't prove authenticity.</li><li>IPSec transport mode keeps the original IP header.</li></ul></div>"
+  },
+  {
+   "id": "w8",
+   "title": "Steganography, biometrics and network attacks",
+   "short": "W8",
+   "tag": "Week 8 · Lectures 36–40",
+   "intro": "<p>Lectures 36–40. Five topics this week: hiding data inside files, identifying people by their bodies, attacks that knock services offline, and keeping DNS and email trustworthy. The attack sections explain how each one works and how it's stopped. That is the level the exam asks about.</p>",
+   "html": "<div class=\"cs-card\"><h3>Steganography: hiding that a message exists</h3>\n<p><b>Steganography</b> is Greek for \"covered writing\": hiding a message inside something innocent-looking.</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>Encryption</th><th>Steganography</th></tr></thead><tbody><tr><td>Goal</td><td>Make the message <b>unreadable</b></td><td>Make the message <b>invisible</b></td></tr><tr><td>Draws attention?</td><td>Yes; scrambled text looks suspicious</td><td>No; it looks like a normal photo</td></tr></tbody></table>\n<p>The two can be combined: encrypt the message first, then hide it.</p>\n<p><b>Digital watermarking</b> uses the same techniques, but to embed copyright or ownership information rather than a secret.</p>\n<p><b>Historical examples:</b></p>\n<ul><li>A message tattooed on a messenger's shaved head, with the hair allowed to grow back.</li><li>A WWII spy letter where the second letter of each word spelled the real message.</li></ul>\n<p><b>The formula:</b> cover medium + hidden message + stego key = <b>stego medium</b>.</p>\n<p>Good covers: images, audio, video, program files, text.</p>\n<h4>Hiding data in images</h4>\n<p>Every pixel is a colour made of Red, Green and Blue, each 0–255 (one byte). For example, FF 00 00 = red and FF FF FF = white.</p>\n<ul><li><b>GIF:</b> 8 bits per pixel, at most 256 colours (each pixel points into a colour table). Lossless compression.</li><li><b>JPEG:</b> 24 bits per pixel. Lossy compression, based on the DCT (discrete cosine transform).</li><li><b>BMP:</b> 24 bits per pixel.</li></ul>\n<p><b>The main method: LSB (Least Significant Bit) insertion.</b> Change only the last bit of each pixel's value. That shifts the colour so slightly nobody can see it.</p>\n<ul><li>1 bit hidden per pixel.</li><li>8 pixels hide 1 character (8 bits).</li><li>Simple, works best with 24-bit and grayscale images.</li><li>Easily destroyed if the image is edited or recompressed.</li></ul>\n<p><b>Example:</b> to hide \"C\" (ASCII 67 = <code>01000011</code>), set the last bit of 8 pixels to 0,1,0,0,0,0,1,1.</p>\n<p><b>Capacity maths:</b> bytes hidden = number of pixels ÷ 8. A 1500 × 1200 image = 1,800,000 pixels = <b>225,000 bytes</b>.</p>\n<p><b>Other methods:</b></p>\n<ul><li><b>Masking and filtering:</b> subtly brighten certain areas, usually busy or noisy parts of the picture.</li><li><b>Algorithms and transformations:</b> hide data inside the maths of JPEG's DCT compression. The most sophisticated approach.</li></ul></div>\n<div class=\"cs-card\"><h3>Biometrics: identifying people by their bodies</h3>\n<p><b>Biometrics</b> means recognising a person automatically from measurable features of their body or behaviour.</p>\n<table class=\"cs-table\"><thead><tr><th>Physical (what you <i>are</i>)</th><th>Behavioural (how you <i>act</i>)</th></tr></thead><tbody><tr><td>Fingerprint, face, hand geometry, iris, retina, DNA</td><td>Signature dynamics (speed, pressure), keystroke rhythm, gait (walk), voice</td></tr></tbody></table>\n<table class=\"cs-table\"><thead><tr><th>Biometric</th><th>Notes from the course</th></tr></thead><tbody><tr><td>Fingerprint</td><td>Matches ridge details (\"minutiae\"); sometimes unreliable</td></tr><tr><td>Hand geometry</td><td>More accurate than fingerprints, but needs a larger scanner</td></tr><tr><td>Iris</td><td>Infrared scan of the eye's coloured ring; very distinctive</td></tr><tr><td>Retina</td><td>Among the most secure, unique even to each eye; uncomfortable for the user</td></tr><tr><td>Face</td><td>Affected by lighting and background</td></tr><tr><td>Voice</td><td>Pitch, intensity, duration; background noise causes problems</td></tr></tbody></table>\n<p><b>Multimodal biometrics</b> combines several features (e.g. face + voice), because no single one is accurate enough on its own.</p>\n<p><b>Uses:</b></p>\n<ul><li><b>Commercial:</b> logins, payments, building access.</li><li><b>Government:</b> passports, border control, <b>Aadhaar</b>.</li><li><b>Forensic:</b> criminal investigations, missing persons.</li></ul></div>\n<div class=\"cs-card\"><h3>Denial of Service (DoS) attacks</h3>\n<p>A <b>DoS attack</b> tries to stop real users from reaching a service, usually by overwhelming it.</p>\n<table class=\"cs-table\"><thead><tr><th>Attack</th><th>How it works (concept)</th><th>Defence</th></tr></thead><tbody><tr><td><b>Smurf</b></td><td>Pings are sent to a network's broadcast address with the victim's address faked as the sender, so every host on that network replies to the victim at once</td><td>Routers reject outside packets addressed to broadcast addresses</td></tr><tr><td><b>Ping of Death</b></td><td>An oversized ping (over 65,535 bytes, the IP maximum) arrives in fragments. When reassembled it overflows the receiver, and older systems crash</td><td>Patched systems simply discard oversized packets</td></tr><tr><td><b>SYN flood</b></td><td>Many SYNs with faked source addresses. The server reserves space for each half-open connection until the table is full</td><td><b>SYN cookies</b> (below)</td></tr></tbody></table>\n<p><b>Why SYN floods work:</b> sending a SYN costs the attacker nothing, but the server spends memory on every one. The cost is lopsided.</p>\n<p><b>SYN cookies, the fix:</b> the server doesn't store anything when a SYN arrives. Instead it encodes the connection details in a cryptographic value (the \"cookie\") and puts it in its SYN-ACK. Only when a real client sends back the final ACK carrying that cookie does the server recreate the state and open the connection.</p>\n<h4>Distributed DoS (DDoS)</h4>\n<p>A <b>DDoS</b> attack comes from many machines at once, usually a <b>botnet</b> (infected computers controlled through \"handler\" machines). That makes it much harder to block, and the person behind it may not even be online during the attack.</p>\n<p><b>HTTP flood:</b> bots send huge numbers of normal-looking web requests.</p>\n<ul><li><b>GET flood:</b> requests for pages, images and files.</li><li><b>POST flood:</b> form submissions, which are expensive because each one makes the server do database work.</li><li><b>Defences:</b> CAPTCHA or JavaScript challenges to tell bots from people, a <b>web application firewall</b>, and IP reputation lists.</li></ul>\n<p><b>General DoS/DDoS defences:</b></p>\n<ul><li><b>ISPs:</b> anti-spoofing filters (very important), turn off directed broadcasts, monitor traffic volumes.</li><li><b>Servers:</b> watch for unusual traffic, disable unused UDP services.</li><li><b>Everyone:</b> install security patches, and scan regularly for malware so your machines don't become bots.</li></ul></div>\n<div class=\"cs-card\"><h3>DNS security</h3>\n<p><b>DNS</b> turns names (www.gmail.com) into IP addresses. It also supports aliases (several names for one host) and load balancing (several IPs for one name).</p>\n<p><b>It's a hierarchy of servers:</b></p>\n<ol><li><b>Root</b> servers know where the \".com\" servers are.</li><li>The <b>.com</b> servers know where gmail.com's server is.</li><li><b>gmail.com's own server</b> gives the final IP address.</li></ol>\n<ul><li><b>Iterative lookup:</b> each server replies \"ask this server next\".</li><li><b>Recursive lookup:</b> the server does all the asking for you and returns the answer.</li><li><b>Caching:</b> servers remember answers for a while, so they don't ask the root every time.</li></ul>\n<p><b>Why DNS is weak:</b> most queries travel in plain text over UDP (easy to fake), and responses aren't authenticated.</p>\n<p><b>DNS cache poisoning:</b> a fake answer gets accepted and stored in a DNS server's cache. Everyone who uses that server is then sent to the wrong website.</p>\n<p><b>DNSSEC, the fix:</b> DNS answers are <b>digitally signed</b> at every level, which guarantees where the answer came from and that it wasn't changed. The downside is bigger packets and more load on servers.</p></div>\n<div class=\"cs-card\"><h3>Email security: PGP</h3>\n<p><b>PGP (Pretty Good Privacy)</b> secures email and stored files. It's popular because it's free, runs everywhere, uses well-known algorithms, and isn't controlled by any government.</p>\n<p><b>Its five services:</b></p>\n<ul><li><b>Authentication:</b> a digital signature proves the sender.</li><li><b>Confidentiality:</b> encryption keeps the message private.</li><li><b>Compression:</b> ZIP, applied after signing.</li><li><b>Email compatibility:</b> base-64 encoding, so binary data survives email systems.</li><li><b>Segmentation:</b> splits large messages into 50 KB pieces.</li></ul></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 8 tests</h3>\n<ul><li>Steganography = hiding inside a cover; valid examples (image, audio, executable).</li><li>Behavioural biometrics (signature, gait, keystrokes); the iris is the most reliable.</li><li>DoS definition; how Smurf and SYN flood work.</li><li>PGP = authentication + confidentiality; DNS = names to IP addresses.</li><li>LSB capacity: pixels ÷ 8 = bytes.</li></ul></div>"
+  },
+  {
+   "id": "w9",
+   "title": "Sniffing, social engineering and DoS",
+   "short": "W9",
+   "tag": "Week 9 · Lectures 41–45",
+   "intro": "<p>Lectures 41–45. This week covers three ways attackers get information or disrupt services without breaking any cryptography: listening to network traffic (sniffing), tricking people (social engineering), and overloading services (DoS). For each, the notes explain the idea, name the tools the course mentions, and list the defences.</p>",
+   "html": "<div class=\"cs-card\"><h3>Sniffing and network analysis</h3>\n<p><b>Sniffing</b> (network analysis) means capturing the traffic travelling across a network and reading it. The same tools are used by network admins to fix problems and by attackers to spy.</p>\n<p>Good analysers support many protocols, have a graphical interface, and produce statistics.</p>\n<h4>Wireshark</h4>\n<p>Wireshark is the best-known free analyser. It <b>captures and displays</b> traffic in readable form, keeps logs for investigations, and <b>filters</b> by protocol. It only watches: it can't change live traffic and isn't an attack tool.</p>\n<p><b>Its screen has three parts:</b></p>\n<ul><li><b>Packet list:</b> number, time, source, destination, protocol, length, info.</li><li><b>Packet details:</b> each layer's header, broken down.</li><li><b>Raw bytes:</b> the data in hex and ASCII.</li></ul>\n<p>Type a filter such as <code>http</code> or <code>dns</code> in the filter bar. It turns green when the filter is valid and red when it isn't.</p>\n<p><b>How capture works:</b></p>\n<ul><li>The network card is switched to <b>promiscuous mode</b> (this needs admin/root rights), so it keeps every frame on its segment, not just frames addressed to it.</li><li>On a <b>hub</b>, that means everyone's traffic.</li><li>On a <b>switch</b>, you mostly see only your own traffic. That's why switches are safer than hubs.</li></ul>\n<h4>Why unencrypted protocols are dangerous</h4>\n<p>With HTTP, FTP or Telnet, a sniffer can read usernames and passwords directly. With HTTPS, SSL/TLS or SSH, it only sees scrambled data.</p>\n<h4>Other tools named in the course</h4>\n<table class=\"cs-table\"><thead><tr><th>Tool</th><th>What it is</th></tr></thead><tbody><tr><td><b>Ettercap</b></td><td>A man-in-the-middle tool for LANs. IP/MAC filtering, injecting characters into live connections, filtering or dropping packets, plug-ins, OS fingerprinting. It does <b>not</b> do SQL injection or dictionary password cracking</td></tr><tr><td><b>Burp Suite</b></td><td>A web-application security testing platform (Java, by PortSwigger). Modules: Target, <b>Proxy</b> (sits between your browser and the server so you can inspect traffic), Spider (crawler), Scanner, Intruder, Repeater</td></tr><tr><td>SolarWinds, Kismet</td><td>Other network analysers</td></tr></tbody></table>\n<h4>Defending against sniffing</h4>\n<ul><li><b>Encrypt everything:</b> HTTPS not HTTP, SSH not Telnet, SFTP/SCP not FTP, SSL/TLS for email, VPN/IPSec, PGP or S/MIME for messages.</li><li>Use <b>switches</b>, not hubs.</li><li>Restrict physical access to network sockets and cables.</li><li>Use <b>static ARP entries</b> (especially for the gateway) so fake ARP replies can't redirect traffic.</li><li>Use one-time passwords.</li><li><b>Detect sniffers:</b> NMAP's <code>sniffer-detect</code> script checks whether a machine on the local network has its card in promiscuous mode.</li></ul>\n<p><b>Recap from Week 5: ARP spoofing.</b> Fake ARP replies make victims send their traffic to the attacker's machine, turning a switched network into a man-in-the-middle situation.</p></div>\n<div class=\"cs-card\"><h3>Social engineering: hacking people</h3>\n<p><b>Social engineering</b> means persuading or tricking people into giving away confidential information. It often works by appealing to greed (\"something for nothing\"), fear or helpfulness.</p>\n<p><b>Common targets:</b> help-desk staff, technical support, system administrators, unhappy employees.</p>\n<p><b>The four phases:</b></p>\n<ol><li><b>Research the company:</b> websites, employees, even rubbish bins (\"dumpster diving\").</li><li><b>Pick a victim:</b> the most vulnerable person.</li><li><b>Build a relationship</b> with them.</li><li><b>Exploit it</b> to get the information.</li></ol>\n<h4>The three types</h4>\n<table class=\"cs-table\"><thead><tr><th>Type</th><th>Examples</th></tr></thead><tbody><tr><td><b>Human-based</b> (in person or by voice)</td><td><b>Impersonation</b> (pretending to be IT staff or a manager, the most common); <b>reverse social engineering</b> (posing as an expert so the victim comes to <i>you</i> for help); <b>piggybacking</b> (an authorised person knowingly lets you through a door: \"I forgot my badge\"); <b>tailgating</b> (slipping in closely behind someone, perhaps with a fake badge); <b>eavesdropping</b>; <b>shoulder surfing</b></td></tr><tr><td><b>Computer-based</b></td><td><b>Phishing</b> (fake emails or sites pretending to be your bank, etc.); <b>spear phishing</b> (phishing aimed at one specific person or small group); fake <b>pop-up windows</b>; <b>chain letters</b> (\"forward to 10 people for a prize\"); chatting to collect personal details</td></tr><tr><td><b>Mobile-based</b></td><td>Fake or malicious apps with names like popular ones; SMS messages pretending to be your bank and asking you to call a number</td></tr></tbody></table>\n<p><b>Quick rule:</b> if it needs the attacker physically present or on the phone, it's <b>human-based</b>. If it arrives on a screen (email, pop-up, chain letter), it's <b>computer-based</b>.</p>\n<p>The course demo uses the <b>Social-Engineer Toolkit (SET)</b> to show, in the lab, how convincing a fake login page can be.</p>\n<h4>Defences</h4>\n<ul><li><b>Training:</b> the most important defence. Policies are useless if staff don't know them.</li><li><b>Password policy:</b> regular changes, no guessable passwords, lock accounts after failed attempts.</li><li><b>Physical security:</b> ID cards, escorted visitors, restricted areas.</li><li><b>Least access:</b> separate admin, user and guest accounts.</li><li><b>Classify information</b> (top secret, internal, public, ...).</li><li><b>Background checks</b>, and a proper process when people leave.</li><li><b>Layered anti-virus and anti-phishing</b> at both the user and mail-server level.</li><li><b>Two-factor authentication</b> for important services.</li></ul></div>\n<div class=\"cs-card\"><h3>Denial of Service, revisited</h3>\n<p>A <b>DoS</b> attack reduces or blocks access to a service by flooding it with bogus requests. A <b>DDoS</b> uses many compromised machines (a <b>botnet</b>) at once.</p>\n<table class=\"cs-table\"><thead><tr><th>Category</th><th>Idea</th></tr></thead><tbody><tr><td><b>Bandwidth attacks</b></td><td>Use up the network's capacity; needs many machines</td></tr><tr><td><b>SYN flood</b></td><td>Half-open TCP connections fill the server's listen queue. Each one is held for about <b>75 seconds</b> waiting for the final ACK, which never comes</td></tr><tr><td><b>ICMP flood</b></td><td>Huge numbers of ICMP (ping) packets</td></tr><tr><td><b>Application-level flood</b></td><td>Targets a specific application, e.g. repeated failed logins that lock out a real user</td></tr></tbody></table>\n<p><b>Tools the course names</b> (you only need to recognise them):</p>\n<ul><li><b>Slowloris:</b> opens many connections to a web server and sends each request <b>incompletely and very slowly</b>, so the server's connection slots stay tied up. It needs very little bandwidth.</li><li><b>LOIC (Low Orbit Ion Cannon):</b> a \"stress-testing\" tool that floods a target with TCP, UDP or HTTP traffic.</li><li><b>R.U.D.Y. (\"R U Dead Yet?\"):</b> a \"low and slow\" attack that submits web forms one tiny piece at a time.</li></ul>\n<p><b>Defences:</b></p>\n<ul><li>Keep anti-virus and anti-Trojan software up to date, so your machines don't become bots.</li><li>Disable unnecessary services and uninstall unused applications.</li><li>Scan files from outside sources.</li><li>Add bandwidth on critical links, and replicate servers for backup.</li><li>Raise security awareness.</li><li>As a last resort, shut services down until the attack passes.</li><li>Also see Week 8: SYN cookies, web application firewalls, anti-spoofing filters.</li></ul></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 9 tests</h3>\n<ul><li>Sniffing = capturing traffic; promiscuous mode.</li><li>Wireshark can't modify traffic or do SQL injection.</li><li>Plain-text protocols (HTTP, FTP, Telnet) can be sniffed.</li><li>What Ettercap can't do (SQL injection, dictionary attacks).</li><li>Phishing is computer-based, not human-based.</li><li>SYN flooding; Slowloris = partial HTTP requests.</li><li>Computer-based social engineering examples (phishing, pop-ups, chain letters).</li><li>ARP spoofing = traffic routed through the attacker.</li></ul></div>"
+  },
+  {
+   "id": "w10",
+   "title": "Hardware security",
+   "short": "W10",
+   "tag": "Week 10 · Lectures 46–50",
+   "intro": "<p>Lectures 46–50. So far, every attack has targeted software or networks. This week the target is the <b>chip itself</b>. The main lesson: an encryption algorithm can be mathematically perfect and still leak its secret key through the hardware running it.</p>",
+   "html": "<div class=\"cs-card\"><h3>Why hardware security matters</h3>\n<p>\"Hardware\" here means processors, memory and firmware, but also small security devices: <b>SIM cards</b> (they hold your subscriber identity), <b>RFID tags</b> (unique ID codes), <b>smart cards</b> (secret keys) and <b>PUFs</b> (section 4).</p>\n<p><b>Three kinds of threat:</b></p>\n<ul><li><b>Physical attacks:</b> done on the device itself, with lab equipment.</li><li><b>Planned attacks:</b> a weakness deliberately built into the chip (a hardware Trojan, section 5).</li><li><b>Stealing secrets:</b> reading the confidential data a device carries.</li></ul>\n<h4>Types of hardware attack</h4>\n<table class=\"cs-table\"><thead><tr><th>Attack</th><th>How it works</th><th>Invasive?</th></tr></thead><tbody><tr><td><b>Black-box testing</b></td><td>Feed in inputs, watch the outputs, and work out the algorithm</td><td>No</td></tr><tr><td><b>Physical probing</b></td><td>Place tiny probes on the chip's wires and read data directly</td><td><b>Yes</b></td></tr><tr><td><b>Reverse engineering</b></td><td>Strip the chip layer by layer and photograph each one</td><td><b>Yes</b></td></tr><tr><td><b>Side-channel analysis</b></td><td>Measure timing, power or radio emissions during normal use</td><td>No</td></tr></tbody></table>\n<p><b>Invasive</b> means the chip is physically opened or damaged. Only probing and reverse engineering are invasive.</p>\n<h4>Countermeasures</h4>\n<ul><li><b>Scramble or encrypt</b> the data inside the chip's registers and buses.</li><li><b>Disguise the layout:</b> 3D stacking, dummy circuits.</li><li><b>Metal mesh</b> over the circuit: probing it causes a short, which wipes the stored secrets.</li><li><b>Side-channel defences:</b> random noise generators, hiding secrets (section 3).</li><li><b>PUFs</b>, for low-cost security protocols.</li></ul></div>\n<div class=\"cs-card\"><h3>Side-channel attacks</h3>\n<p>A <b>side channel</b> is anything a device leaks <i>unintentionally</i> while it works: how long it takes, how much power it draws, radio (electromagnetic) emissions, heat, faulty outputs, or test data.</p>\n<p>The important point: side-channel attacks don't question the <b>maths</b> of the algorithm. They attack its <b>implementation</b>, so the attacker usually needs to be near the device, or have it in hand.</p>\n<h4>Timing attacks</h4>\n<p>Paul Kocher published the first one in 1995. If a calculation takes longer for some key bits than for others, then timing it many times can reveal the key.</p>\n<p><b>Example: square-and-multiply.</b> RSA and Diffie-Hellman compute big powers like x^e. To do this quickly, go through the bits of e:</p>\n<ul><li>Every bit needs a <b>squaring</b>.</li><li>A <b>1</b> bit also needs a <b>multiplication</b>.</li></ul>\n<p>So multiplications only happen on 1 bits, and the total time reveals <b>how many 1s are in the key</b>.</p>\n<table class=\"cs-table\"><thead><tr><th>Formula</th><th>Meaning</th></tr></thead><tbody><tr><td>Time = n × t_square + k × t_multiply</td><td>n = number of key bits, k = number of 1 bits. Time leaks k</td></tr><tr><td>Fixed: Time = n × (t_square + t_multiply)</td><td>Do a dummy multiplication on 0 bits too, so the time no longer depends on the key</td></tr></tbody></table>\n<p><b>Counting operations (assignment style):</b> for x²², write 22 in binary: <code>10110</code> (5 bits, three 1s).</p>\n<ul><li>Squarings = bits − 1 = <b>4</b>.</li><li>Multiplications = number of 1s − 1 = <b>2</b>.</li><li>Slide example: x¹³ = <code>1101</code> gives 3 squarings and 2 multiplications, instead of 12 multiplications done the slow way.</li></ul>\n<h4>Power analysis attacks</h4>\n<p>These were introduced in 1998 and are more powerful than timing attacks. The attacker measures the device's <b>power consumption</b> while it encrypts. A recording of power over time is called a <b>trace</b>.</p>\n<table class=\"cs-table\"><thead><tr><th></th><th>SPA (Simple Power Analysis)</th><th>DPA (Differential Power Analysis)</th></tr></thead><tbody><tr><td>Traces needed</td><td>One, or a few</td><td><b>Many</b></td></tr><tr><td>Method</td><td>Look at the trace and spot patterns, e.g. the rounds of AES, or a square vs a multiply</td><td>Split the traces into two groups by a guessed key bit, average each group, subtract. A peak means the guess was right</td></tr><tr><td>Strength</td><td>Easier to defend against</td><td><b>More powerful</b>: finds leaks too small to see in any single trace</td></tr></tbody></table>\n<h4>Defences against side channels</h4>\n<ul><li><b>Against timing:</b> make the run time independent of the data. Use <b>constant-time code</b>, or add <b>dummy operations</b> so every path takes equally long. This is relatively easy.</li><li><b>Against power analysis</b> (harder):<ul><li><b>Hardware:</b> special low-leakage logic styles, <b>masking</b>, <b>noise generators</b>, random interruptions to break up the timing.</li><li><b>Software:</b> avoid predictable intermediate values, add redundant computations, and <b>mask</b> data by mixing in a secret random value.</li></ul></li></ul>\n<p>Note that <b>masking</b> protects against power leaks, not timing leaks. Making code more complicated without fixing the timing differences does nothing.</p>\n<p>A catch: a defence against one side channel can open up another. This is still an active research area.</p></div>\n<div class=\"cs-card\"><h3>PUFs: Physically Unclonable Functions</h3>\n<p>No two chips come out of the factory exactly alike; there are tiny random variations. A <b>PUF</b> turns those variations into a <b>fingerprint</b> for the chip.</p>\n<p>It works by <b>challenge and response</b>: give it an n-bit input (the challenge), and it returns an n-bit output (the response) that depends on that particular chip's physical quirks.</p>\n<p><b>Four properties to know:</b></p>\n<table class=\"cs-table\"><thead><tr><th>Property</th><th>Meaning</th></tr></thead><tbody><tr><td><b>Evaluable</b></td><td>Working out the response for a challenge is quick and easy</td></tr><tr><td><b>Unique</b></td><td>The response identifies that specific chip</td></tr><tr><td><b>Unclonable</b></td><td>Nobody, not even the manufacturer, can build another chip that gives the same responses</td></tr><tr><td><b>One-way</b></td><td>Given a response, you can't work back to the challenge</td></tr></tbody></table>\n<p><b>Why PUFs are useful:</b></p>\n<ul><li><b>No stored key to steal.</b> Normally a secret key sits in memory, where an attacker might extract it. With a PUF, the key is generated from the chip's own physics when needed, and deleted afterwards.</li><li><b>Anti-counterfeiting.</b> Record each genuine chip's challenge-response pairs at the factory. Later, test any chip: a fake won't give matching answers.</li><li><b>Key generation.</b> The PUF response seeds a public/private key pair created on the chip itself.</li></ul>\n<p><b>Kinds of PUF:</b></p>\n<ul><li><b>Arbiter PUF:</b> two signals race along paths chosen by the challenge; whichever arrives first decides the bit.</li><li><b>Ring-oscillator PUF:</b> compares the frequencies of two oscillators.</li><li><b>SRAM PUF:</b> the random 0/1 values memory cells take when the power first comes on.</li><li>The course also shows a simple latch-based PUF built on an FPGA.</li></ul></div>\n<div class=\"cs-card\"><h3>Hardware Trojans</h3>\n<p>A <b>hardware Trojan</b> is a <b>malicious, deliberate change to a chip's circuitry</b>, made during design or manufacturing.</p>\n<ul><li>It has a <b>trigger</b> (a condition that wakes it up, e.g. a rare input, or a counter reaching a value: a \"time bomb\").</li><li>And a <b>payload</b> (what it does then: malfunction, leak secret data, shut down).</li></ul>\n<p><b>Why they're a real worry:</b> modern chips are built from third-party design blocks with outside software tools, and are often made in overseas factories. Many parties touch the design, and not all of them are trusted.</p>\n<p><b>Types:</b></p>\n<ul><li><b>Combinational:</b> triggered by a rare combination of inputs.</li><li><b>Sequential:</b> triggered by a sequence over time; counters act like time bombs.</li><li><b>Analog</b> Trojans.</li><li><b>Information-leakage</b> Trojans, including ones that leak through side channels.</li></ul>\n<p><b>Why they're hard to detect:</b></p>\n<ul><li>They add <b>tiny</b> amounts of extra circuitry: a few gates among billions.</li><li>Their triggers are rare by design.</li><li>There are endless possible kinds.</li><li><b>No single detection method catches them all</b>, and every detection method adds its own cost in design, testing or run time.</li></ul>\n<p><b>Detection approaches:</b> destructive (reverse engineering) or non-destructive (logic testing, side-channel measurements); at test time or while running.</p>\n<p><b>A twist:</b> Trojan-like techniques can be used for good too, e.g. to detect tampering or to fingerprint chips for copyright protection.</p></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 10 tests</h3>\n<ul><li>Hardware attacks: probing, electromagnetic analysis.</li><li>Side channels attack the <i>implementation</i>, using timing, power or EM.</li><li>Square-and-multiply counting for x²² (4 squarings, 2 multiplications).</li><li>DPA needs many traces plus statistics; SPA reads one trace.</li><li>PUF evaluability; PUF = Physically Unclonable Function.</li><li>Hardware Trojan definition; Trojans are small and hard to detect.</li><li>Probing is invasive.</li><li>Timing defences: dummy operations and constant-time code (not masking).</li></ul></div>"
+  },
+  {
+   "id": "w11",
+   "title": "Web application attacks",
+   "short": "W11",
+   "tag": "Week 11 · Lectures 51–55",
+   "intro": "<p>Lectures 51–55. This week moves to attacking websites and the databases behind them: the Metasploit framework, SQL injection, the sqlmap tool, and cross-site scripting. The notes stay at the level of ideas, terms and defences, which is what the exam asks about.</p>\n<p><b>Why web servers are a favourite target:</b> firewalls and good network settings now block most network- and OS-level attacks, but a web server has to be reachable from anywhere on the internet. That makes the <i>application</i> running on it the easiest way in.</p>",
+   "html": "<div class=\"cs-card\"><h3>The Metasploit framework</h3>\n<p><b>Metasploit</b> is a penetration-testing platform: a big toolbox for finding a weakness and then taking advantage of it, all in one place. It comes with Kali Linux, is written in Ruby, and has a free and a paid version.</p>\n<p>You drive it from the <b>msfconsole</b> (its command console). A separate tool, <b>msfvenom</b>, builds payloads.</p>\n<h4>The modules</h4>\n<table class=\"cs-table\"><thead><tr><th>Module</th><th>What it is</th></tr></thead><tbody><tr><td><b>Exploit</b></td><td>The code that takes advantage of a specific weakness. Over 2000 are included</td></tr><tr><td><b>Payload</b></td><td>What runs on the target <i>after</i> the exploit works, to set up a channel back to the attacker. Over 500</td></tr><tr><td><b>Auxiliary</b></td><td>Helpers that scan, brute-force or probe, but don't give control of the target</td></tr><tr><td><b>Encoder</b></td><td>Disguises a payload so antivirus doesn't recognise its \"bad\" byte patterns</td></tr><tr><td><b>NOPS</b></td><td>Padding that keeps a payload from crashing</td></tr><tr><td><b>Post</b></td><td>For deeper work <i>after</i> access is gained</td></tr></tbody></table>\n<p><b>Payloads worth knowing:</b></p>\n<ul><li><b>Command shell:</b> run commands on the target.</li><li><b>Meterpreter:</b> a powerful remote-control shell. It can browse, upload and download files, take screenshots, dump passwords, and try to become admin.</li></ul>\n<h4>The commands</h4>\n<p>In Metasploit, <code>show</code> and <code>search</code> <i>list</i> things, and <code>set</code> <i>chooses</i> a value.</p>\n<table class=\"cs-table\"><thead><tr><th>Command</th><th>Does</th></tr></thead><tbody><tr><td><code>search</code></td><td>Find an exploit or payload</td></tr><tr><td><code>use &lt;name&gt;</code></td><td>Select a module</td></tr><tr><td><code>info</code></td><td>Show details of a module (which OS it hits, what to configure)</td></tr><tr><td><code>show targets</code></td><td>List the operating systems an exploit works against</td></tr><tr><td><code>set RHOST</code></td><td>Set the <b>remote</b> (target) IP; LHOST is your own machine</td></tr><tr><td><code>set RPORT</code> / <code>LPORT</code></td><td>Set port numbers</td></tr></tbody></table>\n<p><b>The usual workflow:</b> scan for a weakness → pick an exploit → configure it (target IP, port) → pick a payload → encode it → run the exploit.</p>\n<p><b>Meterpreter commands:</b> <code>hashdump</code> copies out password hashes (to crack offline with Hashcat), <code>getuid</code> shows who you are, <code>getsystem</code> tries for admin, <code>sysinfo</code> shows system details, <code>ps</code> lists running programs.</p></div>\n<div class=\"cs-card\"><h3>SQL injection</h3>\n<p>Many websites build a database question (a query) by pasting your input straight into it. <b>SQL injection</b> abuses that: you type database commands into an ordinary box (like a login field), and the site runs them.</p>\n<p>It isn't a bug in any one program. It's the result of <b>not checking user input</b>, so the fix is always on the website's side.</p>\n<p><b>Example (login bypass):</b> the site runs</p>\n<pre>SELECT * FROM users WHERE username = 'INPUT1' AND password = 'INPUT2'</pre>\n<p>Type <code>admin' OR '1'='1</code> as the username. The <code>'</code> closes the username early, and <code>OR '1'='1'</code> is always true, so the check passes. Adding <code>--</code> comments out the rest (the password check), so it's skipped.</p>\n<p><b>Impact:</b> data theft, altered or deleted data, denial of service, reputation damage.</p>\n<p><b>Types of SQL injection:</b></p>\n<table class=\"cs-table\"><thead><tr><th>Type</th><th>How it tells the attacker what it found</th></tr></thead><tbody><tr><td><b>Error-based</b></td><td>Bad input makes the site show a raw database error, and the error leaks details of the query and tables</td></tr><tr><td><b>UNION-based</b></td><td>Glues an extra query onto the real one to pull out data</td></tr><tr><td><b>Blind – boolean</b></td><td>The site shows no errors, so the attacker asks true/false questions and reads the answer from how the page changes</td></tr><tr><td><b>Blind – time-based</b></td><td>Reads the answer from <i>how long</i> the page takes to respond</td></tr></tbody></table>\n<p><b>Defence:</b> validate and sanitise all input; never paste user input directly into a query (use parameterised queries); show generic error messages.</p></div>\n<div class=\"cs-card\"><h3>sqlmap</h3>\n<p><b>sqlmap</b> is a free tool that <b>automates</b> SQL injection: it finds the flaw and then extracts the data for you. It supports MySQL, Oracle, PostgreSQL, SQL Server, SQLite and more.</p>\n<p>It can list databases, tables and columns, pull out users and password hashes, and even escalate privileges through Metasploit's Meterpreter.</p>\n<p><b>Key options</b> (they go from big to small):</p>\n<table class=\"cs-table\"><thead><tr><th>Option</th><th>Does</th></tr></thead><tbody><tr><td><code>--dbs</code></td><td>List all <b>d</b>ata<b>b</b>ase<b>s</b></td></tr><tr><td><code>--tables</code></td><td>List tables in a database</td></tr><tr><td><code>--columns</code> (<code>-C</code>)</td><td>List columns</td></tr><tr><td><code>--dump</code></td><td>Copy out the actual data</td></tr><tr><td><code>--current-db</code></td><td>The database in use now</td></tr><tr><td><code>--current-user</code></td><td>The current user</td></tr><tr><td><code>--is-dba</code></td><td>Is the user a database admin?</td></tr><tr><td><code>--users</code> / <code>--passwords</code></td><td>List users / their password hashes</td></tr><tr><td><code>-D</code> / <code>-T</code> / <code>-C</code></td><td>Pick a database / table / column</td></tr></tbody></table>\n<p><b>Other web tools named this week:</b> <b>Dirb</b> (brute-forces hidden folders and pages), Hydra, Acunetix.</p></div>\n<div class=\"cs-card\"><h3>Cross-Site Scripting (XSS)</h3>\n<p><b>XSS</b> sneaks the attacker's JavaScript into a web page so it runs in <b>other visitors'</b> browsers. The browser trusts the page, so the script can steal cookies and session tokens, or rewrite the page. Like SQL injection, it happens when a site uses user input in its output without checking it.</p>\n<p><b>The three types:</b></p>\n<table class=\"cs-table\"><thead><tr><th>Type</th><th>Where the script lives</th><th>Example</th></tr></thead><tbody><tr><td><b>Stored</b> (persistent, Type I)</td><td>Saved on the server, e.g. in a comment or forum post</td><td>Everyone who views that page is hit, including an admin reading feedback</td></tr><tr><td><b>Reflected</b> (non-persistent, Type II)</td><td>In a crafted link; the page bounces it straight back</td><td>The victim clicks a malicious link and the script runs</td></tr><tr><td><b>DOM-based</b> (Type 0)</td><td>Entirely in the browser: the page's own JavaScript puts the input into the page unsafely</td><td>The data never even reaches the server</td></tr></tbody></table>\n<p>(The slides also mention \"Server XSS\" vs \"Client XSS\" as a newer way to group these.)</p>\n<p><b>Defences:</b> validate and encode user input, keep server software patched, block unsigned applets, and use content-filtering proxies.</p></div>\n<div class=\"cs-card\"><h3>File upload vulnerability</h3>\n<p>(Lecture 55 also covers this, with command injection.) If a site lets you upload a file but doesn't check what it is, you can upload a malicious script instead of, say, a photo, then run it on the server. Defence: check the file type and contents, rename uploads, and store them where they can't be executed.</p></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 11 tests</h3>\n<ul><li>Metasploit modules: exploit vs payload vs encoder vs auxiliary.</li><li><code>msfconsole</code>; <code>show targets</code>; <code>set RHOST</code>; <code>hashdump</code>.</li><li>Dirb brute-forces directories.</li><li>Error-based SQL injection shows a database error.</li><li>sqlmap <code>--dbs</code> lists databases.</li><li>The three real XSS types (stored, reflected, DOM).</li><li>Classic injection payloads (<code>admin' OR '1'='1</code>, <code>' OR 1=1 --</code>).</li></ul></div>"
+  },
+  {
+   "id": "w12",
+   "title": "NMAP revisited, Wireshark and summary",
+   "short": "W12",
+   "tag": "Week 12 · Lectures 56–60",
+   "intro": "<p>Lectures 56–60. The final week is mostly <b>revision</b>: a deeper, more organised look at NMAP (first met in Weeks 4–5) and Wireshark (Week 9), then a wrap-up. Nothing is really new, so this is a good place to consolidate. The cheat sheet on the Overview tab pulls all the NMAP options together.</p>",
+   "html": "<div class=\"cs-card\"><h3>NMAP: the full picture</h3>\n<p>NMAP (Network Mapper) is a free port scanner written by Gordon Lyon in 1997. One line sums up its job: it sends packets to a target and learns a lot from what comes back. Its four tasks, in order:</p>\n<ol><li><b>Host discovery:</b> which machines are alive?</li><li><b>Port scanning:</b> which ports are open?</li><li><b>Service/version detection:</b> what's running, and which version?</li><li><b>OS detection:</b> which operating system?</li></ol>\n<h4>Host discovery (ping sweeps)</h4>\n<table class=\"cs-table\"><thead><tr><th>Technique</th><th>Option</th><th>How it works</th></tr></thead><tbody><tr><td>ICMP echo</td><td><code>-PE</code></td><td>Ping (type 8); a reply (type 0) means alive. Simple, slow, easily blocked</td></tr><tr><td>Broadcast ICMP</td><td></td><td>One ping to the broadcast address; everyone replies. Routers usually block it</td></tr><tr><td>Non-echo ICMP</td><td><code>-PP</code> (timestamp, type 13), <code>-PM</code> (address mask, type 17)</td><td>Other ICMP questions that get past echo filters</td></tr><tr><td>TCP sweep</td><td><code>-PS</code> (SYN), <code>-PA</code> (ACK)</td><td>TCP to a common port (21, 22, 23, 25, 80). Also shows open ports</td></tr><tr><td>UDP sweep</td><td><code>-PU</code></td><td>A \"port unreachable\" reply means closed. Unreliable</td></tr></tbody></table>\n<h4>Port scans</h4>\n<table class=\"cs-table\"><thead><tr><th>Scan</th><th>Option</th><th>Open port</th><th>Closed port</th></tr></thead><tbody><tr><td>TCP Connect (full handshake)</td><td><code>-sT</code></td><td>Handshake completes</td><td>RST/ACK</td></tr><tr><td>TCP SYN (half-open)</td><td><code>-sS</code></td><td>SYN/ACK</td><td>RST/ACK</td></tr><tr><td>Stealth (FIN/NULL/Xmas)</td><td><code>-sF</code> / <code>-sN</code> / <code>-sX</code></td><td><b>No reply</b></td><td>RST</td></tr><tr><td>FTP bounce</td><td><code>-b</code></td><td></td><td></td></tr><tr><td>UDP</td><td><code>-sU</code></td><td></td><td></td></tr></tbody></table>\n<p>Remember the reversal: in a SYN scan, <b>SYN/ACK = open, RST = closed</b>. In stealth scans, <b>silence = open</b>.</p>\n<h4>Useful options</h4>\n<table class=\"cs-table\"><thead><tr><th>Option</th><th>Meaning</th></tr></thead><tbody><tr><td><code>-sL</code></td><td>Just list the targets; send nothing</td></tr><tr><td><code>-sn</code> / <code>-sP</code></td><td>Only check which hosts are up (no port scan)</td></tr><tr><td><code>-Pn</code></td><td>Skip discovery; assume every host is up</td></tr><tr><td><code>-p 22,80</code> / <code>-p 1-65535</code></td><td>Scan these ports</td></tr><tr><td><code>-F</code></td><td>Fast: the top 100 ports</td></tr><tr><td><code>--top-ports N</code></td><td>The N most common ports</td></tr><tr><td><code>-r</code></td><td>Scan in order, not randomly</td></tr><tr><td><code>-O</code> / <code>-sV</code> / <code>-A</code></td><td>OS / version / everything</td></tr><tr><td><code>--reason</code></td><td>Explain each port's state</td></tr><tr><td><code>--script vuln</code></td><td>Run vulnerability-check scripts</td></tr></tbody></table>\n<h4>Counting questions (the exam likes these)</h4>\n<ul><li><code>nmap --top-ports 20 target</code> scans exactly <b>20</b> ports.</li><li><code>nmap -sL 10.10.5.100-115</code> covers <b>16</b> addresses: 115 − 100 + 1. Don't forget the +1.</li><li><code>-sn</code> statement: host discovery only, no port scan. <code>-Pn</code>: skips discovery, goes straight to scanning. Both are true; they're opposites.</li></ul>\n<h4>Scanning many targets</h4>\n<pre>nmap 144.16.192.70           # one host\nnmap 144.16.192.100-150      # a range\nnmap 144.16.192.0/24         # a whole subnet\nnmap -iL list.txt            # targets from a file\nnmap 144.16.192.0/24 --exclude 144.16.192.60-70</pre>\n<h4>Detection and evasion</h4>\n<ul><li><b>OS/version detection</b> relies on <b>TCP/IP fingerprinting</b>: operating systems answer odd packets slightly differently. For example, Windows acknowledges a certain packet with sequence number + 1; Linux sets a distinctive Type-of-Service value.</li><li><b>Admins spot scans by:</b> checking logs for odd packets, connections that never finished, and unusual port usage.</li><li><b>Scanners avoid detection by:</b> randomising port order, scanning very slowly, spoofing the source address, or coordinating several scanners.</li></ul></div>\n<div class=\"cs-card\"><h3>Wireshark recap</h3>\n<p>Wireshark is the free network analyser (sniffer). It <b>captures</b> traffic and shows it in readable form, <b>logs</b> it for investigations, and <b>filters</b> it, but only watches, it never changes traffic.</p>\n<ul><li>It puts the network card in <b>promiscuous mode</b> (needs root) to keep every frame on the segment. On a switch, you mostly see only your own traffic.</li><li>Start a capture by double-clicking a network adapter or using the Capture menu.</li><li><b>Three panes:</b> packet list (number, time, source, destination, protocol, length, info), packet details (each header expanded), and raw bytes (hex and ASCII).</li><li>Type a filter like <code>tcp</code>, <code>ip</code> or <code>http</code> in the filter bar: it turns <b>green</b> when valid, <b>red</b> when not.</li></ul></div>\n<div class=\"cs-card\"><h3>Course wrap-up</h3>\n<p>Looking back, the course built up in layers, each one needed for the next:</p>\n<ol><li><b>Weeks 1–3 – Networking:</b> how data moves (packets, TCP/IP, addresses, routing). You can't attack what you don't understand.</li><li><b>Weeks 4–5 – Finding targets:</b> reconnaissance, scanning with NMAP, then finding weaknesses, cracking passwords and recognising malware.</li><li><b>Weeks 6–7 – Cryptography:</b> the defensive core, keeping data secret (encryption) and trustworthy (hashes, signatures, TLS).</li><li><b>Weeks 8–9 – More attacks:</b> steganography, biometrics, denial of service, sniffing and social engineering.</li><li><b>Week 10 – Hardware:</b> attacks on the chip itself, where even perfect maths can leak.</li><li><b>Weeks 11–12 – Web and tools:</b> Metasploit, SQL injection, XSS, then a final deep dive on NMAP and Wireshark.</li></ol>\n<p><b>The one idea to carry away:</b> ethical hacking is about understanding how systems work well enough to find their weak points, so they can be fixed, always with permission, and always within the law.</p></div>\n<div class=\"cs-callout\"><h3>🎯 What Assignment 12 tests</h3>\n<p>Almost entirely NMAP:</p>\n<ul><li>ICMP type 0 reply = host alive.</li><li><code>-PS</code>/<code>-PA</code> are the TCP sweeps.</li><li><code>-sn</code> does ICMP + TCP sweeps, not UDP.</li><li><code>-Pn</code> treats all hosts as online.</li><li><code>-F</code> scans the top 100 ports (not 1000).</li><li><code>-sU</code> is the UDP scan; TCP Connect (<code>-sT</code>) completes the full handshake.</li><li>Counting: <code>--top-ports 20</code> = 20; <code>-sL 10.10.5.100-115</code> = 16.</li></ul></div>"
+  }
+ ],
+ "quizIntros": {
+  "W0": "This is an ungraded warm-up on computer basics (14 questions). The course published no official solution for it, so these answers were worked out from standard networking facts.",
+  "W1": "Topics: what ethical hacking is, how networks send data, and the TCP/IP headers. 10 questions, 1 mark each.",
+  "W2": "Topics: reading IP headers, TCP flags, IP address ranges, ports and subnetting. 10 questions.",
+  "W3": "Topics: how routers decide where packets go, routing protocols (RIP, OSPF, BGP) and IPv6. 10 questions.  Watch out: Q2, Q6 and Q8 ask which statements are <b>false</b>.",
+  "W4": "Topics: building a practice lab with virtual machines, gathering information about a target, and scanning with NMAP. 10 questions.  <b>NMAP in one line:</b> a free tool that knocks on a computer's ports to find out which ones are open and what's running behind them.",
+  "W5": "Topics: NMAP scripts, vulnerability scanners, password cracking, malware and attacks on network switches. 10 questions.",
+  "W6": "Topics: types of attack, simple ciphers, hashing, and private-key vs public-key cryptography. 10 questions.  <b>Two kinds of encryption to know:</b>  - <b>Symmetric (private-key):</b> both people share the <i>same</i> secret key, like a house key with a copy. Example: DES, AES. - <b>Asymmetric (public-key):</b> each person has a <i>pair</i>. The <b>public key</b> is like an open padlock anyone can use to lock a box for you; the <b>private key</b> is the only key that opens it. Example: RSA.",
+  "W7": "Topics: hash functions, digital signatures, and where cryptography is used (HTTPS/TLS, IPSec). 10 questions.  <b>Sizes worth memorising for this week:</b>  | Algorithm | What it is | Key number | | --- | --- | --- | | DES | Symmetric encryption | 64-bit block, 56-bit key | | Triple DES | DES run three times | Up to 168-bit key | | MD5 | Hash | 128-bit output | | SHA-256 | Hash | 256-bit output | | SHA-512 | Hash | 512-bit output, 1024-bit blocks |",
+  "W8": "Topics: hiding data inside files (steganography), biometrics, denial-of-service attacks, and DNS/email security. 10 questions.",
+  "W9": "Topics: sniffing (eavesdropping on network traffic), the tools for it, social engineering and denial of service. 10 questions.  <b>Sniffing in one line:</b> recording the data flowing over a network so you can read it, like listening in on a phone line.",
+  "W10": "Topics: attacks on physical hardware, side-channel attacks, PUFs and hardware Trojans. 10 questions.  <b>Side-channel attack in one line:</b> instead of breaking the maths of a lock, you listen to its clicks. The attacker learns secrets from how long a chip takes, how much power it draws, or the radio noise it gives off.",
+  "W11": "Topics: the Metasploit attack framework, web hacking tools, SQL injection and cross-site scripting. 10 questions.  <b>Metasploit vocabulary</b> (Q1–Q5 all use it):  | Term | Plain meaning | | --- | --- | | Exploit | The break-in trick that uses a known weakness | | Payload | What runs on the target after you're in (e.g. a remote control shell) | | Encoder | Disguises the payload so antivirus doesn't spot it | | Auxiliary | Helper tasks: scanning, brute-forcing | | RHOST / RPORT | <b>R</b>emote = the target's IP / port | | LHOST / LPORT | <b>L</b>ocal = the attacker's own IP / port | | Meterpreter | Metasploit's powerful remote-control shell on the victim |",
+  "W12": "Topics: a second, deeper look at NMAP. 10 questions, almost all about NMAP options.  <b>NMAP options cheat sheet</b> (covers Weeks 4, 5 and 12):  | Option | What it does | | --- | --- | | -sn | Only check which hosts are alive. <b>No</b> port scan | | -Pn | Skip the alive check; assume every host is up and scan ports | | -sL | Just <b>L</b>ist the targets. Sends nothing | | -PE / -PS / -PA / -PU | Alive check with ICMP <b>E</b>cho / TCP <b>S</b>YN / TCP <b>A</b>CK / <b>U</b>DP | | -sS | SYN (\"stealth\", half-open) port scan | | -sT | TCP connect scan: completes the full handshake | | -sU | <b>U</b>DP port scan | | -F | <b>F</b>ast: only the top 100 ports | | --top-ports N | Scan the N most common ports | | -O / -sV / -A | Detect OS / service versions / all of it plus scripts | | -sC | Run default scripts |"
+ },
+ "quiz": [
+  {
+   "topic": "W0",
+   "q": "What is ethical hacking?",
+   "why": "<p>The word \"ethical\" is the key. An ethical hacker is hired by the owner and has permission, like a locksmith the homeowner pays to test their locks. Option (a) describes a criminal hacker.</p>",
+   "options": [
+    "Unauthorized intrusion into a system or network to commit malicious acts (privacy invasion, data theft)",
+    "Systematically attempting to penetrate a system/network <b>on behalf of its owner</b> to find threats and vulnerabilities"
+   ],
+   "answer": 1,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which application(s) are used to secure a personal laptop/desktop?",
+   "why": "<p>An antivirus finds and removes harmful programs. A firewall is a security guard that decides which network traffic may come in or go out. A virus and malware are the <i>threats</i>, not the protection.</p>",
+   "options": [
+    "Antivirus",
+    "Virus",
+    "Malware",
+    "Firewall"
+   ],
+   "answer": [
+    0,
+    3
+   ],
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "What does LAN stand for?",
+   "why": "<p>LAN = Local Area Network: the network inside one home, office or building.</p>",
+   "options": [
+    "Long Area Network",
+    "Large Area Network",
+    "Local Area Network",
+    "Light Area Network"
+   ],
+   "answer": 2,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which device is used to connect two different networks?",
+   "why": "<p>A router joins <i>different</i> networks, like your home Wi-Fi and the internet. A switch and a hub connect devices <i>within</i> one network. A repeater just boosts a weak signal.</p>",
+   "options": [
+    "Switch",
+    "Router",
+    "Hub",
+    "Repeater"
+   ],
+   "answer": 1,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which protocol is used to send emails?",
+   "why": "<p>SMTP = Simple <b>Mail</b> Transfer Protocol. FTP moves files, HTTP loads web pages, and SNMP manages network devices.</p>",
+   "options": [
+    "FTP",
+    "SMTP",
+    "HTTP",
+    "SNMP"
+   ],
+   "answer": 1,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which Linux command(s) can be used to view network configuration?",
+   "why": "<p><code>ifconfig</code> shows your network settings (IP address and so on) on Linux. <code>ipconfig</code> is the <i>Windows</i> version. <code>ls</code> lists files and <code>cd</code> changes folder.</p>",
+   "options": [
+    "ipconfig",
+    "ifconfig",
+    "ls",
+    "cd",
+    "None of these"
+   ],
+   "answer": 1,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "How many layers are there in the OSI model?",
+   "why": "<p>The OSI model splits networking into 7 layers: Physical, Data Link, Network, Transport, Session, Presentation, Application. A memory trick: \"Please Do Not Throw Sausage Pizza Away\".</p>",
+   "numeric": {
+    "lo": 7,
+    "hi": 7,
+    "text": "7"
+   },
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which of the following is/are transport layer protocol(s)?",
+   "why": "<p>TCP and UDP both work at the transport layer (layer 4). IP is at the network layer (3) and Ethernet at the data link layer (2).</p>",
+   "options": [
+    "UDP",
+    "TCP",
+    "IP",
+    "Ethernet"
+   ],
+   "answer": [
+    0,
+    1
+   ],
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which OSI layer is responsible for reliable data transmission?",
+   "why": "<p>The transport layer (where TCP lives) makes sure all data arrives, in order, and resends anything lost.</p>",
+   "options": [
+    "Data-Link",
+    "Network",
+    "Transport",
+    "Application"
+   ],
+   "answer": 2,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which port number is normally used by HTTP?",
+   "why": "<p>Web traffic (HTTP) uses port 80. Ports 20/21 are for FTP and 110 is for POP3 email.</p>",
+   "options": [
+    "80",
+    "20",
+    "21",
+    "110"
+   ],
+   "answer": 0,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which of the following is/are NOT a valid IP address?",
+   "why": "<p>Each of the four numbers in an IPv4 address must be between 0 and 255. In (d), 296 is too big. All the others stay within 0–255.</p>",
+   "options": [
+    "192.168.1.9",
+    "255.102.3.25",
+    "225.250.10.3",
+    "192.168.296.1"
+   ],
+   "answer": 3,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "In IPv6, the number of bits used in an IP address is ____.",
+   "why": "<p>IPv4 addresses are 32 bits; IPv6 addresses are 128 bits. That makes far more addresses possible.</p>",
+   "numeric": {
+    "lo": 128,
+    "hi": 128,
+    "text": "128"
+   },
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which command(s) can check the reachability of one system from another?",
+   "why": "<p><code>ping</code> sends a small \"are you there?\" message and waits for a reply. <code>ls</code> lists files and <code>mkdir</code> makes a folder.</p>",
+   "options": [
+    "ping",
+    "ls",
+    "mkdir",
+    "None of these"
+   ],
+   "answer": 0,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W0",
+   "q": "Which network covers a small area like a room or building?",
+   "why": "<p>LAN = local (a room or building), MAN = metropolitan (a city), WAN = wide (countries; the internet is the biggest WAN).</p>",
+   "options": [
+    "LAN",
+    "WAN",
+    "MAN",
+    "None of these"
+   ],
+   "answer": 0,
+   "note": "unofficial key"
+  },
+  {
+   "topic": "W1",
+   "q": "Which of the following belong to the CIA Triad in information security?",
+   "why": "<p>The CIA Triad is the three basic goals of security:</p>\n<ul><li><b>Confidentiality:</b> only the right people can read it (your bank balance is private).</li><li><b>Integrity:</b> nobody can secretly change it (no one edits your balance).</li><li><b>Availability:</b> it works when you need it (the bank app isn't down).</li></ul>\n<p>The other options are real security ideas but are not part of the triad.</p>",
+   "options": [
+    "Confidentiality",
+    "Authentication",
+    "Availability",
+    "Accountability",
+    "Integrity",
+    "Authorization"
+   ],
+   "answer": [
+    0,
+    2,
+    4
+   ]
+  },
+  {
+   "topic": "W1",
+   "q": "Which penetration testing model gives the tester no prior information about the target network?",
+   "why": "<p>Picture a box you can or can't see into. <b>Black box</b> = you see nothing and start blind, like a real outside attacker. <b>White box</b> = you get full details. <b>Gray box</b> = partial details. \"Blue box\" isn't a testing model.</p>",
+   "options": [
+    "White box model",
+    "Black box model",
+    "Gray box model",
+    "Blue box model"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W1",
+   "q": "Which statement(s) are true for packet-switched networks?",
+   "why": "<p>Packet switching is like the postal system. Your message is cut into small envelopes (packets) that share the same roads as everyone else's mail. The opposite, <b>circuit switching</b>, is like an old phone call: a dedicated line reserved just for you (options a, c, d). Packets can get delayed or lost, so (f) is false.</p>",
+   "options": [
+    "Bandwidth is dedicated for the entire session",
+    "Multiple connections can share the same link",
+    "Delay is always constant regardless of load",
+    "Requires end-to-end circuit setup before data transfer",
+    "Data is divided into smaller packets before transmission",
+    "Guarantees zero packet loss"
+   ],
+   "answer": [
+    1,
+    4
+   ]
+  },
+  {
+   "topic": "W1",
+   "q": "Which OSI layer handles framing, MAC addressing, and error detection over a physical link?",
+   "why": "<p>The <b>data link layer</b> (layer 2) packs bits into \"frames\" and uses MAC addresses (hardware IDs) to deliver between two directly connected devices. The physical layer just sends raw 1s and 0s; the network layer handles IP addresses and routing.</p>",
+   "options": [
+    "Physical layer",
+    "Data link layer",
+    "Network layer",
+    "Transport layer",
+    "Session layer"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W1",
+   "q": "A 1500-byte packet is sent over a 100 Kbps link with 8 ms propagation delay. When does it reach the destination (in ms)? (1K = 1000)",
+   "why": "<p>Total time = time to push the bits onto the wire + time to travel.</p>\n<ol><li>Convert to bits: 1500 bytes × 8 = 12,000 bits.</li><li>Push time (transmission): 12,000 ÷ 100,000 bits/sec = 0.12 s = 120 ms.</li><li>Travel time (propagation): 8 ms.</li><li>Total: 120 + 8 = <b>128 ms</b>.</li></ol>",
+   "numeric": {
+    "lo": 120,
+    "hi": 130,
+    "text": "128 ms (accepted range 120–130)"
+   }
+  },
+  {
+   "topic": "W1",
+   "q": "What is the primary purpose of an IP address?",
+   "why": "<p>An IP address is a device's address on a network, so data can be routed to the right place, like a house address for mail.</p>",
+   "options": [
+    "Identifies the hardware manufacturer",
+    "Uniquely identifies a host or interface on a network",
+    "Specifies the number of open ports",
+    "Determines the encryption algorithm"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W1",
+   "q": "What is the minimum size (in bytes) of a TCP header without options?",
+   "why": "<p>Every TCP packet carries a \"label\" (header) with info like port numbers. With no extras it is 20 bytes; with options it can grow up to 60 bytes.</p>",
+   "numeric": {
+    "lo": 20,
+    "hi": 20,
+    "text": "20"
+   }
+  },
+  {
+   "topic": "W1",
+   "q": "Which IP header field is decremented at every router hop, to stop packets looping forever?",
+   "why": "<p>TTL is a countdown. Every router the packet passes through subtracts 1, and at 0 the packet is thrown away. That way a lost packet can't circle the internet forever.</p>",
+   "options": [
+    "Header checksum",
+    "Fragment offset",
+    "Time to Live (TTL)",
+    "HLEN",
+    "Identification"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W1",
+   "q": "If the IP header is 224 bits long, what is the value of the HLEN field (in decimal)?",
+   "why": "<p>HLEN doesn't store the length directly. It counts in chunks of 32 bits (4 bytes). So 224 ÷ 32 = <b>7</b>.</p>",
+   "numeric": {
+    "lo": 7,
+    "hi": 7,
+    "text": "7"
+   }
+  },
+  {
+   "topic": "W1",
+   "q": "How many bits are used to represent a MAC address?",
+   "why": "<p>A MAC address is the permanent hardware ID of a network card. It is 48 bits, usually written as 12 hex digits like <code>00:1A:2B:3C:4D:5E</code>.</p>",
+   "numeric": {
+    "lo": 48,
+    "hi": 48,
+    "text": "48"
+   }
+  },
+  {
+   "topic": "W2",
+   "q": "An IP packet arrives with the first eight bits 0100 0101. How many bytes are in the OPTIONS field?",
+   "why": "<p>Split the 8 bits into two halves.</p>\n<ol><li>First half <code>0100</code> = 4, meaning IP version 4.</li><li>Second half <code>0101</code> = 5. This is HLEN, counted in 4-byte chunks: 5 × 4 = 20 bytes.</li><li>20 bytes is the smallest possible IP header, so there is no room left for options: 20 − 20 = <b>0</b>.</li></ol>",
+   "numeric": {
+    "lo": 0,
+    "hi": 0,
+    "text": "0"
+   }
+  },
+  {
+   "topic": "W2",
+   "q": "Which is/are true for TCP header flag bits?",
+   "why": "<p>TCP flags are on/off switches in the packet label. Starting a connection is like a phone greeting:</p>\n<ul><li><b>SYN</b> (\"hello, can we talk?\") = request (a)</li><li><b>SYN + ACK</b> (\"yes, I hear you\") = confirmation (b)</li><li><b>URG</b> = this part is urgent (e)</li></ul>\n<p>The trap: <b>FIN</b> is the <i>polite</i> goodbye, and <b>RST</b> is slamming the phone down. Options (c) and (d) swap them.</p>",
+   "options": [
+    "SYN=1, ACK=0 indicates a connection request",
+    "SYN=1, ACK=1 indicates connection confirmation",
+    "FIN is used to reject a connection",
+    "RST is used to gracefully terminate a connection",
+    "URG indicates urgent data"
+   ],
+   "answer": [
+    0,
+    1,
+    4
+   ]
+  },
+  {
+   "topic": "W2",
+   "q": "Which is a valid broadcast address for its subnet?",
+   "why": "<p>A broadcast address means \"send to everyone on this network\". You get it by setting all the host part to the maximum (255s).</p>\n<ul><li>The <code>/number</code> says how many bits are the network part; the rest is the host part.</li><li>/8 → last three numbers are host → 10.<b>255.255.255</b> (a is correct).</li><li>/24 → last number is host → 192.168.5.<b>255</b> (c is correct).</li><li>(b) and (e) end in zeros: that's the <i>network</i> address (the name of the network), not broadcast.</li><li>(d) for /16 should be 172.16.255.<b>255</b>.</li></ul>",
+   "options": [
+    "10.255.255.255 for 10.0.0.0/8",
+    "10.20.0.0 for 10.20.0.0/16",
+    "192.168.5.255 for 192.168.5.0/24",
+    "172.16.255.0 for 172.16.0.0/16",
+    "192.168.5.0 for 192.168.5.0/24"
+   ],
+   "answer": [
+    0,
+    2
+   ]
+  },
+  {
+   "topic": "W2",
+   "q": "A packet arrives with D flag = 0, M flag = 0, offset = 5. Which is true?",
+   "why": "<p>Big packets can be chopped into pieces (fragments).</p>\n<ul><li><b>M = 0</b> (\"More fragments\" = no) means nothing comes after this piece.</li><li><b>Offset = 5</b> (not 0) means this piece isn't at the start, so the packet <i>was</i> chopped.</li></ul>\n<p>Not first, nothing after it, so it's the <b>last piece</b>.</p>",
+   "options": [
+    "The packet has not been fragmented",
+    "The packet is the first fragment",
+    "The packet is the last fragment of a fragmented packet",
+    "The packet will be dropped due to invalid flags"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W2",
+   "q": "Which IP address ranges are reserved for private use?",
+   "why": "<p>Private addresses are for inside homes and offices and never appear on the public internet (your home Wi-Fi probably uses 192.168.x.x). Memorise the three ranges: <b>10.x</b>, <b>172.16–172.31</b>, <b>192.168.x</b>. The others are special-purpose: 169.254 is the address a computer gives itself when it can't get one, 224–239 is multicast, and 100.64 is for ISPs.</p>",
+   "options": [
+    "10.0.0.0–10.255.255.255",
+    "100.64.0.0–100.127.255.255",
+    "172.16.0.0–172.31.255.255",
+    "192.168.0.0–192.168.255.255",
+    "169.254.0.0–169.254.255.255",
+    "224.0.0.0–239.255.255.255"
+   ],
+   "answer": [
+    0,
+    2,
+    3
+   ]
+  },
+  {
+   "topic": "W2",
+   "q": "Which well-known ports are correctly matched with their service?",
+   "why": "<p>The correct pairs to memorise:</p>\n<div class=\"tbl\"><table><thead><tr><th>Service</th><th>Port</th><th>What it does</th></tr></thead><tbody><tr><td>FTP</td><td>21</td><td>File transfer</td></tr><tr><td>SSH</td><td>22</td><td>Secure remote login</td></tr><tr><td>Telnet</td><td>23</td><td>Old, insecure remote login</td></tr><tr><td>SMTP</td><td>25</td><td>Sending email</td></tr><tr><td>DNS</td><td>53</td><td>Turns names (google.com) into IP addresses</td></tr><tr><td>HTTP</td><td>80</td><td>Web pages</td></tr></tbody></table></div>\n<p>Options c–f shuffle these numbers.</p>",
+   "options": [
+    "HTTP – 80",
+    "FTP – 21",
+    "SSH – 25",
+    "DNS – 23",
+    "Telnet – 53",
+    "SMTP – 22"
+   ],
+   "answer": [
+    0,
+    1
+   ]
+  },
+  {
+   "topic": "W2",
+   "q": "What subnet mask corresponds to CIDR /26?",
+   "why": "<p>/26 means 26 ones, then zeros, out of 32 bits.</p>\n<ol><li>The first 24 ones fill three numbers: 255.255.255.</li><li>That leaves 2 more ones in the last number: <code>11000000</code>.</li><li><code>11000000</code> = 128 + 64 = <b>192</b>, giving 255.255.255.192.</li></ol>\n<p>Quick table: /25 = 128, /26 = 192, /27 = 224, /28 = 240.</p>",
+   "options": [
+    "255.255.255.0",
+    "255.255.255.128",
+    "255.255.255.192",
+    "255.255.255.224",
+    "255.255.255.240"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W2",
+   "q": "Which statements about IPv4 fragmentation and the \"Don't Fragment\" (DF) bit are true?",
+   "why": "<p>MTU is the biggest packet a link can carry. DF = 1 is a \"do not cut me\" sticker. If the packet is too big and can't be cut, the router throws it away and sends back an error (a). With DF = 0 the router may cut it (c). DF lives in the <i>Flags</i> field, not the offset, and it never guarantees delivery.</p>",
+   "options": [
+    "If DF = 1 and the packet exceeds the MTU, it is dropped and an error is generated",
+    "If DF = 1, the router fragments the packet regardless",
+    "If DF = 0, fragmentation is allowed if needed",
+    "DF is part of the Fragment Offset field",
+    "DF = 1 guarantees delivery"
+   ],
+   "answer": [
+    0,
+    2
+   ]
+  },
+  {
+   "topic": "W2",
+   "q": "A packet has HLEN = 12 and TOTAL LENGTH = 900 bytes. How many data bytes does it carry?",
+   "why": "<ol><li>HLEN counts 4-byte chunks: header = 12 × 4 = 48 bytes.</li><li>Data = total − header = 900 − 48 = <b>852 bytes</b>.</li></ol>",
+   "numeric": {
+    "lo": 852,
+    "hi": 852,
+    "text": "852"
+   }
+  },
+  {
+   "topic": "W2",
+   "q": "What is the size (in bytes) of a UDP header?",
+   "why": "<p>UDP is the simple, no-frills protocol. Its header has just 4 fields (source port, destination port, length, checksum) of 2 bytes each: 4 × 2 = <b>8 bytes</b>. Compare TCP's minimum of 20.</p>",
+   "numeric": {
+    "lo": 8,
+    "hi": 8,
+    "text": "8"
+   }
+  },
+  {
+   "topic": "W3",
+   "q": "Which is/are true about the connectionless routing used by IP?",
+   "why": "<p>\"Connectionless\" means no route is booked in advance. Each packet is like a separate letter: every post office (router) decides on the spot where to send it next. So two letters from the same sender can travel different roads.</p>",
+   "options": [
+    "Each packet is treated as an independent unit for routing",
+    "A fixed path is set up before any packet is sent",
+    "Packets between the same source and destination may take different paths",
+    "IP uses connection-oriented routing"
+   ],
+   "answer": [
+    0,
+    2
+   ]
+  },
+  {
+   "topic": "W3",
+   "q": "Which is/are FALSE about direct and indirect delivery?",
+   "why": "<p>Direct delivery is handing a note to someone in the same room: no router needed. That makes (c) false. Indirect delivery goes through routers until it reaches the destination's network. The final router then hands it over directly, which is why (e) is true.</p>",
+   "options": [
+    "Direct delivery happens when sender and destination are on the same physical network",
+    "Indirect delivery happens when the destination is on a different network",
+    "In direct delivery, packets always pass through at least one router",
+    "In indirect delivery, the packet is routed hop by hop to a router on the destination's network",
+    "Direct delivery can happen between the last router and the destination host"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W3",
+   "q": "Which routing table flag says a route is for a single host rather than a whole network?",
+   "why": "<p><b>H = Host</b>: the route points to one specific computer. Other common flags: U = route is Up, G = goes through a Gateway (router).</p>",
+   "options": [
+    "U",
+    "G",
+    "H",
+    "D",
+    "M"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W3",
+   "q": "In OSPF, which packet type checks whether a neighbouring router is alive?",
+   "why": "<p>OSPF routers regularly send each other a \"Hello\". If a neighbour stops saying hello for a while, it's treated as down. It works like a check-in call.</p>",
+   "options": [
+    "Link State Update",
+    "Link State Request",
+    "Hello packet",
+    "Link State Acknowledgement",
+    "TCP SYN packet"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W3",
+   "q": "Which address type delivers a packet to every host on a specific network?",
+   "why": "<ul><li><b>Unicast</b> = to one person.</li><li><b>Broadcast</b> = to everyone on the network, like a loudspeaker announcement.</li><li><b>Anycast</b> = to the nearest one of a group.</li></ul>",
+   "options": [
+    "Unicast address",
+    "Broadcast address",
+    "Anycast address",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W3",
+   "q": "Which is/are FALSE about routing protocols?",
+   "why": "<p>An <b>autonomous system (AS)</b> is one organisation's network, such as an ISP. There are two kinds of protocol:</p>\n<ul><li><b>Inside one AS</b> (interior): RIP and OSPF.</li><li><b>Between ASes</b> (exterior): BGP, the protocol that glues the internet together.</li></ul>\n<p>Options (c) and (e) swap these roles, so they're false. (a), (b) and (d) are correct facts.</p>",
+   "options": [
+    "RIP uses distance vector routing and can suffer from count-to-infinity",
+    "OSPF is a link-state protocol",
+    "BGP is used for routing within a single autonomous system",
+    "OSPF uses Dijkstra's algorithm for shortest paths",
+    "RIP is typically used between different autonomous systems"
+   ],
+   "answer": [
+    2,
+    4
+   ]
+  },
+  {
+   "topic": "W3",
+   "q": "What address represents the default route in an IPv4 routing table?",
+   "why": "<p>The default route is the \"if nothing else matches, send it here\" rule. It's written 0.0.0.0/0, meaning \"any address\". For comparison, 127.0.0.1 means \"this computer itself\" and 255.255.255.255 is a broadcast.</p>",
+   "options": [
+    "127.0.0.1",
+    "255.255.255.255",
+    "0.0.0.0",
+    "192.0.0.1",
+    "None of these"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W3",
+   "q": "Which is/are FALSE about IPv6?",
+   "why": "<p>IPv6 dropped the old Class A/B/C system, so (a) is false. Its base header is a <b>fixed 40 bytes</b>; the 20–60 byte range describes IPv4, so (d) is false. (b) is true, e.g. <code>2001:db8::1</code>. (c) is true: in IPv6 only the sender may split packets.</p>",
+   "options": [
+    "IPv6 has address classes like IPv4 (Class A, B, C)",
+    "IPv6 addresses are written in hexadecimal, separated by colons",
+    "IPv6 removes the need for routers along the way to fragment packets",
+    "The IPv6 base header is variable, from 20 to 60 bytes"
+   ],
+   "answer": [
+    0,
+    3
+   ]
+  },
+  {
+   "topic": "W3",
+   "q": "How many bits are used for Hop Limit in the IPv6 base header?",
+   "why": "<p>Hop Limit is IPv6's version of TTL: a countdown reduced by 1 at each router. It is 8 bits, so it can count up to 255.</p>",
+   "numeric": {
+    "lo": 8,
+    "hi": 8,
+    "text": "8"
+   }
+  },
+  {
+   "topic": "W3",
+   "q": "An organisation is given the block 172.20.64.0/20. How many valid host addresses does it have?",
+   "why": "<ol><li>An IPv4 address has 32 bits. /20 uses 20 for the network, leaving 32 − 20 = 12 bits for hosts.</li><li>12 bits give 2¹² = 4096 addresses.</li><li>Two can't be given to devices: the network address (all zeros) and the broadcast address (all ones).</li><li>4096 − 2 = <b>4094</b>.</li></ol>\n<p>General formula: usable hosts = 2<sup>32 − prefix</sup> − 2.</p>",
+   "numeric": {
+    "lo": 4094,
+    "hi": 4094,
+    "text": "4094"
+   }
+  },
+  {
+   "topic": "W4",
+   "q": "What is the main purpose of a hypervisor in a pen-testing lab?",
+   "why": "<p>A virtual machine (VM) is a pretend computer running inside your real one. The <b>hypervisor</b> (e.g. VirtualBox) is the software that creates and runs them. This lets you build a safe practice lab, with an attacker VM and a victim VM, on one laptop.</p>",
+   "options": [
+    "Encrypts all traffic between virtual machines",
+    "Lets you create and manage multiple virtual machines on one physical computer",
+    "A hack-proof security layer for the host OS",
+    "Automatically patches guest machines",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W4",
+   "q": "Which information can a Whois lookup typically NOT give you?",
+   "why": "<p>Whois is the public register of who owns a domain name: owner, contacts, name servers, expiry date. Old copies of a website come from a different service, the Wayback Machine at archive.org.</p>",
+   "options": [
+    "Domain registration details",
+    "Name servers",
+    "Registrant contact information",
+    "Historical snapshots of the website",
+    "Domain expiration date"
+   ],
+   "answer": 3
+  },
+  {
+   "topic": "W4",
+   "q": "How does host discovery with an ICMP Echo sweep work?",
+   "why": "<p>This is just <code>ping</code> sent to many addresses. Type 8 = Echo <b>Request</b> (\"are you there?\"), type 0 = Echo <b>Reply</b> (\"yes!\"). A reply means the computer is switched on.</p>",
+   "options": [
+    "An ICMP type-8 request is sent and an ICMP type-0 reply confirms the host is alive",
+    "A TCP SYN is sent and an ACK confirms the host is alive",
+    "ARP requests are broadcast to find all hosts",
+    "None of these"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W4",
+   "q": "Which NMAP option(s) perform a TCP-based host discovery sweep?",
+   "why": "<p>NMAP's <code>-P?</code> options are different ways to check if a host is alive. The letter after P tells you the method:</p>\n<div class=\"tbl\"><table><thead><tr><th>Option</th><th>Sends</th><th>Type</th></tr></thead><tbody><tr><td>-PS</td><td>TCP <b>S</b>YN</td><td>TCP</td></tr><tr><td>-PA</td><td>TCP <b>A</b>CK</td><td>TCP</td></tr><tr><td>-PE</td><td>ICMP <b>E</b>cho</td><td>ICMP</td></tr><tr><td>-PM</td><td>ICMP net<b>M</b>ask</td><td>ICMP</td></tr><tr><td>-PU</td><td><b>U</b>DP</td><td>UDP</td></tr></tbody></table></div>\n<p>Only -PS and -PA use TCP.</p>",
+   "options": [
+    "-PE",
+    "-PS",
+    "-PA",
+    "-PU",
+    "-PM"
+   ],
+   "answer": [
+    1,
+    2
+   ]
+  },
+  {
+   "topic": "W4",
+   "q": "In the TCP three-way handshake, what does the client send first?",
+   "why": "<p>The handshake is three steps:</p>\n<ol><li>Client: <b>SYN</b> (\"can we talk?\")</li><li>Server: <b>SYN-ACK</b> (\"yes, can you hear me?\")</li><li>Client: <b>ACK</b> (\"yes, let's go\")</li></ol>",
+   "options": [
+    "ACK",
+    "SYN",
+    "SYN-ACK",
+    "RST",
+    "FIN"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W4",
+   "q": "In a TCP SYN (stealth) scan, which responses mean a port is open or closed?",
+   "why": "<p>NMAP sends only step 1 of the handshake (SYN):</p>\n<ul><li>If the port answers <b>SYN-ACK</b>, someone is listening: <b>open</b>.</li><li>If it answers <b>RST</b> (\"go away\"), nobody is there: <b>closed</b>.</li></ul>\n<p>NMAP then never finishes the handshake. That's why it's called \"stealth\" or a \"half-open\" scan.</p>",
+   "options": [
+    "SYN-ACK received → port open",
+    "RST received → port closed",
+    "ACK received → port open",
+    "FIN received → port open"
+   ],
+   "answer": [
+    0,
+    1
+   ]
+  },
+  {
+   "topic": "W4",
+   "q": "Which is/are true about VirtualBox's default networking mode (NAT)?",
+   "why": "<p>NAT works like your home router. The VMs sit behind the host computer with a private address (VirtualBox gives each one the same default, 10.0.2.15). They can reach out to the internet, but outsiders can't reach in directly.</p>",
+   "options": [
+    "Gives each VM a unique public IP",
+    "Gives guest machines the same private/virtual IP address",
+    "VMs in this mode can access the internet",
+    "Gives guests the host's own IP",
+    "VMs in NAT mode are reachable from outside by default"
+   ],
+   "answer": [
+    1,
+    2
+   ]
+  },
+  {
+   "topic": "W4",
+   "q": "Which NMAP option(s) detect the operating system and/or service versions?",
+   "why": "<ul><li><b>-O</b> guesses the <b>O</b>perating system.</li><li><b>-sV</b> finds service <b>V</b>ersions (e.g. \"Apache 2.4\").</li><li><b>-A</b> is \"aggressive\" or \"all\": OS detection, version detection, scripts and traceroute together.</li><li><b>-sn</b> only checks if hosts are up (no port scan), and <b>-Pn</b> skips that check. Neither detects OS or versions.</li></ul>\n<p>(The solution PDF prints b, c and e without the dash; they are -O, -sV and -A.)</p>",
+   "options": [
+    "-sn",
+    "-O",
+    "-sV",
+    "-Pn",
+    "-A"
+   ],
+   "answer": [
+    1,
+    2,
+    4
+   ]
+  },
+  {
+   "topic": "W4",
+   "q": "Ports 80 and 443 are open on a target. What can you infer?",
+   "why": "<p>Port 80 = HTTP (web) and port 443 = HTTPS (secure web). Both open means it's almost certainly a web server. SSH would be 22, email 25/110/143, DNS 53.</p>",
+   "options": [
+    "The target is very likely running SSH services",
+    "The target is very likely hosting a website (HTTP/HTTPS)",
+    "The target is running a mail server",
+    "The target is running a DNS resolver",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W4",
+   "q": "Using --reason with a SYN scan, the reason field shows \"syn-ack\". What does that mean?",
+   "why": "<p><code>--reason</code> makes NMAP explain each verdict. \"syn-ack\" means the target answered the knock with SYN-ACK, which (as in Q6) means the port is <b>open</b>.</p>",
+   "options": [
+    "The port is open because NMAP got a SYN-ACK from the target",
+    "The port is closed and there's no evidence",
+    "The target sent an RST",
+    "None of these"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W5",
+   "q": "Which NMAP option(s) can trigger NMAP scripts to run?",
+   "why": "<p>NMAP has a library of add-on scripts (the NSE, NMAP Scripting Engine) that run extra checks. <code>-sC</code> runs the default scripts and is the same as <code>--script=default</code>. <code>-A</code> (\"all\") includes scripts too. <code>-Pn</code> and <code>-sn</code> only deal with whether a host is up.</p>",
+   "options": [
+    "-A",
+    "-sC",
+    "-Pn",
+    "--script=default",
+    "-sn"
+   ],
+   "answer": [
+    0,
+    1,
+    3
+   ]
+  },
+  {
+   "topic": "W5",
+   "q": "Which tool(s) CANNOT be used for vulnerability scanning?",
+   "why": "<p>Know each tool's job:</p>\n<div class=\"tbl\"><table><thead><tr><th>Tool</th><th>What it does</th></tr></thead><tbody><tr><td>Nessus, Nexpose</td><td>Vulnerability scanners: list a system's known weaknesses</td></tr><tr><td>NMAP</td><td>Port scanner; can also find vulnerabilities with scripts</td></tr><tr><td>Hydra</td><td>Password guesser: tries many logins</td></tr><tr><td>Crunch</td><td>Wordlist maker: creates lists of possible passwords</td></tr></tbody></table></div>\n<p>Hydra and Crunch are password tools, not scanners.</p>",
+   "options": [
+    "Nessus",
+    "Hydra",
+    "Nexpose",
+    "Crunch",
+    "NMAP"
+   ],
+   "answer": [
+    1,
+    3
+   ]
+  },
+  {
+   "topic": "W5",
+   "q": "Which is NOT a common password cracking approach?",
+   "why": "<ul><li><b>Dictionary</b> = try a list of common words.</li><li><b>Brute force</b> = try every possible combination.</li><li><b>Rule-based</b> = try words with tweaks, like \"password\" → \"P@ssw0rd1\".</li><li><b>Shoulder surfing</b> = literally watch someone type.</li></ul>\n<p>Packet sniffing just <i>records network traffic</i>. It may capture a password, but it isn't a cracking method.</p>",
+   "options": [
+    "Dictionary attack",
+    "Brute-force attack",
+    "Rule-based attack",
+    "Packet sniffing",
+    "Shoulder surfing"
+   ],
+   "answer": 3
+  },
+  {
+   "topic": "W5",
+   "q": "Which TCP/IP protocol is connectionless and unreliable?",
+   "why": "<p>UDP fires data off without setting up a connection or checking it arrived, like shouting across a room. It's fast but things can get lost, so it's used for video calls and games. TCP is like a recorded-delivery letter, and FTP and Telnet run on TCP.</p>",
+   "options": [
+    "TCP",
+    "UDP",
+    "FTP",
+    "TELNET"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W5",
+   "q": "Which tool is mainly used to generate custom wordlists for dictionary attacks?",
+   "why": "<p>Crunch builds the list of guesses, e.g. \"all 6-letter lowercase words\". Hydra then uses a list to try logins, and Hashcat cracks stolen password hashes.</p>",
+   "options": [
+    "Hydra",
+    "Nessus",
+    "Crunch",
+    "Wireshark",
+    "Hashcat"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W5",
+   "q": "Which is/are FALSE about malware?",
+   "why": "<p>\"All\" is the trap. Viruses and worms copy themselves, but a <b>Trojan</b> doesn't. It just pretends to be a useful program, like the wooden horse, and waits for you to run it.</p>",
+   "options": [
+    "All malware types can copy themselves (self-replicate)",
+    "Malware can give an attacker partial or full control of a system",
+    "Malware can arrive via file sharing or fake/pirated software",
+    "Malware can modify, corrupt or delete data",
+    "None of these"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W5",
+   "q": "In a MAC flooding attack, what is the goal of overwhelming a switch's CAM table?",
+   "why": "<p>A switch keeps a table (the CAM table) of which device is plugged into which port, so it sends data only where it belongs. The attacker floods it with thousands of fake entries until it's full. A confused switch falls back to sending everything to everyone, like a hub, so the attacker can now eavesdrop on traffic.</p>",
+   "options": [
+    "Crash the switch permanently",
+    "Force the switch to act like a hub, sending traffic to all ports",
+    "Increase the switch's memory",
+    "Disable its power supply",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W5",
+   "q": "Which NMAP script identifies the operating system of an SMB-enabled target?",
+   "why": "<p>SMB is the Windows file-sharing service. Script names describe what they do: <b>os-discovery</b> finds the OS, <b>brute</b> guesses passwords, <b>enum-users</b> lists user accounts. http-os-brute isn't a real script.</p>",
+   "options": [
+    "smb-os-discovery",
+    "smb-brute",
+    "http-os-brute",
+    "smb-enum-users",
+    "ssh-brute"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W5",
+   "q": "Hydra runs a dictionary attack on SSH, testing 5000 passwords against 4 usernames. What is the maximum number of login attempts?",
+   "why": "<p>Every password is tried with every username: 4 × 5000 = <b>20,000</b> attempts in the worst case.</p>",
+   "numeric": {
+    "lo": 20000,
+    "hi": 20000,
+    "text": "20000"
+   }
+  },
+  {
+   "topic": "W5",
+   "q": "A brute-force cracker must try every 4-character password made of lowercase letters (26 options per position). How many combinations are there?",
+   "why": "<p>Each of the 4 positions has 26 choices, so multiply: 26 × 26 × 26 × 26 = 26⁴ = <b>456,976</b>. Each extra character multiplies the work by 26, which is why longer passwords are much safer.</p>",
+   "numeric": {
+    "lo": 456976,
+    "hi": 456976,
+    "text": "456976"
+   }
+  },
+  {
+   "topic": "W6",
+   "q": "Which attack involves pretending to be a legitimate entity to gain access?",
+   "why": "<p>To masquerade = to wear a disguise. The attacker pretends to be someone trusted.</p>\n<ul><li><b>Replay</b> = recording a real message and re-sending it later.</li><li><b>Modification</b> = changing a message on its way.</li><li><b>Traffic analysis</b> = just watching who talks to whom.</li></ul>",
+   "options": [
+    "Replay attack",
+    "Masquerade attack",
+    "Modification attack",
+    "Denial of service attack",
+    "Traffic analysis"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W6",
+   "q": "Encrypt \"SECURE\" with a shift cipher, k = 3 (wrap Z → A).",
+   "why": "<p>This is the Caesar cipher: move each letter 3 places forward in the alphabet.</p>\n<div class=\"tbl\"><table><thead><tr><th>Plain</th><th>S</th><th>E</th><th>C</th><th>U</th><th>R</th><th>E</th></tr></thead><tbody><tr><td>+3</td><td>V</td><td>H</td><td>F</td><td>X</td><td>U</td><td>H</td></tr></tbody></table></div>\n<p>Result: <b>VHFXUH</b>.</p>",
+   "options": [
+    "VHFXUH",
+    "VFEXRU",
+    "UHFXVH",
+    "VHFXRV",
+    "None of these"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W6",
+   "q": "A mono-alphabetic cipher maps A–Z to Q W E R T Y U I O P A S D F G H J K L Z X C V B N M. Encrypt \"CODE\".",
+   "why": "<p>Line up the alphabet with the key (it's the keyboard's QWERTY rows) and swap each letter.</p>\n<ul><li>C is the 3rd letter → 3rd key letter is <b>E</b></li><li>O is the 15th → <b>G</b></li><li>D is the 4th → <b>R</b></li><li>E is the 5th → <b>T</b></li></ul>\n<p>Result: <b>EGRT</b>.</p>",
+   "options": [
+    "EGRT",
+    "EGDT",
+    "EODT",
+    "EGDR",
+    "None of these"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W6",
+   "q": "Which is/are FALSE about hashing algorithms for message integrity?",
+   "why": "<p>A hash is a one-way fingerprint. You can make a fingerprint from a person, but you can't rebuild the person from it. So (c) is false. The rest are true:</p>\n<ul><li>(a) No two messages should share a hash (a \"collision\").</li><li>(b) The same message always gives the same hash.</li><li>(d) Change one letter and the whole hash changes (the \"avalanche effect\").</li></ul>",
+   "options": [
+    "A good hash should resist collisions",
+    "The same input always gives the same hash",
+    "A hash can be reversed to get the original message",
+    "A tiny change in input gives a very different hash"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W6",
+   "q": "Decrypt \"KHOOR\" (shift cipher, k = 3).",
+   "why": "<p>To decrypt, move each letter 3 places <b>back</b>: K→H, H→E, O→L, O→L, R→O = <b>HELLO</b>.</p>",
+   "options": [
+    "HELLO",
+    "WORLD",
+    "HELPS",
+    "HFLLO",
+    "None of these"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W6",
+   "q": "A DoS attack makes a service unavailable to real users. Which category is this?",
+   "why": "<p>The four classic categories, each hitting one security goal:</p>\n<div class=\"tbl\"><table><thead><tr><th>Category</th><th>What happens</th><th>Goal attacked</th></tr></thead><tbody><tr><td>Interruption</td><td>Service is blocked or broken</td><td>Availability</td></tr><tr><td>Interception</td><td>Someone secretly reads the data</td><td>Confidentiality</td></tr><tr><td>Modification</td><td>Data is changed on the way</td><td>Integrity</td></tr><tr><td>Fabrication</td><td>Fake data is created</td><td>Authenticity</td></tr></tbody></table></div>\n<p>DoS = blocking the service = <b>interruption</b>.</p>",
+   "options": [
+    "Interruption",
+    "Interception",
+    "Modification",
+    "Fabrication",
+    "Replay"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W6",
+   "q": "With public-key cryptography, A wants to send B a confidential message. Which key encrypts it?",
+   "why": "<p>A locks the box with <b>B's</b> open padlock (B's public key). Only B has the key that opens it (B's private key), so only B can read it.</p>",
+   "options": [
+    "A's private key",
+    "A's public key",
+    "B's public key",
+    "B's private key"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W6",
+   "q": "What block size (in bits) does DES use for plaintext?",
+   "why": "<p>DES encrypts data in chunks of 64 bits. Don't mix it up with the key: DES's key is 56 bits (stored as 64 with 8 check bits).</p>",
+   "numeric": {
+    "lo": 64,
+    "hi": 64,
+    "text": "64"
+   }
+  },
+  {
+   "topic": "W6",
+   "q": "150 parties communicate using public-key encryption (like RSA). How many distinct keys are needed?",
+   "why": "<p>Each person needs just one pair (1 public + 1 private), whoever they talk to. 150 people × 2 keys = <b>300</b>.</p>",
+   "numeric": {
+    "lo": 300,
+    "hi": 300,
+    "text": "300"
+   }
+  },
+  {
+   "topic": "W6",
+   "q": "40 parties communicate using symmetric-key encryption. How many distinct keys are needed?",
+   "why": "<p>With symmetric keys, every <i>pair</i> of people needs its own shared secret. Count the pairs:</p>\n<div class=\"formula\">(N(N-1)) / (2) = (40 × 39) / (2) = 780</div>\n<p>That fast growth is the big weakness of symmetric keys, and why public-key cryptography is useful (compare Q9).</p>",
+   "numeric": {
+    "lo": 780,
+    "hi": 780,
+    "text": "780"
+   }
+  },
+  {
+   "topic": "W7",
+   "q": "A message M is hashed to H = HASH(M). Which is/are true?",
+   "why": "<p>Whether you hash one word or a whole movie file, SHA-256 always gives exactly 256 bits. So the hash is fixed-length and usually much smaller than the message.</p>",
+   "options": [
+    "H usually has far fewer bits than M",
+    "H and M always have exactly the same number of bits",
+    "Hashing gives a fixed-length output whatever the input size",
+    "Output length grows with input length"
+   ],
+   "answer": [
+    0,
+    2
+   ]
+  },
+  {
+   "topic": "W7",
+   "q": "Which is/are true?",
+   "why": "<p>Check each against the table above. DES's key is 56 bits, not 128. SHA-256's number <i>is</i> its output size (256). Triple DES tops out at 168 bits.</p>",
+   "options": [
+    "DES block size is 64 bits",
+    "DES key size is 128 bits",
+    "MD5 digest size is 128 bits",
+    "SHA-256 produces a 512-bit digest",
+    "Triple DES uses a fixed 512-bit key"
+   ],
+   "answer": [
+    0,
+    2
+   ]
+  },
+  {
+   "topic": "W7",
+   "q": "Which is/are true about SSL/TLS?",
+   "why": "<p>HTTPS is just HTTP (web pages) wrapped in TLS encryption: that's the padlock in your browser. Encryption adds work, so it's not faster (b). It runs high up the stack, not at the physical (cables) layer (c). It doesn't give non-repudiation (d).</p>",
+   "options": [
+    "HTTPS relies on SSL/TLS to secure HTTP",
+    "SSL/TLS makes data travel faster than plain HTTP",
+    "TLS works at the physical layer",
+    "The SSL Record Protocol guarantees non-repudiation"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W7",
+   "q": "Which is/are true about collision resistance in hash functions?",
+   "why": "<p>A \"collision\" is two different messages with the same fingerprint. Collision resistance means finding <i>any</i> such pair should be practically impossible. That's the definition, so (b). It's a strong requirement, and has nothing to do with keeping data secret.</p>",
+   "options": [
+    "It's a weaker requirement than second preimage resistance",
+    "It should be computationally hard to find any two different messages with the same hash",
+    "It guarantees confidentiality",
+    "It's trivial to achieve",
+    "It applies only to keyed hashes (MACs)"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W7",
+   "q": "Which is/are true about verifying a digital signature?",
+   "why": "<p>A digital signature is the reverse of encryption. The signer \"locks\" with their <b>private</b> key, which only they have, and anyone can check it with their <b>public</b> key. If it checks out, you know who signed it and that nothing changed. The signer doesn't need to be around.</p>",
+   "options": [
+    "The verifier uses the signer's public key",
+    "The verifier uses the signer's private key",
+    "Successful verification shows the message wasn't altered and came from the claimed signer",
+    "The signer must be online during verification"
+   ],
+   "answer": [
+    0,
+    2
+   ]
+  },
+  {
+   "topic": "W7",
+   "q": "Which property of digital signatures stops the signer from later denying they signed?",
+   "why": "<p>\"Repudiate\" means to deny. Only the signer holds their private key, so they can't later claim \"that wasn't me\". It works like a handwritten signature on a contract.</p>",
+   "options": [
+    "Confidentiality",
+    "Integrity",
+    "Non-repudiation",
+    "Availability",
+    "Authentication"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W7",
+   "q": "Which statement is FALSE about keyed vs unkeyed hash functions?",
+   "why": "<p>Anyone can compute an unkeyed hash such as SHA-256. An attacker could change the message and simply recompute the hash, so it proves nothing about <i>who</i> sent it. A keyed hash (HMAC) mixes in a secret key, so only key holders can produce it.</p>",
+   "options": [
+    "An unkeyed hash can verify integrity if the hash comes from a trusted source",
+    "A keyed hash needs a secret key to compute",
+    "An unkeyed hash inherently provides authenticity",
+    "HMAC gives both integrity and some authentication"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W7",
+   "q": "Which IPSec mode protects only the payload and keeps the original IP header intact?",
+   "why": "<p>IPSec secures IP packets.</p>\n<ul><li><b>Transport mode</b> encrypts the letter but leaves the envelope's address visible.</li><li><b>Tunnel mode</b> puts the whole envelope, address and all, inside a new sealed envelope. This is how VPNs work.</li></ul>\n<p>\"Replay\" and \"Confidential\" modes don't exist.</p>",
+   "options": [
+    "Tunnel mode",
+    "Transport mode",
+    "Replay mode",
+    "Confidential mode",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W7",
+   "q": "What digest size (in bits) does MD5 produce?",
+   "why": "<p>MD5 always outputs 128 bits. It is now considered broken for security use, but the number is still examinable.</p>",
+   "numeric": {
+    "lo": 128,
+    "hi": 128,
+    "text": "128"
+   }
+  },
+  {
+   "topic": "W7",
+   "q": "What block size (in bits) does SHA-512 use?",
+   "why": "<p>Careful, this is the <i>block</i> size, not the output. SHA-512 chews through input 1024 bits at a time and outputs a 512-bit hash.</p>",
+   "numeric": {
+    "lo": 1024,
+    "hi": 1024,
+    "text": "1024"
+   }
+  },
+  {
+   "topic": "W8",
+   "q": "Which best describes steganography?",
+   "why": "<p>Encryption makes a message <i>unreadable</i>; steganography makes it <i>invisible</i>. The message is hidden inside something innocent-looking, like a photo, so nobody even knows it exists. Think of invisible ink on an ordinary letter.</p>",
+   "options": [
+    "Encrypting with public and private keys",
+    "Embedding information inside another cover medium",
+    "Tunnelling data over HTTPS/TLS",
+    "Compressing data",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W8",
+   "q": "Which are valid examples of steganography?",
+   "why": "<p>All three hide data inside a \"cover\" file (image, audio, program). (c) is encryption and (e) is a signature: neither hides that a message exists.</p>",
+   "options": [
+    "Hiding text inside an image",
+    "Hiding data inside an audio clip",
+    "Encrypting a file so only the recipient can decrypt it",
+    "Hiding data inside an executable file",
+    "Digitally signing a document",
+    "None of these"
+   ],
+   "answer": [
+    0,
+    1,
+    3
+   ]
+  },
+  {
+   "topic": "W8",
+   "q": "Which are examples of behavioural biometrics?",
+   "why": "<p>Biometrics identify you by your body. There are two kinds:</p>\n<ul><li><b>Behavioural</b> = how you <i>do</i> things: how you sign (speed, pressure), how you walk (gait), how you type (rhythm).</li><li><b>Physiological</b> = what you <i>are</i>: fingerprint, iris, retina, face shape.</li></ul>",
+   "options": [
+    "Fingerprint",
+    "Signature dynamics",
+    "Gait",
+    "Iris pattern",
+    "Keystroke dynamics",
+    "Retina pattern",
+    "Facial structure"
+   ],
+   "answer": [
+    1,
+    2,
+    4
+   ]
+  },
+  {
+   "topic": "W8",
+   "q": "Which biometric is generally considered to give very high uniqueness and reliability?",
+   "why": "<p>The coloured ring of your eye (the iris) has an extremely detailed pattern that is unique to each person and barely changes over life. Voice, face, signature and walk all vary with mood, age, illness or lighting.</p>",
+   "options": [
+    "Voice recognition",
+    "Facial recognition",
+    "Iris scan",
+    "Signature dynamics",
+    "Gait analysis"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W8",
+   "q": "What is a Denial-of-Service (DoS) attack?",
+   "why": "<p>DoS = overwhelming a service so real users can't use it, like 10,000 prank callers jamming a pizza shop's phone line. Nothing has to be stolen or deleted.</p>",
+   "options": [
+    "Deletes or modifies files",
+    "Prevents legitimate users from accessing a service",
+    "Destroys password databases",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W8",
+   "q": "How does a Smurf DoS attack typically work?",
+   "why": "<ol><li>The attacker sends a \"ping everyone\" message to a whole network (the broadcast address).</li><li>They fake the sender address to be the <b>victim's</b>.</li><li>Every computer on that network replies, all to the victim, at once.</li></ol>\n<p>It's like sending a party invitation to 500 people with your enemy's phone number for RSVPs. Oversized packets (a) is a different attack, the \"Ping of Death\".</p>",
+   "options": [
+    "Sends oversized IP packets to crash the target",
+    "Sends fake ICMP Echo requests to a network's broadcast address with the victim's IP as the sender, so many hosts flood the victim with replies",
+    "Exploits a buffer overflow in a web server",
+    "Uses SQL injection on a database",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W8",
+   "q": "Which attack abuses the TCP three-way handshake by leaving connections half-open?",
+   "why": "<p>Recall the handshake: SYN → SYN-ACK → ACK. In a <b>SYN flood</b> the attacker sends thousands of SYNs but never sends the final ACK. The server keeps a slot open for each half-finished connection until it runs out, and real users get refused.</p>",
+   "options": [
+    "Ping of Death attack",
+    "SYN flooding attack",
+    "Smurf attack",
+    "DNS spoofing attack"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W8",
+   "q": "What does PGP (Pretty Good Privacy) mainly provide for secure email?",
+   "why": "<p>PGP signs emails (proving who sent them) and encrypts them (keeping them private). It uses the hashing and public/private keys from Weeks 6–7. It can't guarantee delivery and has nothing to do with spam.</p>",
+   "options": [
+    "Authentication of the sender",
+    "Confidentiality of the message content",
+    "Guaranteed message availability",
+    "Protection against spam filtering"
+   ],
+   "answer": [
+    0,
+    1
+   ]
+  },
+  {
+   "topic": "W8",
+   "q": "What is the main purpose of DNS?",
+   "why": "<p>DNS is the internet's phone book. You type <code>google.com</code>, and DNS looks up the number (IP address) your computer actually needs to connect.</p>",
+   "options": [
+    "End-to-end email encryption",
+    "Translating human-readable domain names into IP addresses",
+    "Compressing and fragmenting messages",
+    "Hiding data in cover files",
+    "None of these"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W8",
+   "q": "A grayscale image is 1500 × 1200 pixels, 8 bits per pixel. With LSB steganography (1 hidden bit per pixel), how many bytes can be hidden?",
+   "why": "<p>LSB = Least Significant Bit. Changing the last bit of a pixel alters its shade so slightly the eye can't see it, so you can hide 1 bit per pixel.</p>\n<ol><li>Pixels: 1500 × 1200 = 1,800,000, so 1,800,000 hidden bits.</li><li>Bits to bytes: 1,800,000 ÷ 8 = <b>225,000 bytes</b>.</li></ol>\n<p>(The \"8 bits per pixel\" is a distractor; only 1 of those 8 is used.)</p>",
+   "numeric": {
+    "lo": 225000,
+    "hi": 225000,
+    "text": "225000"
+   }
+  },
+  {
+   "topic": "W9",
+   "q": "Which is/are true for sniffing?",
+   "why": "<p>Sniffing = capturing and reading traffic. Normally a network card ignores data meant for other computers. <b>Promiscuous mode</b> turns that filter off so it keeps everything. Finding vulnerabilities and listing users are different techniques.</p>",
+   "options": [
+    "Analysing network activity by capturing traffic",
+    "Finding vulnerabilities in a network",
+    "Enumerating users",
+    "May require the network card to be in promiscuous mode to capture frames not addressed to it",
+    "None of these"
+   ],
+   "answer": [
+    0,
+    3
+   ]
+  },
+  {
+   "topic": "W9",
+   "q": "Which is/are NOT features of Wireshark?",
+   "why": "<p>Wireshark is a <i>watcher</i>: it captures, displays, filters and summarises traffic. It doesn't change traffic, and it's not an attack tool like SQL injection.</p>",
+   "options": [
+    "Capturing and analysing packets",
+    "Generating statistics on captured traffic",
+    "Manipulating and modifying live traffic",
+    "Showing packet details in a GUI",
+    "Carrying out SQL injection",
+    "Filtering packets by protocol"
+   ],
+   "answer": [
+    2,
+    4
+   ]
+  },
+  {
+   "topic": "W9",
+   "q": "Which protocols are vulnerable to sniffing?",
+   "why": "<p>HTTP, FTP and Telnet send everything in <b>plain text</b>, passwords included, like a postcard anyone can read. HTTPS, SSL and SSH encrypt the data, so a sniffer only sees gibberish. Easy rule: the \"S\" usually means <b>S</b>ecure.</p>",
+   "options": [
+    "HTTP",
+    "FTP",
+    "Telnet",
+    "HTTPS",
+    "SSL",
+    "SSH"
+   ],
+   "answer": [
+    0,
+    1,
+    2
+   ]
+  },
+  {
+   "topic": "W9",
+   "q": "Which feature(s) are NOT in the Ettercap tool?",
+   "why": "<p>Ettercap is a man-in-the-middle tool: it sits between two computers and can watch, filter, drop or inject into their traffic. SQL injection (sqlmap's job) and password cracking (Hydra's job) belong to other tools.</p>",
+   "options": [
+    "IP- and MAC-based filtering",
+    "Injecting characters into live connections",
+    "Filtering and dropping packets",
+    "Automating SQL injection",
+    "Dictionary-attack password cracking"
+   ],
+   "answer": [
+    3,
+    4
+   ]
+  },
+  {
+   "topic": "W9",
+   "q": "Which is NOT a human-based social engineering attack?",
+   "why": "<p>Social engineering = tricking <i>people</i>, not computers. There are two kinds:</p>\n<ul><li><b>Human-based</b> (in person): pretending to be IT staff (impersonation), peeking at someone typing (shoulder surfing), following someone through a locked door (tailgating).</li><li><b>Computer-based</b> (through a screen): phishing emails, fake pop-ups.</li></ul>",
+   "options": [
+    "Impersonation",
+    "Shoulder surfing",
+    "Piggybacking/tailgating",
+    "Phishing email"
+   ],
+   "answer": 3
+  },
+  {
+   "topic": "W9",
+   "q": "A DoS attack that abuses the TCP handshake by leaving connections incomplete is called:",
+   "why": "<p>Same idea as Week 8 Q7: thousands of \"hello\" (SYN) messages, never followed by the final ACK, fill up the server's waiting list.</p>",
+   "options": [
+    "SYN Flooding",
+    "ICMP Flood",
+    "Ping of Death",
+    "UDP Flood"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W9",
+   "q": "Which tool causes DoS by sending partial HTTP requests and never finishing them?",
+   "why": "<p>Slowloris (named after a slow animal) opens many connections to a web server and sends each request <i>very</i> slowly, never finishing. The server politely waits on all of them until it has no connections left for real visitors.</p>",
+   "options": [
+    "Hydra",
+    "Wireshark",
+    "Slowloris",
+    "Crunch"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W9",
+   "q": "Which mode lets a network card capture frames not addressed to it?",
+   "why": "<p><b>Promiscuous mode</b> (see Q1) means the card accepts all traffic it sees. Don't confuse it with <i>monitor</i> mode, which is a Wi-Fi-specific mode for listening to wireless signals.</p>",
+   "options": [
+    "Monitor mode",
+    "Transparent mode",
+    "Promiscuous mode",
+    "Bridge mode"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W9",
+   "q": "Which are computer-based social engineering attacks?",
+   "why": "<p>If it arrives on a screen (email, pop-up, chain letter), it's computer-based. Shoulder surfing and tailgating need you physically there, so they're human-based (see Q5).</p>",
+   "options": [
+    "Phishing emails",
+    "Pop-up window scams",
+    "Shoulder surfing",
+    "Chain letter emails",
+    "Tailgating"
+   ],
+   "answer": [
+    0,
+    1,
+    3
+   ]
+  },
+  {
+   "topic": "W9",
+   "q": "What is the main purpose of ARP spoofing in a sniffing attack?",
+   "why": "<p>ARP is how computers on a local network find each other's hardware (MAC) address from an IP address. The attacker sends fake ARP replies saying \"I'm the router\". Now the victim's traffic goes to the attacker first, who reads it and passes it on. That's a <b>man-in-the-middle</b> attack.</p>",
+   "options": [
+    "Get more bandwidth",
+    "Redirect traffic between two hosts through the attacker's machine",
+    "Encrypt traffic",
+    "Permanently disable the target's network card"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W10",
+   "q": "Which are hardware-based attacks?",
+   "why": "<p>Both need the physical device: probing touches the chip's wires, and EM analysis measures the radio signals it leaks. SQL injection and XSS attack websites, and phishing attacks people.</p>",
+   "options": [
+    "Physical probing",
+    "SQL injection",
+    "Cross-site scripting",
+    "Electromagnetic emission analysis",
+    "Phishing"
+   ],
+   "answer": [
+    0,
+    3
+   ]
+  },
+  {
+   "topic": "W10",
+   "q": "Which is/are true about side-channel attacks?",
+   "why": "<p>The maths can be perfect; the leak is in the <i>real device</i> running it, so (a) is true and (e) false. To measure power or radio noise you usually need to be near or touching the device (b), using clues like timing or power (d). (c) is false: side channels use <i>extra</i> information beyond inputs and outputs.</p>",
+   "options": [
+    "They exploit weaknesses in how an algorithm is implemented, not the algorithm itself",
+    "They may need physical access to, or closeness to, the device",
+    "They rely only on analysing input/output pairs",
+    "They can use timing, power consumption or electromagnetic emissions",
+    "They exploit mathematical weaknesses in the algorithm's design"
+   ],
+   "answer": [
+    0,
+    1,
+    3
+   ]
+  },
+  {
+   "topic": "W10",
+   "q": "Computing x²² with the square-and-multiply method, how many squarings and multiplications are needed?",
+   "why": "<p>Write the power in binary: 22 = <code>10110</code> (5 bits, three 1s).</p>\n<ul><li><b>Squarings</b> = number of bits − 1 = 5 − 1 = <b>4</b></li><li><b>Multiplications</b> = number of 1s − 1 = 3 − 1 = <b>2</b></li></ul>\n<p>Step by step, reading the bits after the first: start x → bit 0: square = x² → bit 1: square + multiply = x⁵ → bit 1: square + multiply = x¹¹ → bit 0: square = x²². This matters for security because a multiply takes extra time and power, so watching a chip can reveal the secret bits.</p>",
+   "options": [
+    "4 and 2",
+    "3 and 2",
+    "4 and 3",
+    "5 and 2",
+    "3 and 3"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W10",
+   "q": "Which is/are true about Differential Power Analysis (DPA) and Simple Power Analysis (SPA)?",
+   "why": "<p>A \"trace\" is a recording of the chip's power use over time.</p>\n<ul><li><b>SPA (Simple)</b> = look at one recording and spot the pattern by eye.</li><li><b>DPA (Differential)</b> = collect many recordings and use statistics to tease out tiny differences invisible in any one. That makes it <i>more</i> powerful, so (d) is false.</li></ul>",
+   "options": [
+    "DPA needs only one power trace",
+    "DPA needs many traces plus statistics",
+    "DPA uses statistics over many traces to reveal what single traces don't show",
+    "DPA is generally less effective than SPA",
+    "SPA directly reads patterns in one or a few traces"
+   ],
+   "answer": [
+    1,
+    2,
+    4
+   ]
+  },
+  {
+   "topic": "W10",
+   "q": "Which PUF property means the response y = PUF(x) to a challenge x can be computed efficiently?",
+   "why": "<p>\"Evaluate\" = work out the answer. Evaluability means getting the response is quick and easy. Unclonability = nobody can build a copy. One-wayness = you can't work backwards from y to x.</p>",
+   "options": [
+    "Unclonability",
+    "One-wayness",
+    "Evaluability",
+    "Unpredictability",
+    "Tamper-evidence"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W10",
+   "q": "What does PUF stand for in hardware security?",
+   "why": "<p><b>Physically Unclonable Function.</b> Tiny random flaws from manufacturing make every chip slightly different. A PUF uses those flaws as a built-in fingerprint that can't be copied, even by the factory.</p>",
+   "options": [
+    "Physically Unique Function",
+    "Physically Unclonable Function",
+    "Protected Unclonable Feature",
+    "Physically Untraceable Function"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W10",
+   "q": "What is a hardware Trojan?",
+   "why": "<p>It's a hidden extra circuit secretly added to a chip during design or manufacture. It sleeps until a trigger (a certain date or input), then does damage, such as leaking keys or shutting down. It is built into the hardware, not software.</p>",
+   "options": [
+    "A software virus targeting firmware updates",
+    "A malicious, deliberate change to a chip's circuitry that activates under specific trigger conditions",
+    "A testing tool used before shipping",
+    "A feature to make hardware faster under load"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W10",
+   "q": "Which is/are true about hardware Trojans?",
+   "why": "<p>A Trojan is tiny on purpose, a few gates among billions, so it's hard to find (a). There's no single detection method that catches them all, and checking costs time and resources (c). They live in the circuit, not software, so (d) is false.</p>",
+   "options": [
+    "They usually add very little extra hardware, so they're hard to detect",
+    "One universal method easily detects them",
+    "Detecting them often adds extra design, testing or runtime cost",
+    "They're inserted only through software changes"
+   ],
+   "answer": [
+    0,
+    2
+   ]
+  },
+  {
+   "topic": "W10",
+   "q": "Which hardware attack(s) are generally considered invasive?",
+   "why": "<p><b>Invasive</b> = you physically open or damage the chip, e.g. removing its casing and placing needles on its wires (probing). The others just measure from outside without breaking anything.</p>",
+   "options": [
+    "Black-box testing",
+    "Physical probing",
+    "Side-channel power analysis",
+    "Timing analysis"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W10",
+   "q": "Which software techniques help defend against timing side-channel attacks?",
+   "why": "<p>A timing attack works because some secrets make the code run faster or slower. The fix is to make it always take <b>the same time</b>, either with dummy work (a) or by writing constant-time code (d). Complexity alone (c) doesn't hide timing. Masking (b) protects against <i>power</i> leaks, not timing.</p>",
+   "options": [
+    "Adding dummy computations so every path takes the same time",
+    "Masking sensitive intermediate values",
+    "Making the program more complex without fixing timing differences",
+    "Constant-time implementations of security-critical operations"
+   ],
+   "answer": [
+    0,
+    3
+   ]
+  },
+  {
+   "topic": "W11",
+   "q": "Which Metasploit module takes advantage of a known vulnerability on the target?",
+   "why": "<p>The exploit is the key that opens the lock. The payload is what you do once the door is open.</p>",
+   "options": [
+    "Payload",
+    "Exploit",
+    "Encoder",
+    "Auxiliary"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W11",
+   "q": "Which command launches the Metasploit Framework console?",
+   "why": "<p><code>msfconsole</code> = the Metasploit Framework <b>console</b>. <code>msfvenom</code> is a separate tool for building payloads. The other two don't exist.</p>",
+   "options": [
+    "msfvenom",
+    "msfconsole",
+    "metasploit-cli",
+    "msf-start"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W11",
+   "q": "Which Metasploit command shows which target operating systems an exploit works on?",
+   "why": "<p>In Metasploit, <code>show</code> <i>lists</i> things and <code>set</code> <i>chooses</i> a value. \"Which systems can this exploit hit?\" = <code>show targets</code>.</p>",
+   "options": [
+    "show targets",
+    "set targets",
+    "check compatibility",
+    "show exploits",
+    "show payloads"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W11",
+   "q": "Which option sets the target's IP address?",
+   "why": "<p><b>R</b>HOST = <b>R</b>emote host = the victim. LHOST is your own machine. The PORT versions set port numbers.</p>",
+   "options": [
+    "set LHOST",
+    "set LPORT",
+    "set RHOST",
+    "set RPORT"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W11",
+   "q": "Which Meterpreter command retrieves stored password hashes from the target?",
+   "why": "<p><code>hashdump</code> = dump (copy out) the password hashes, which you can then crack offline with Hashcat. The others: <code>getuid</code> = which user am I, <code>getsystem</code> = try to become admin, <code>sysinfo</code> = system details, <code>ps</code> = list running programs.</p>",
+   "options": [
+    "getuid",
+    "getsystem",
+    "hashdump",
+    "sysinfo",
+    "ps"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W11",
+   "q": "Which tool brute-forces hidden files and directories on a web server?",
+   "why": "<p><b>Dir</b>b = <b>dir</b>ectory buster. It tries thousands of common folder names (<code>/admin</code>, <code>/backup</code>, ...) to find pages the site doesn't link to.</p>",
+   "options": [
+    "SQLMAP",
+    "Dirb",
+    "Hydra",
+    "Crunch",
+    "Hashcat"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W11",
+   "q": "If a page is vulnerable to error-based SQL injection, what happens with bad or malicious input?",
+   "why": "<p>\"Error-based\" says it all. The site shows the raw database error, and that error leaks clues (table names, query shape) the attacker uses for the next step.</p>",
+   "options": [
+    "It shows a database error message revealing the query structure",
+    "It silently returns nothing",
+    "It redirects to a login page",
+    "It crashes the whole server permanently"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W11",
+   "q": "Which SQLMAP option lists all database names on the target?",
+   "why": "<p>sqlmap automates SQL injection. Its options go from big to small: <code>--dbs</code> (all <b>d</b>ata<b>b</b>ase<b>s</b>) → <code>--tables</code> (tables inside one) → <code>--dump</code> (copy out the actual data).</p>",
+   "options": [
+    "--tables",
+    "--dbs",
+    "--dump",
+    "--current-db",
+    "--passwords"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W11",
+   "q": "Which are recognised types of Cross-Site Scripting (XSS)?",
+   "why": "<p>XSS = sneaking the attacker's JavaScript into a web page so it runs in <i>other visitors'</i> browsers. The three real types:</p>\n<ul><li><b>Stored:</b> the script is saved on the site, e.g. in a comment, and hits everyone who views it.</li><li><b>Reflected:</b> the script is in a link; the page bounces it straight back to whoever clicks.</li><li><b>DOM-based:</b> the page's own JavaScript inserts the attacker's input unsafely.</li></ul>",
+   "options": [
+    "Stored XSS",
+    "Reflected XSS",
+    "DOM-based XSS",
+    "SQL-based XSS",
+    "Cookie-Injection XSS"
+   ],
+   "answer": [
+    0,
+    1,
+    2
+   ]
+  },
+  {
+   "topic": "W11",
+   "q": "A login form runs: <code>SELECT * FROM users WHERE username = &#x27;INPUT1&#x27; AND password = &#x27;INPUT2&#x27;</code>. Which username inputs are classic SQL injection attempts to bypass login?",
+   "why": "<p>The website pastes your input straight into its database question. Normal input asks \"is the username X and password Y?\".</p>\n<ul><li><b>(b)</b> The <code>&#x27;</code> closes the username early, then <code>OR &#x27;1&#x27;=&#x27;1&#x27;</code> adds a condition that is <i>always true</i>, so the check passes.</li><li><b>(d)</b> Same trick, and <code>--</code> marks the rest of the query (the password check) as a comment, so it's ignored.</li></ul>\n<p>(The solution PDF prints option d as <code>&#x27;OR 1=1 -</code>, a lost dash; the standard payload is <code>&#x27; OR 1=1 --</code>.) The fix for websites is to never paste user input directly into queries.</p>",
+   "options": [
+    "<code>admin</code>",
+    "<code>admin&#x27; OR &#x27;1&#x27;=&#x27;1</code>",
+    "<code>admin123</code>",
+    "<code>&#x27; OR 1=1 --</code>",
+    "<code>guest_user</code>"
+   ],
+   "answer": [
+    1,
+    3
+   ]
+  },
+  {
+   "topic": "W12",
+   "q": "In an ICMP Echo sweep, the scanner gets an ICMP Type 0 reply to a Type 8 request. What does that mean?",
+   "why": "<p>Type 8 = \"are you there?\" (Echo Request), Type 0 = \"yes!\" (Echo Reply). A reply means the host is up. This is the same idea as Week 4 Q3.</p>",
+   "options": [
+    "The target host is alive/up",
+    "The target host is down",
+    "The target port is filtered",
+    "The target host does not support ICMP"
+   ],
+   "answer": 0
+  },
+  {
+   "topic": "W12",
+   "q": "Which NMAP option(s) do a TCP-based sweep for host discovery?",
+   "why": "<p>This repeats Week 4 Q4. -PS (TCP <b>S</b>YN) and -PA (TCP <b>A</b>CK) use TCP. -PE and -PM use ICMP, and -PU uses UDP.</p>",
+   "options": [
+    "-PE",
+    "-PS",
+    "-PA",
+    "-PU",
+    "-PM"
+   ],
+   "answer": [
+    1,
+    2
+   ]
+  },
+  {
+   "topic": "W12",
+   "q": "Which are automatically performed with NMAP's -sn option?",
+   "why": "<p><code>-sn</code> checks which hosts are alive by default with a ping (ICMP Echo) plus TCP probes. It does not send UDP probes unless you ask.</p>",
+   "options": [
+    "ICMP Echo sweep",
+    "TCP sweep",
+    "UDP sweep",
+    "All of these"
+   ],
+   "answer": [
+    0,
+    1
+   ]
+  },
+  {
+   "topic": "W12",
+   "q": "Which NMAP option treats all hosts as online and skips host discovery?",
+   "why": "<p><code>-Pn</code> = <b>n</b>o ping. It's useful when a target blocks pings but is still really there, so NMAP goes straight to scanning its ports.</p>",
+   "options": [
+    "-sL",
+    "-sP",
+    "-PO",
+    "-sU",
+    "-Pn"
+   ],
+   "answer": 4
+  },
+  {
+   "topic": "W12",
+   "q": "Statement (i): -sn does host discovery only, no port scan. Statement (ii): -Pn skips host discovery and goes straight to port scanning.",
+   "why": "<p>They're opposites, and both statements describe them correctly. <code>-sn</code> = \"who's home?\" only. <code>-Pn</code> = \"assume they're home, check the doors\".</p>",
+   "options": [
+    "Only (i) is true",
+    "Only (ii) is true",
+    "Both (i) and (ii) are true",
+    "Both (i) and (ii) are false"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W12",
+   "q": "Which is/are true about NMAP's -F (fast scan) option?",
+   "why": "<p>A normal NMAP scan checks the 1000 most common ports. <code>-F</code> checks only the top <b>100</b>, so it's faster. That also makes (d) wrong: 1000 is the <i>default</i>, not -F.</p>",
+   "options": [
+    "Scans the top 100 most common ports",
+    "Scans all 65535 ports",
+    "Faster than a default scan because it checks fewer ports",
+    "Same as --top-ports 1000"
+   ],
+   "answer": [
+    0,
+    2
+   ]
+  },
+  {
+   "topic": "W12",
+   "q": "Which NMAP option does a UDP port scan?",
+   "why": "<p>-s<b>U</b> = <b>U</b>DP. All the others are TCP scans: T = connect, S = SYN, A = ACK, N = NULL.</p>",
+   "options": [
+    "-sT",
+    "-sS",
+    "-sU",
+    "-sA",
+    "-sN"
+   ],
+   "answer": 2
+  },
+  {
+   "topic": "W12",
+   "q": "Which scan completes the full TCP three-way handshake to find a port's state?",
+   "why": "<p>The <b>Connect</b> scan (-sT) makes a real, complete connection: SYN → SYN-ACK → ACK. The SYN scan stops halfway (Week 4 Q6). FIN, NULL and Xmas send odd flag combinations with no handshake at all.</p>",
+   "options": [
+    "TCP SYN scan",
+    "TCP Connect scan",
+    "FIN scan",
+    "NULL scan",
+    "Xmas scan"
+   ],
+   "answer": 1
+  },
+  {
+   "topic": "W12",
+   "q": "How many ports does <code>nmap --top-ports 20 target_ip</code> scan?",
+   "why": "<p><code>--top-ports N</code> scans exactly the N most common ports, so 20.</p>",
+   "numeric": {
+    "lo": 20,
+    "hi": 20,
+    "text": "20"
+   }
+  },
+  {
+   "topic": "W12",
+   "q": "How many IP addresses are covered by <code>nmap -sL 10.10.5.100-115</code>?",
+   "why": "<p>Count from 100 to 115 <b>including both ends</b>: 115 − 100 + 1 = <b>16</b>. A common mistake is answering 15 by forgetting the +1. (Strictly, <code>-sL</code> only <i>lists</i> the 16 targets without sending them anything.)</p>",
+   "numeric": {
+    "lo": 16,
+    "hi": 16,
+    "text": "16"
+   }
+  }
+ ]
+}
