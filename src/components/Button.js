@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 
 
-const Button = ({ id, label, content, backgroundColor, onToggle, passClass }) => {
-  const [isHidden, setIsHidden] = useState(true);
+const Button = ({ id, label, content, backgroundColor, onToggle, passClass, forceOpen }) => {
+  const [hidden, setIsHidden] = useState(true);
+  const isHidden = hidden && !forceOpen;
 
   const toggleContent = () => {
     setIsHidden(!isHidden);

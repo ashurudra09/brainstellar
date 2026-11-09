@@ -42,6 +42,7 @@ exports.createSchemaCustomization = ({ actions }) => {
     type MarkdownRemarkFrontmatter {
       open: [String]
       collapsed: [String]
+      answer: Int
     }
   `);
 };
@@ -134,36 +135,6 @@ exports.createPages = async function ({ actions, graphql }) {
       component: require.resolve(`./src/templates/domain.js`),
       context: { domain },
     });
-  });
-
-  // --- Legacy routes, quant only: the illustrated album grid and its
-  // category/difficulty list pages. Per-question aliases are gone -- quant's
-  // canonical question URL is /q/quant/{qid}, same as every other domain. ---
-  const puzzles = byDomain['quant'] || [];
-  const categories = Array.from(new Set(puzzles.map(node => node.frontmatter.category)));
-  const difficulties = Array.from(new Set(puzzles.map(node => node.frontmatter.difficulty)));
-
-  categories.forEach((category) => {
-    actions.createPage({
-      path: `puzzles/${category}`,
-      component: require.resolve(`./src/templates/legacy-list.js`),
-      context: { field: 'category', value: category },
-    });
-  });
-
-  difficulties.forEach((difficulty) => {
-    actions.createPage({
-      path: `puzzles/${difficulty}`,
-      component: require.resolve(`./src/templates/legacy-list.js`),
-      context: { field: 'difficulty', value: difficulty },
-    });
-  });
-
-  // extra homepage (album grid + full puzzle list), kept separate from the
-  // practice dashboard that now lives at `/`
-  actions.createPage({
-    path: `puzzles`,
-    component: require.resolve(`./src/templates/albums.js`),
   });
 
   data.cheatsheets.nodes.forEach(node => {

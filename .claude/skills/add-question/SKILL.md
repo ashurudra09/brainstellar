@@ -1,6 +1,6 @@
 ---
 name: add-question
-description: Add one or more new questions to this placement-prep dashboard (a Gatsby app under src/data/questions), across any of its ten domains (Quant Puzzles, DSA, SQL, LLD & OOP, HLD, OS & Networks, Data Science, AI/ML, Behavioural, Language-Specific) — classifying domain/difficulty/category, assigning the next qid (scoped per domain), and writing the markdown file in the section format that domain's template renders. Trigger this whenever the user invokes /add-question or /add-puzzle, or asks to "add a question", "add a puzzle", "add this to the site", "put this in brainstellar", or similar — whether the content was just discussed in the conversation or is being pasted in directly.
+description: Add one or more new questions to this placement-prep dashboard (a Gatsby app under src/data/questions), across any of its twelve domains (Quant Puzzles, Probability & Statistics, Aptitude, DSA, SQL, LLD & OOP, HLD, OS & Networks, Data Science, AI/ML, Behavioural, Language-Specific) — classifying domain/difficulty/category, assigning the next qid (scoped per domain), and writing the markdown file in the section format that domain's template renders. Trigger this whenever the user invokes /add-question or /add-puzzle, or asks to "add a question", "add a puzzle", "add this to the site", "put this in brainstellar", or similar — whether the content was just discussed in the conversation or is being pasted in directly.
 ---
 
 # Add Question
@@ -63,22 +63,31 @@ ids relate to each other (per domain).
 
 Read `src/data/domains.js` for the current list of domains (`slug`,
 `label`) — don't restate them here since the list can change. As of this
-writing there are ten: Quant Puzzles, DSA, SQL, LLD & OOP, HLD, OS &
-Networks, Data Science, AI/ML, Behavioural, Language-Specific.
+writing there are twelve: Quant Puzzles, Probability & Statistics,
+Aptitude, DSA, SQL, LLD & OOP, HLD, OS & Networks, Data Science, AI/ML,
+Behavioural, Language-Specific.
 
-Infer the domain from the content's shape: a brain-teaser/probability
-puzzle → `quant`; a data-structures-and-algorithms problem (arrays, trees,
+Infer the domain from the content's shape: a brain-teaser, or a
+probability question wrapped in a story → `quant`; a plain probability or
+statistics problem of the kind an OA asks (counting, Bayes, expectation,
+distributions, inference, mental maths) → `prob-stats`; an arithmetic,
+reasoning, puzzle or data-interpretation aptitude MCQ → `aptitude`; a data-structures-and-algorithms problem (arrays, trees,
 graphs, DP, ...) → `dsa`; a query-writing exercise over tables → `sql`;
 an object-design/design-patterns question, **or an OOP concept question**
 → `lld`; a system-design question → `hld`; a processes/memory/networking
-concept question → `os-networks`; a statistics/experiment-design/pandas
-question → `data-science`; an ML/DL/NLP/LLM question → `ai-ml`; a "tell me
+concept question → `os-networks`; an experiment-design/pandas/applied
+data question → `data-science`; an ML/DL/NLP/LLM question → `ai-ml`; a "tell me
 about a time..." / leadership / conflict story → `behavioural`; a question
 about how a specific language implements something, or a cross-language
 comparison → `language-specific`.
 
-Two tie-breaks, since they're the only ambiguous calls the above list
+Three tie-breaks, since they're the only ambiguous calls the above list
 introduces:
+- **Story vs plain, `quant` vs `prob-stats`: lean toward `quant`.** OA
+  probability questions are rarely veiled in an elaborate story, so a
+  probability question framed as a story ("a drunk passenger...", "a monkey
+  throws a die...") is a puzzle → `quant`/`probability`. Only a plainly
+  stated problem ("expected flips until HH?") goes to `prob-stats`.
 - **Names a language → `language-specific`**, even when the topic is OOP.
   "How does Python's MRO resolve diamond inheritance?" is
   `language-specific`/`python`; "what is the diamond problem?" is
@@ -144,9 +153,10 @@ fixing, not your invocation.
 It scans only `src/data/questions/{domain}/*.md` frontmatter and prints the
 next free id in that domain (max + 1). **qids are scoped per domain** —
 `dsa:1` and `quant:1` are different questions — so always pass `--domain`,
-and re-run per domain if a batch spans more than one. Quant continues from
-1034 (the pre-migration `puzzleId` sequence); every other domain starts
-fresh at 1 the first time a question is added to it.
+and re-run per domain if a batch spans more than one. `quant` and
+`prob-stats` both use numbers from the pre-migration `puzzleId` sequence
+(questions moved from `quant` to `prob-stats` kept their qids), so both
+continue above 1000; every other domain counts up from 1.
 
 For a batch of N questions in the *same* domain in one invocation, run the
 script once for that domain and assign `nextId, nextId+1, ..., nextId+N-1`
@@ -182,6 +192,21 @@ category: "{category}"
 - **Optional provenance** — add `source: "..."` and/or
   `companies: ["...", ...]` only when the user actually stated them in the
   conversation; never infer or invent a source. Omit both fields otherwise.
+- **`roles: [...]`, always** — the subset of `"swe"`, `"ds"`, `"aiml"`,
+  `"quant"` whose interviews or OAs ask this kind of question (in that
+  order). Like `source` and `companies`, it is back-end metadata for the
+  owner: nothing on the site queries or renders these three fields.
+
+### Multiple-choice questions
+
+An MCQ adds a `## Options` section right after `## Question` (a plain
+markdown list, one `- ` item per option, no nested lists) and a frontmatter
+`answer:` with the **0-based index** of the correct option. The question page
+shows the options as buttons; picking any one marks the question solved,
+colours it right/wrong and opens Answer and Solution. Put the correct option
+in `## Answer` as `**B.** text` and the reasoning in `## Solution`. If no
+listed option is correct (a misremembered reported question), leave out
+`answer:`: the options then render as a plain list and Answer says so.
 - **A per-file override**, if a question's own section split should differ
   from its domain's default, is a frontmatter `open: [...]` /
   `collapsed: [...]` array of section names. Use this rarely — most
@@ -215,10 +240,11 @@ For each question added, tell the user:
 Don't commit anything to git — leave that to the user, since new question
 content is exactly the kind of thing they'll want to read over first.
 
-## 7. Keep the two copies of this skill in sync
+## 7. Keep the copies of this skill in sync
 
-This skill exists twice: once in the site repo's own `.claude/skills/`, and
-once in the parent workspace's `.claude/skills/`. Whichever copy you
+This skill exists three times: in the site repo's own `.claude/skills/`,
+in `quant/.claude/skills/`, and in the top-level workspace's
+`.claude/skills/`. Whichever copy you
 loaded, any edit you make to `SKILL.md` or to `scripts/` must be mirrored
 to the other, or the next session will load the stale one. Check with:
 

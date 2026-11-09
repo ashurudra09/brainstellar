@@ -52,7 +52,6 @@ Networks, Data Science, AI/ML, Behavioural, Language-Specific.
 | `/q/{domain}/{qid}` | A single question |
 | `/cheatsheets` | Cheatsheet index |
 | `/cheatsheets/{slug}` | A single cheatsheet |
-| `/puzzles`, `/puzzles/{category}`, `/puzzles/{difficulty}` | Quant's original illustrated album grid and category/difficulty list pages — still live as navigation, not aliases. The old per-question alias URLs under `/puzzles/` (`/puzzles/{qid}`, `/puzzles/{category}/{qid}`, `/puzzles/{difficulty}/{qid}`) were removed; quant's question pages now live at `/q/quant/{qid}` like every other domain's. |
 
 ## Progress tracking
 
